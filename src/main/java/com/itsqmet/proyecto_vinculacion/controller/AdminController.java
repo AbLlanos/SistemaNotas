@@ -1,8 +1,5 @@
 package com.itsqmet.proyecto_vinculacion.controller;
 
-import com.itsqmet.proyecto_vinculacion.entity.Curso;
-import com.itsqmet.proyecto_vinculacion.entity.Estudiante;
-import com.itsqmet.proyecto_vinculacion.entity.Materia;
 import com.itsqmet.proyecto_vinculacion.entity.Notas;
 import com.itsqmet.proyecto_vinculacion.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,7 @@ public class AdminController {
 
 
     //1. Sistema de notas
+
     @GetMapping("/pages/Admin/vistaAdmin")
     public String vistaAdmin(
             @RequestParam(required = false) String nombrePeriodo,
@@ -58,6 +56,7 @@ public class AdminController {
 
         return "pages/Admin/vistaAdmin";
     }
+
 
 
 

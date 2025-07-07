@@ -19,6 +19,9 @@ public class ConfiguracionSeguridad {
                         .requestMatchers("/", "/index",
                                 "/login",
                                 "/css/**", "/js/**", "/imagenes/**").permitAll()
+
+                        .requestMatchers("/pages/Admin/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

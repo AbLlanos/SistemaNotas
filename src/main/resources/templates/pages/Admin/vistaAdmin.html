@@ -41,11 +41,11 @@
 
 
 
-
+<!--Seccion para nivel Inicial -->
 
 <div class="max-w-7xl mx-auto bg-white p-8 rounded-lg shadow-md">
     <h1 class="text-3xl font-bold mb-8 text-blue-700">Listado de Notas</h1>
-
+    <h1 class="text-3xl font-bold mb-8 text-blue-700">Nivel Inicial </h1>
     <!-- Formulario de filtros -->
     <form method="get" action="/pages/Admin/vistaAdmin" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
@@ -206,6 +206,413 @@
 
 
 </div>
+
+
+
+
+
+<!--Seccion para Educación Básica General -->
+
+<div class="max-w-7xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold mb-8 text-blue-700">Listado de Notas</h1>
+    <h1 class="text-3xl font-bold mb-8 text-blue-700">Educación Básica General </h1>
+    <!-- Formulario de filtros -->
+    <form method="get" action="/pages/Admin/vistaAdmin" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+        <!-- Nivel Educativo -->
+        <div>
+            <label for="nombreNivel" class="block mb-2 font-semibold text-gray-700">Nivel Educativo</label>
+            <select id="nombreNivel" name="nombreNivel"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Nivel Educativo --</option>
+                <option th:each="nivel : ${nivelesEducativos}"
+                        th:value="${nivel.nombre}"
+                        th:text="${nivel.nombre}"
+                        th:selected="${nivel.nombre == param.nombreNivel}">
+                </option>
+            </select>
+        </div>
+
+        <!--Perido academico-->
+        <div>
+            <label for="nombrePeriodo" class="block mb-2 font-semibold text-gray-700">Periodo acádemico</label>
+            <select id="nombrePeriodo" name="nombrePeriodo"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione el periodo académico --</option>
+                <option th:each="periodo : ${aniosLectivos}"
+                        th:value="${periodo.nombre}"
+                        th:text="${periodo.nombre}"
+                        th:selected="${periodo.nombre == param.nombrePeriodo}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Curso -->
+        <div>
+            <label for="nombreCurso" class="block mb-2 font-semibold text-gray-700">Curso</label>
+            <select id="nombreCurso" name="nombreCurso"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Curso --</option>
+                <option th:each="curso : ${cursos}"
+                        th:value="${curso.nombre}"
+                        th:text="${curso.nombre}"
+                        th:selected="${curso.nombre == param.nombreCurso}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Materia -->
+        <div>
+            <label for="nombreMateria" class="block mb-2 font-semibold text-gray-700">Materia</label>
+            <select id="nombreMateria" name="nombreMateria"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Materia --</option>
+                <option th:each="materia : ${materias}"
+                        th:value="${materia.nombre}"
+                        th:text="${materia.nombre}"
+                        th:selected="${materia.nombre == param.nombreMateria}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Cédula Estudiante -->
+        <div>
+            <label for="cedula" class="block mb-2 font-semibold text-gray-700">Cédula Estudiante</label>
+            <input
+                    type="text"
+                    id="cedula"
+                    name="cedula"
+                    th:value="${param.cedula}"
+                    placeholder="Ej: 1234567890"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+        </div>
+
+        <!-- Semestre / Trimestre -->
+        <div>
+            <label for="nombreTrimestre" class="block mb-2 font-semibold text-gray-700">Semestre</label>
+            <select id="nombreTrimestre" name="nombreTrimestre"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Semestre --</option>
+                <option th:each="trimestre : ${trimestres}"
+                        th:value="${trimestre.nombre}"
+                        th:text="${trimestre.nombre}"
+                        th:selected="${trimestre.nombre == param.nombreTrimestre}">
+                </option>
+            </select>
+        </div>
+
+        <div class="md:col-span-4 text-right">
+            <button
+                    type="submit"
+                    class="px-6 py-2 bg-blue-700 text-white font-semibold rounded hover:bg-blue-800 transition"
+            >
+                Filtrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Tabla de resultados -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+            <thead class="bg-blue-700 text-white">
+            <tr>
+                <th class="text-left px-4 py-2">Nivel Educativo</th>
+                <th class="text-left px-4 py-2">Estudiante</th>
+                <th class="text-left px-4 py-2">Cédula</th>
+                <th class="text-left px-4 py-2">Curso</th>
+                <th class="text-left px-4 py-2">Materia</th>
+                <th class="text-left px-4 py-2">Periodo Académico</th>
+                <th class="text-left px-4 py-2">Trimestre</th>
+                <th class="text-left px-4 py-2">Deber</th>
+                <th class="text-left px-4 py-2">Taller</th>
+                <th class="text-left px-4 py-2">Pruebas</th>
+                <th class="text-left px-4 py-2">Participación</th>
+                <th class="text-left px-4 py-2">Examen</th>
+                <th class="text-left px-4 py-2">Nota Final</th>
+                <th class="text-left px-4 py-2">Recuperación</th>
+                <th class="text-left px-4 py-2">Editar</th>
+                <th class="text-left px-4 py-2">Eliminar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="nota : ${notas}" class="even:bg-gray-50 odd:bg-white hover:bg-gray-100">
+                <td class="px-4 py-2" th:text="${nota.materia.curso.nivelEducativo.nombre}">Bachillerato General</td>
+                <td class="px-4 py-2" th:text="${nota.estudiante.nombre}">Nombre Estudiante</td>
+                <td class="px-4 py-2" th:text="${nota.estudiante.cedula}">1234567890</td>
+                <td class="px-4 py-2" th:text="${nota.materia.curso.nombre}">3ro</td>
+                <td class="px-4 py-2" th:text="${nota.materia.nombre}">Matemáticas</td>
+                <td class="px-4 py-2" th:text="${nota.periodoAcademico.nombre}">Mayo 2024</td>
+                <td class="px-4 py-2" th:text="${nota.trimestre.nombre}">Primero</td>
+                <td class="px-4 py-2" th:text="${nota.deber}">7.0</td>
+                <td class="px-4 py-2" th:text="${nota.taller}">8.0</td>
+                <td class="px-4 py-2" th:text="${nota.pruebas}">0.0</td>
+                <td class="px-4 py-2" th:text="${nota.participacion}">8.5</td>
+                <td class="px-4 py-2" th:text="${nota.examen}">9.5</td>
+                <td class="px-4 py-2" th:text="${nota.notaTotal}">8.25</td>
+                <td class="px-4 py-2" th:text="${nota.recuperacion}">0.0</td>
+                <td class="px-4 py-2">
+                    <a th:href="@{'/notas/editar/' + ${nota.id}}" class="text-blue-600 hover:underline">Editar</a>
+                </td>
+                <td class="px-4 py-2">
+                    <form th:action="@{'/notas/eliminar/' + ${nota.id}}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta nota?')">
+                        <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${notas == null or #lists.isEmpty(notas)}">
+                <td class="px-4 py-2 text-center" colspan="15">No se encontraron notas.</td>
+            </tr>
+            </tbody>
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+<!--Seccion para Bachillerato General Unificado -->
+
+<div class="max-w-7xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold mb-8 text-blue-700">Listado de Notas</h1>
+    <h1 class="text-3xl font-bold mb-8 text-blue-700">Bachillerato General Unificado </h1>
+    <!-- Formulario de filtros -->
+    <form method="get" action="/pages/Admin/vistaAdmin" class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+        <!-- Nivel Educativo -->
+        <div>
+            <label for="nombreNivel" class="block mb-2 font-semibold text-gray-700">Nivel Educativo</label>
+            <select id="nombreNivel" name="nombreNivel"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Nivel Educativo --</option>
+                <option th:each="nivel : ${nivelesEducativos}"
+                        th:value="${nivel.nombre}"
+                        th:text="${nivel.nombre}"
+                        th:selected="${nivel.nombre == param.nombreNivel}">
+                </option>
+            </select>
+        </div>
+
+        <!--Perido academico-->
+        <div>
+            <label for="nombrePeriodo" class="block mb-2 font-semibold text-gray-700">Periodo acádemico</label>
+            <select id="nombrePeriodo" name="nombrePeriodo"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione el periodo académico --</option>
+                <option th:each="periodo : ${aniosLectivos}"
+                        th:value="${periodo.nombre}"
+                        th:text="${periodo.nombre}"
+                        th:selected="${periodo.nombre == param.nombrePeriodo}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Curso -->
+        <div>
+            <label for="nombreCurso" class="block mb-2 font-semibold text-gray-700">Curso</label>
+            <select id="nombreCurso" name="nombreCurso"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Curso --</option>
+                <option th:each="curso : ${cursos}"
+                        th:value="${curso.nombre}"
+                        th:text="${curso.nombre}"
+                        th:selected="${curso.nombre == param.nombreCurso}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Materia -->
+        <div>
+            <label for="nombreMateria" class="block mb-2 font-semibold text-gray-700">Materia</label>
+            <select id="nombreMateria" name="nombreMateria"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Materia --</option>
+                <option th:each="materia : ${materias}"
+                        th:value="${materia.nombre}"
+                        th:text="${materia.nombre}"
+                        th:selected="${materia.nombre == param.nombreMateria}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Cédula Estudiante -->
+        <div>
+            <label for="cedula" class="block mb-2 font-semibold text-gray-700">Cédula Estudiante</label>
+            <input
+                    type="text"
+                    id="cedula"
+                    name="cedula"
+                    th:value="${param.cedula}"
+                    placeholder="Ej: 1234567890"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+        </div>
+
+        <!-- Semestre / Trimestre -->
+        <div>
+            <label for="nombreTrimestre" class="block mb-2 font-semibold text-gray-700">Semestre</label>
+            <select id="nombreTrimestre" name="nombreTrimestre"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                <option value="">-- Seleccione Semestre --</option>
+                <option th:each="trimestre : ${trimestres}"
+                        th:value="${trimestre.nombre}"
+                        th:text="${trimestre.nombre}"
+                        th:selected="${trimestre.nombre == param.nombreTrimestre}">
+                </option>
+            </select>
+        </div>
+
+        <div class="md:col-span-4 text-right">
+            <button
+                    type="submit"
+                    class="px-6 py-2 bg-blue-700 text-white font-semibold rounded hover:bg-blue-800 transition"
+            >
+                Filtrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Tabla de resultados -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+            <thead class="bg-blue-700 text-white">
+            <tr>
+                <th class="text-left px-4 py-2">Nivel Educativo</th>
+                <th class="text-left px-4 py-2">Estudiante</th>
+                <th class="text-left px-4 py-2">Cédula</th>
+                <th class="text-left px-4 py-2">Curso</th>
+                <th class="text-left px-4 py-2">Materia</th>
+                <th class="text-left px-4 py-2">Periodo Académico</th>
+                <th class="text-left px-4 py-2">Trimestre</th>
+                <th class="text-left px-4 py-2">Deber</th>
+                <th class="text-left px-4 py-2">Taller</th>
+                <th class="text-left px-4 py-2">Pruebas</th>
+                <th class="text-left px-4 py-2">Participación</th>
+                <th class="text-left px-4 py-2">Examen</th>
+                <th class="text-left px-4 py-2">Nota Final</th>
+                <th class="text-left px-4 py-2">Recuperación</th>
+                <th class="text-left px-4 py-2">Editar</th>
+                <th class="text-left px-4 py-2">Eliminar</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="nota : ${notas}" class="even:bg-gray-50 odd:bg-white hover:bg-gray-100">
+                <td class="px-4 py-2" th:text="${nota.materia.curso.nivelEducativo.nombre}">Bachillerato General</td>
+                <td class="px-4 py-2" th:text="${nota.estudiante.nombre}">Nombre Estudiante</td>
+                <td class="px-4 py-2" th:text="${nota.estudiante.cedula}">1234567890</td>
+                <td class="px-4 py-2" th:text="${nota.materia.curso.nombre}">3ro</td>
+                <td class="px-4 py-2" th:text="${nota.materia.nombre}">Matemáticas</td>
+                <td class="px-4 py-2" th:text="${nota.periodoAcademico.nombre}">Mayo 2024</td>
+                <td class="px-4 py-2" th:text="${nota.trimestre.nombre}">Primero</td>
+                <td class="px-4 py-2" th:text="${nota.deber}">7.0</td>
+                <td class="px-4 py-2" th:text="${nota.taller}">8.0</td>
+                <td class="px-4 py-2" th:text="${nota.pruebas}">0.0</td>
+                <td class="px-4 py-2" th:text="${nota.participacion}">8.5</td>
+                <td class="px-4 py-2" th:text="${nota.examen}">9.5</td>
+                <td class="px-4 py-2" th:text="${nota.notaTotal}">8.25</td>
+                <td class="px-4 py-2" th:text="${nota.recuperacion}">0.0</td>
+                <td class="px-4 py-2">
+                    <a th:href="@{'/notas/editar/' + ${nota.id}}" class="text-blue-600 hover:underline">Editar</a>
+                </td>
+                <td class="px-4 py-2">
+                    <form th:action="@{'/notas/eliminar/' + ${nota.id}}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta nota?')">
+                        <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${notas == null or #lists.isEmpty(notas)}">
+                <td class="px-4 py-2 text-center" colspan="15">No se encontraron notas.</td>
+            </tr>
+            </tbody>
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+<div>
+    <h1>Añadir Docente</h1>
+    <p>Te permite añadir docente</p>
+    <a th:href="@{/pages/Admin/docenteVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+<div>
+    <h1>Añadir Estudiante</h1>
+    <p>Te permite añadir estudiantes</p>
+    <a th:href="@{/pages/Admin/estudianteVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+<div>
+    <h1>Añadir Curso</h1>
+    <p>Te permite crear cursos</p>
+    <a th:href="@{/pages/Admin/cursoVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+<div>
+    <h1>Añadir Materia</h1>
+    <p>Te permite añadir materias</p>
+    <a th:href="@{/pages/Admin/materiaVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+<div>
+    <h1>Añadir Trimeste</h1>
+    <p>Te permite añadir trmestres</p>
+    <a th:href="@{/pages/Admin/trimestreVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+<div>
+    <h1>Añadir Periodos academicos</h1>
+    <p>Te permite añadir  Periodos academicos</p>
+    <a th:href="@{/pages/Admin/periodoAcademicoVista}">
+        <button type="button"
+                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
+            Ir
+        </button>
+    </a>
+</div>
+
+
+
+
+
+
+
+
+
 
 </body>
 </html>
