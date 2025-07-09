@@ -9,8 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface DocenteRepository extends JpaRepository <Docente, Long> {
-   Optional <Docente> findByCedula(String cedula);
+
+    Optional <Docente> findById(Long id);
     List <Docente> findByNombreContainingIgnoreCase(String nombre);
-    Optional <Docente> findById(Long id); //buscar por id
+    List<Docente> findByCedulaContainingIgnoreCase(String cedula);
+    List<Docente> findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(String nombre, String cedula);
 
 }

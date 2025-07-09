@@ -22,20 +22,35 @@ public class DocenteService {
         return docenteRepository.findAll();
     }
 
-    //Buscar docente por ID
-    public Optional<Docente> buscarDocenteId(Long id){
-        return  docenteRepository.findById(id);
-    }
-    //Buscar docente por cedula
-    public Optional<Docente> buscarDocenteCedula(String cedula){
-        return docenteRepository.findByCedula(cedula);
-    }
     //Guardar docente
     public  Docente guardarDocente(Docente docente){
         return docenteRepository.save(docente);
     }
+
     //Eliminar el docente
     public void eliminarDocente(Long id){
         docenteRepository.deleteById(id);
     }
+
+    //Buscar docente por ID
+    public Optional<Docente> buscarDocenteId(Long id){
+        return  docenteRepository.findById(id);
+    }
+
+    //Buscar docente por Nombre
+    public List<Docente> buscarPorNombre(String nombre) {
+        return docenteRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+    //Buscar docente por Cédula
+    public List<Docente> buscarPorCedula(String cedula) {
+        return docenteRepository.findByCedulaContainingIgnoreCase(cedula);
+    }
+
+    //Buscar docente con dos filtros
+    public List<Docente> buscarPorNombreYCedula(String nombre, String cedula) {
+        return docenteRepository.findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(nombre, cedula);
+    }
+
+
 }
