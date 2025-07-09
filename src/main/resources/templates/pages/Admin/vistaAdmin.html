@@ -539,71 +539,81 @@
 </div>
 
 
-<div>
-    <h1>Añadir Docente</h1>
-    <p>Te permite añadir docente</p>
-    <a th:href="@{/pages/Admin/docenteVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
+
+<div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
+    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">📚 Panel de Gestión Académica</h2>
+
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">👨‍🏫 Añadir Docente</h3>
+            <p class="text-gray-600 mb-4 text-sm">Registro de nuevos docentes en el sistema académico</p>
+            <a th:href="@{/pages/Admin/docenteVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">🎓 Añadir Estudiante</h3>
+            <p class="text-gray-600 mb-4 text-sm">Inscripción de nuevos estudiantes en la plataforma</p>
+            <a th:href="@{/pages/Admin/estudianteVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">📘 Añadir Curso</h3>
+            <p class="text-gray-600 mb-4 text-sm">Creación de cursos académicos con asignaturas vinculadas</p>
+            <a th:href="@{/pages/Admin/cursoVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">📚 Añadir Materia</h3>
+            <p class="text-gray-600 mb-4 text-sm">Registro de asignaturas para distintos niveles académicos</p>
+            <a th:href="@{/pages/Admin/materiaVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">🗓️ Añadir Trimestre</h3>
+            <p class="text-gray-600 mb-4 text-sm">Organización temporal de los contenidos por ciclos</p>
+            <a th:href="@{/pages/Admin/trimestreVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-indigo-700 mb-1">📆 Añadir Periodos Académicos</h3>
+            <p class="text-gray-600 mb-4 text-sm">Gestión anual o semestral del calendario institucional</p>
+            <a th:href="@{/pages/Admin/periodoAcademicoVista}">
+                <button
+                        class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
+                    Ir
+                </button>
+            </a>
+        </div>
+
+    </div>
 </div>
 
-<div>
-    <h1>Añadir Estudiante</h1>
-    <p>Te permite añadir estudiantes</p>
-    <a th:href="@{/pages/Admin/estudianteVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
-
-<div>
-    <h1>Añadir Curso</h1>
-    <p>Te permite crear cursos</p>
-    <a th:href="@{/pages/Admin/cursoVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
-
-<div>
-    <h1>Añadir Materia</h1>
-    <p>Te permite añadir materias</p>
-    <a th:href="@{/pages/Admin/materiaVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
-
-<div>
-    <h1>Añadir Trimeste</h1>
-    <p>Te permite añadir trmestres</p>
-    <a th:href="@{/pages/Admin/trimestreVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
-
-<div>
-    <h1>Añadir Periodos academicos</h1>
-    <p>Te permite añadir  Periodos academicos</p>
-    <a th:href="@{/pages/Admin/periodoAcademicoVista}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
 
 
 
