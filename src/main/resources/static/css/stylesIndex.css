@@ -1,0 +1,48 @@
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #3b82f6, #1e40af, #1e3a8a);
+}
+
+.glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.glass-card {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.contact-card {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.decorative-circle {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}

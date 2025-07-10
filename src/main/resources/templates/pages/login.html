@@ -2,60 +2,65 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+    <link rel="stylesheet" href="/css/styleslogin.css">
     <style>
         @import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css')
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Iniciar sesión</title>
 </head>
 <body>
-
-
-<div>
-
-    <div>
-        <div>
-
-            <!-- Formulario -->
-            <div>
-                <div>
-                    <h1>Iniciar Sesión</h1>
-                    <p>Ingrese su correo electrónico y contraseña</p>
-                </div>
-
-                <div th:if="${param.logout}">
-                    <p>¡Has cerrado sesión exitosamente!</p>
-                </div>
-
-                <div th:if="${param.error}">
-                    <p>Usuario o contraseña incorrectos</p>
-                </div>
-
-                <form th:action="@{/login}" method="post">
-                    <div>
-                        <label for="username">Email</label>
-                        <div>
-                            <input type="email" id="username" name="username" placeholder="Ingrese su correo electrónico">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="password">Contraseña</label>
-                        <div>
-                            <input type="password" id="password" name="password" placeholder="Ingrese su contraseña">
-                        </div>
-                    </div>
-
-                    <div>
-                        <button type="submit">Iniciar Sesión</button>
-                    </div>
-                </form>
-            </div>
+<div class="main-container">
+    <!-- Contenedor del Logo -->
+    <div class="logo-container">
+        <div class="logo">
+            <img src="/images/logo.png" alt="Logo Institución">
         </div>
+        <h2>Unidad Educativa Banalcázar</h2>
+        <p>Educación personalizada y de alta calidad</p>
+    </div>
+
+    <!-- Contenedor del Login -->
+    <div class="login-container">
+        <div class="login-header">
+            <h1>Iniciar Sesión</h1>
+            <p>Ingrese su correo electrónico y contraseña</p>
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            <p>¡Has cerrado sesión exitosamente!</p>
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-error">
+            <p>Usuario o contraseña incorrectos</p>
+        </div>
+
+        <form th:action="@{/login}" method="post" class="login-form">
+            <div class="form-group">
+                <label for="username" class="form-label">Email</label>
+                <div class="input-container">
+                    <input type="email" id="username" name="username"
+                           placeholder="Ingrese su correo electrónico"
+                           class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-container">
+                    <input type="password" id="password" name="password"
+                           placeholder="Ingrese su contraseña"
+                           class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="login-button">Iniciar Sesión</button>
+            </div>
+        </form>
     </div>
 </div>
-
 </body>
 </html>
