@@ -1,19 +1,87 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-    <style>
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css')
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Añadir curso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Curso</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-<h1>Form para añadir cursos</h1>
+<body class="bg-gradient-to-br from-purple-50 to-purple-100 min-h-screen">
 
+<nav class="bg-blue-700 p-6">
+    <div class="container mx-auto flex flex-wrap items-center justify-between">
+        <span class="text-white font-bold text-3xl">Curso</span>
+        <a th:href="@{/pages/Admin/cursoVista}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
+            Regresar
+        </a>
+    </div>
+</nav>
 
+<section class="flex justify-center mt-10 px-4 pb-5">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10">
+        <div class="mb-8 text-center">
+            <h2 class="text-4xl font-extrabold text-blue-800 mb-2">Registro de Curso</h2>
+            <p class="text-gray-500">Por favor, completa todos los campos para registrar un nuevo curso.</p>
+        </div>
+
+        <form th:action="@{/guardarCurso}" method="post" th:object="${curso}" class="space-y-6">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="space-y-6">
+                <!-- Campo Nombre -->
+                <div>
+                    <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Curso</label>
+                    <input type="text" id="nombre" th:field="*{nombre}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                           placeholder="Ej: Primer Año de Básica" />
+                </div>
+
+                <!-- Campo Nivel Educativo -->
+                <div>
+                    <label for="nivelEducativo" class="block text-sm font-semibold text-gray-700 mb-1">Nivel Educativo</label>
+                    <select id="nivelEducativo" th:field="*{nivelEducativo.id}" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                        <option value="">Seleccione un nivel educativo</option>
+                        <option th:each="nivel : ${nivelesEducativos}"
+                                th:value="${nivel.id}"
+                                th:text="${nivel.nombre}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Campo Materias -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Materias del Curso</label>
+                    <div class="border border-gray-300 rounded-lg p-4 max-h-40 overflow-y-auto">
+                        <div th:each="materia : ${materias}" class="flex items-center mb-2">
+                            <input type="checkbox"
+                                   th:id="'materia_' + ${materia.id}"
+                                   th:value="${materia.id}"
+                                   name="materiasSeleccionadas"
+                                   class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                            <label th:for="'materia_' + ${materia.id}"
+                                   th:text="${materia.nombre}"
+                                   class="text-sm text-gray-700 cursor-pointer">
+                            </label>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Seleccione las materias que pertenecen a este curso</p>
+                </div>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+                    Registrar Curso
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.js"></script>
+</body>
+</html>
 
 </body>
 </html>
