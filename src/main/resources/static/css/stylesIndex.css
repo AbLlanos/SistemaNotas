@@ -1,48 +1,332 @@
-.card-hover {
-    transition: all 0.3s ease;
-}
+ /* --- Root Variables for Professional Theme --- */
+        :root {
+            --primary-navy: #1A2F4B;        /* Deep, academic navy */
+            --secondary-blue: #2E4B7C;      /* Richer, supportive blue */
+            --tertiary-gray: #E0E6EE;       /* Light, clean background gray */
+            --text-dark: #333333;           /* Standard body text color */
+            --text-light: #F8F8F8;          /* Light text on dark backgrounds */
+            --accent-gold: #C0A46F;         /* Subtle, elegant gold accent */
+            --border-color: rgba(0, 0, 0, 0.08); /* Lighter, crisp border */
+            --shadow-subtle: rgba(0, 0, 0, 0.06); /* Even lighter shadows */
+            --shadow-medium: rgba(0, 0, 0, 0.12); /* Adjusted medium shadow */
+            --shadow-heavy: rgba(0, 0, 0, 0.25);  /* Slightly less harsh heavy shadow */
+        }
 
-.card-hover:hover {
-    transform: scale(1.05);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-blue) 100%);
+            background-attachment: fixed;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 50px; /* Reduced space from top */
+            padding-bottom: 50px; /* Reduced space at bottom */
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
 
-.gradient-bg {
-    background: linear-gradient(135deg, #3b82f6, #1e40af, #1e3a8a);
-}
+        /* --- Main Container: Adjusted for smaller view --- */
+        .main-container {
+            background-color: var(--text-light);
+            border-radius: 12px; /* Slightly smaller border-radius */
+            box-shadow: 0 15px 40px var(--shadow-heavy); /* Slightly smaller shadow */
+            padding: 40px 50px; /* Reduced internal padding */
+            max-width: 800px; /* Significantly reduced max-width */
+            width: 90%;
+            text-align: center;
+            animation: fadeInSlideUp 0.9s ease-out forwards;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
 
-.glass-effect {
-    backdrop-filter: blur(10px);
-    background: rgba(0, 0, 0, 0.8);
-}
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.glass-card {
-    backdrop-filter: blur(10px);
-    background: rgba(0, 0, 0, 0.9);
-}
+        /* --- Header: Scaled down --- */
+        .header-section {
+            background-color: var(--primary-navy);
+            color: var(--text-light);
+            padding: 20px 40px; /* Reduced padding */
+            border-radius: 8px; /* Slightly smaller border-radius */
+            margin-bottom: 50px; /* Reduced separation */
+            box-shadow: 0 5px 20px var(--shadow-medium);
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
 
-.contact-card {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-}
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
+            z-index: 0;
+        }
 
-.animate-float {
-    animation: float 6s ease-in-out infinite;
-}
+        .header-section h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem; /* Reduced font size */
+            font-weight: 700;
+            letter-spacing: 1.5px; /* Reduced letter spacing */
+            margin: 0;
+            text-transform: uppercase;
+            color: var(--text-light);
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4); /* Slightly smaller text shadow */
+            position: relative;
+            z-index: 1;
+        }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
+        /* --- Content Grid: Adjusted spacing --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Adjusted min-width for cards */
+            gap: 30px; /* Reduced space between cards */
+            margin-top: 40px; /* Reduced space from header */
+        }
 
-.decorative-circle {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(40px);
-    animation: pulse 4s ease-in-out infinite;
-}
+        /* --- Information Cards: Smaller footprint --- */
+        .info-card {
+            background-color: var(--tertiary-gray);
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* Slightly smaller border-radius */
+            padding: 30px; /* Reduced internal padding */
+            box-shadow: 0 8px 25px var(--shadow-subtle);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.35s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 280px; /* Reduced consistent height for cards */
+            position: relative;
+            overflow: hidden;
+        }
 
-@keyframes pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.7; }
-}
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.03);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .info-card:hover::before {
+            opacity: 1;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px); /* Slightly less pronounced lift */
+            box-shadow: 0 12px 35px var(--shadow-medium);
+            background-color: #DDE2E8;
+        }
+
+        .card-icon {
+            width: 90px; /* Reduced icon size */
+            height: 90px;
+            margin-bottom: 30px; /* Reduced margin */
+            color: var(--secondary-blue);
+            font-size: 3.8rem; /* Reduced icon font size */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+
+        .info-card:hover .card-icon {
+            color: var(--primary-navy);
+        }
+
+        /* --- Buttons: Proportionately smaller --- */
+        .button {
+            background: linear-gradient(90deg, var(--secondary-blue), var(--primary-navy));
+            color: var(--text-light);
+            padding: 16px 35px; /* Reduced padding */
+            border: none;
+            border-radius: 8px; /* Slightly smaller border-radius */
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1.05rem; /* Reduced font size */
+            font-weight: 600;
+            letter-spacing: 0.7px; /* Reduced letter spacing */
+            cursor: pointer;
+            transition: all 0.3s ease-out;
+            margin-top: 30px; /* Reduced margin */
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px var(--shadow-subtle);
+            position: relative;
+            overflow: hidden;
+            outline: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            transform: skewX(-20deg);
+            transition: transform 0.4s ease-out;
+        }
+
+        .button:hover::before {
+            transform: skewX(-20deg) translateX(200%);
+        }
+
+        .button:hover {
+            background: linear-gradient(90deg, var(--primary-navy), var(--secondary-blue));
+            transform: translateY(-3px); /* Slightly less pronounced lift */
+            box-shadow: 0 6px 20px var(--shadow-medium); /* Slightly smaller shadow */
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 8px var(--shadow-subtle);
+            background: var(--primary-navy);
+        }
+
+        .button:focus-visible {
+            box-shadow: 0 0 0 3px var(--accent-gold), 0 4px 15px var(--shadow-subtle);
+        }
+
+        /* --- Contact Information: More compact --- */
+        .contact-info-section {
+            background-color: var(--primary-navy);
+            color: var(--text-light);
+            border-radius: 10px; /* Slightly smaller border-radius */
+            padding: 25px 40px; /* Reduced padding */
+            margin-top: 60px; /* Reduced vertical separation */
+            box-shadow: 0 8px 25px var(--shadow-medium);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px; /* Reduced space between contact items */
+            font-size: 1rem; /* Reduced font size */
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px; /* Reduced space between icon and text */
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .contact-item:hover {
+            color: var(--accent-gold);
+        }
+
+        .contact-item i {
+            color: var(--accent-gold);
+            font-size: 1.3rem; /* Reduced icon size */
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .contact-item:hover i {
+            transform: scale(1.08); /* Slightly less pronounced icon grow */
+            color: #FFD700;
+        }
+
+        /* --- Responsive Adjustments for Smaller Views --- */
+        @media (max-width: 992px) {
+            .main-container {
+                padding: 35px 45px;
+            }
+            .header-section h1 {
+                font-size: 2.2rem;
+            }
+            .content-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+            .button {
+                font-size: 0.95rem;
+                padding: 14px 30px;
+            }
+            .info-card {
+                padding: 28px;
+                min-height: 240px;
+            }
+            .card-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 30px;
+                padding-bottom: 30px;
+            }
+            .main-container {
+                padding: 30px 35px;
+                width: 95%;
+            }
+            .header-section {
+                padding: 18px 30px;
+                margin-bottom: 40px;
+            }
+            .header-section h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            .button {
+                font-size: 0.9rem;
+                padding: 12px 28px;
+            }
+            .contact-info-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 20px 30px;
+            }
+            .contact-item {
+                font-size: 0.95rem;
+                gap: 8px;
+            }
+            .contact-item i {
+                font-size: 1.1rem;
+            }
+            .card-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 20px 20px;
+            }
+            .header-section h1 {
+                font-size: 1.4rem;
+            }
+            .button {
+                font-size: 0.8rem;
+                padding: 10px 22px;
+            }
+            .contact-info-section {
+                align-items: center;
+                gap: 15px;
+            }
+        }
