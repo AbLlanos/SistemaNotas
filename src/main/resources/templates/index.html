@@ -1,131 +1,45 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-    <style>
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css');
-    </style>
-    <link rel="stylesheet" href="/css/stylesIndex.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unidad Educativa Banalcazar</title>
+    <link rel="stylesheet" href="/css/stylesIndex.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
-<body class="gradient-bg min-h-screen">
+<body>
 
-<!-- Decorative background elements -->
-<div class="decorative-circle w-20 h-20 bg-white/10 top-10 left-10"></div>
-<div class="decorative-circle w-32 h-32 bg-cyan-300/20 bottom-10 right-10"></div>
-<div class="decorative-circle w-16 h-16 bg-blue-300/20 top-1/2 left-1/4"></div>
+<div class="main-container">
+    <div class="header-section">
+        <h1>Unidad Educativa Banalcazar</h1>
+    </div>
 
-<!-- Main Container -->
-<div class="min-h-screen p-6">
-    <div class="max-w-4xl mx-auto">
-
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="glass-effect rounded-full px-8 py-4 inline-block mb-8 shadow-2xl animate-float">
-                <h1 class="text-white text-2xl font-bold tracking-wide">
-                    Unidad Educativa Banalcazar
-                </h1>
-            </div>
+    <div class="content-grid">
+        <div class="info-card">
+            <i class="fas fa-book-reader card-icon"></i>
+            <button class="button">Manual de usuario</button>
         </div>
 
-        <!-- Main Cards Section -->
-        <div class="grid md:grid-cols-2 gap-8 mb-12">
-
-            <!-- Manual de usuario Card -->
-            <div class="glass-card rounded-3xl p-8 shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-blue-500/25">
-                <div class="bg-white rounded-2xl p-8 mb-6 shadow-lg">
-                    <div class="flex justify-center">
-                        <img
-                                src="/images/logo.png"
-                                alt="Logo Universidad"
-                                class="w-100 h-100 object-contain filter drop-shadow-lg card-hover"
-                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                        />
-                        <!-- Fallback logo -->
-                        <div class="w-32 h-32 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg" style="display: none;">
-                            <div class="text-white text-center">
-                                <i class="mdi mdi-book-open-variant text-4xl mb-2"></i>
-                                <div class="text-xs font-bold">ADELINE</div>
-                                <div class="text-xs">UNIVERSITY</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="w-full bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-cyan-500/25">
-                    <div class="flex items-center justify-center space-x-3">
-                        <i class="mdi mdi-book-open-variant text-2xl"></i>
-                        <span class="text-lg">Manual de usuario</span>
-                    </div>
-                </button>
-            </div>
-
-            <!-- Iniciar sesión Card -->
-            <div class="glass-card rounded-3xl p-8 shadow-2xl transform transition-all duration-300 hover:scale-105 hover:shadow-blue-500/25">
-                <div class="bg-white rounded-2xl p-8 mb-6 shadow-lg">
-                    <div class="flex justify-center">
-                        <img
-                                src="/images/logo.png"
-                                alt="Logo Universidad"
-                                class="w-100 h-100 object-contain filter drop-shadow-lg card-hover"
-                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                        />
-                        <!-- Fallback logo -->
-                        <div class="w-32 h-32 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg" style="display: none;">
-                            <div class="text-white text-center">
-                                <i class="mdi mdi-account text-4xl mb-2"></i>
-                                <div class="text-xs font-bold">ADELINE</div>
-                                <div class="text-xs">UNIVERSITY</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <a th:href="@{/login}">
-                    <button class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-amber-500/25">
-                        <div class="flex items-center justify-center space-x-3">
-                            <i class="mdi mdi-account text-2xl"></i>
-                            <span class="text-lg">Iniciar sesión</span>
-                        </div>
-                    </button>
-                </a>
-            </div>
+        <div class="info-card">
+            <i class="fas fa-sign-in-alt card-icon"></i>
+            <a th:href="@{/login}" style="text-decoration: none;">
+                <button class="button">Iniciar sesión</button>
+            </a>
         </div>
+    </div>
 
-        <!-- Credentials Section -->
-        <div class="text-center mb-12">
-            <div class="glass-effect rounded-full px-8 py-4 inline-block shadow-2xl animate-float">
-                <h2 class="text-white text-xl font-bold tracking-wide">
-                    Cambiar o agregar credenciales
-                </h2>
-            </div>
+    <div class="contact-info-section">
+        <div class="contact-item">
+            <i class="fas fa-phone-alt"></i>
+            <span>Soporte: 0931231312</span>
         </div>
-
-        <!-- Contact Information -->
-        <div class="contact-card rounded-3xl p-8 shadow-2xl">
-            <div class="text-center space-y-4">
-                <div class="flex items-center justify-center space-x-3 text-gray-800">
-                    <i class="mdi mdi-phone text-2xl text-blue-600"></i>
-                    <span class="text-lg font-semibold">
-                        Número de contacto para soporte:
-                        <span class="text-blue-600 ml-2">0931231312</span>
-                    </span>
-                </div>
-
-                <div class="flex items-center justify-center space-x-3 text-gray-800">
-                    <i class="mdi mdi-email text-2xl text-blue-600"></i>
-                    <span class="text-lg font-semibold">
-                        Gmail de soporte:
-                        <span class="text-blue-600 ml-2">juan@gmail.com</span>
-                    </span>
-                </div>
-            </div>
+        <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <span>Email: juan@gmail.com</span>
         </div>
-
     </div>
 </div>
-
 </body>
 </html>
