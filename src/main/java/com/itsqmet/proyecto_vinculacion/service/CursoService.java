@@ -52,4 +52,7 @@ public class CursoService {
         return cursoRepository.findById(id).orElseThrow();
     }
 
+    public List<Curso> findByNivelEducativoNombre(String nombreNivel) {
+        return cursoRepository.findByNivelEducativo_Nombre(nombreNivel);
+    }
 }

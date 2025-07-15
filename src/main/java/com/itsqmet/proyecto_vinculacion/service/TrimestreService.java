@@ -28,4 +28,8 @@ public class TrimestreService {
     public void eliminar(Long id) {
         trimestreRepository.deleteById(id);
     }
+
+    public Trimestre buscarPorNombre(String nombre) {
+        return trimestreRepository.findByNombre(nombre).orElse(null);
+    }
 }

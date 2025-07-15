@@ -12,16 +12,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class ConfiguracionSeguridad {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-            Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index",
-                                "/login",
+                                "/login", "/notas/guardar",
                                 "/css/**", "/js/**", "/imagenes/**").permitAll()
-
-                        .requestMatchers("/pages/Admin/**").hasRole("ADMIN")
-
+                        //.requestMatchers("/pages/Admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -35,7 +33,6 @@ public class ConfiguracionSeguridad {
                         .permitAll()
                 );
         return http.build();
-
     }
 
     @Bean

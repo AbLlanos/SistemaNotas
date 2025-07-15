@@ -10,4 +10,6 @@ import java.util.List;
 public interface CursoRepository extends JpaRepository<Curso, Long> {
     // Obtiene todos los cursos (de donde luego se extraen años únicos en el servicio)
     List<Curso> findAll();
+
+    List<Curso> findByNivelEducativo_Nombre(String nombreNivel);
 }
