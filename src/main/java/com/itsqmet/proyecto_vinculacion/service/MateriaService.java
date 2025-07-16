@@ -16,5 +16,12 @@ public class MateriaService {
     public List<Materia> obtenerTodasLasMaterias() {
         return materiaRepository.findAll();
     }
-}
 
+    public List<Materia> findByCursoNivelEducativoNombre(String nombreNivel) {
+        return materiaRepository.findByCurso_NivelEducativo_Nombre(nombreNivel);
+    }
+
+    public Materia buscarPorNombre(String nombre) {
+        return materiaRepository.findByNombre(nombre).orElse(null);
+    }
+}

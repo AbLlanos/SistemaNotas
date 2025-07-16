@@ -15,21 +15,21 @@ public class Asistencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String cantidadTotalDias;
-    private String cantidadTotalAsistenciasEstudiante;
-    private String cantidadFaltas;
-    private String cantidadAtrasos;
-    private String cantidadFaltasInjustificadas;
+    private Integer asistencias;
+    private Integer faltasJustificadas;
+    private Integer faltasInjustificadas;
+    private Integer atrasos;
 
-
-    //Conexion con estudiante
     @ManyToOne
-    @JoinColumn(name="id_estudiante")
     private Estudiante estudiante;
 
-    //Conexion con materia
     @ManyToOne
-    @JoinColumn(name = "id_materia")
+    private Trimestre trimestre;
+
+    @ManyToOne
+    private PeriodoAcademico periodo;
+
+    @ManyToOne
     private Materia materia;
 
 

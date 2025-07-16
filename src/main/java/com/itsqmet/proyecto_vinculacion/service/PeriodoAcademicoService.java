@@ -15,4 +15,8 @@ public class PeriodoAcademicoService {
     public List<PeriodoAcademico> listarTodos() {
         return periodoAcademicoRepository.findAll();
     }
+
+    public PeriodoAcademico buscarPorNombre(String nombre) {
+        return periodoAcademicoRepository.findByNombre(nombre).orElse(null);
+    }
 }
