@@ -64,9 +64,6 @@ public class NotasService {
         return notasRepository.findAll(spec);
     }
 
-    public List<Notas> obtenerNotasPorNivel(String nombreNivel) {
-        return notasRepository.findByMateriaCursoNivelEducativoNombre(nombreNivel);
-    }
 
 
 

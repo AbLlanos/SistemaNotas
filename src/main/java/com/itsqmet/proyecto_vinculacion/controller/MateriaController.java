@@ -1,11 +1,21 @@
 package com.itsqmet.proyecto_vinculacion.controller;
 
+import com.itsqmet.proyecto_vinculacion.entity.Materia;
+import com.itsqmet.proyecto_vinculacion.service.MateriaService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 public class MateriaController {
 
+
+    @Autowired
+    private MateriaService materiaService;
     //1.Ruta General
 
     @GetMapping("/pages/Admin/materiaVista")
@@ -18,6 +28,14 @@ public class MateriaController {
     @GetMapping("/pages/Admin/materiaForm")
     public String mostrarMateriaForm(){
         return "pages/Admin/materiaForm";
+    }
+
+
+
+    @GetMapping("/materias-por-curso")
+    @ResponseBody
+    public List<Materia> obtenerMateriasPorCurso(@RequestParam String nombreCurso) {
+        return materiaService.buscarPorNombreCurso(nombreCurso);
     }
 
 }

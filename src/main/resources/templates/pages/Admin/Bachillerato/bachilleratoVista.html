@@ -258,5 +258,36 @@
     });
 </script>
 
+
+<script>
+    document.getElementById('nombreCurso').addEventListener('change', function () {
+        const nombreCurso = this.value;
+        const materiaSelect = document.getElementById('nombreMateria');
+
+        // Limpiar las opciones anteriores
+        materiaSelect.innerHTML = '<option value="">-- Seleccione Materia --</option>';
+
+        if (nombreCurso) {
+            fetch(`/materias-por-curso?nombreCurso=${encodeURIComponent(nombreCurso)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar materias');
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(materia => {
+                        const option = document.createElement('option');
+                        option.value = materia.id;       // usar id es mejor para formulario
+                        option.text = materia.nombre;
+                        materiaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Error al obtener materias para el curso seleccionado.");
+                });
+        }
+    });
+</script>
+
 </body>
 </html>

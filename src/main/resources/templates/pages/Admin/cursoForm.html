@@ -25,7 +25,7 @@
             <p class="text-gray-500">Por favor, completa todos los campos para registrar un nuevo curso.</p>
         </div>
 
-        <form th:action="@{/guardarCurso}" method="post" th:object="${curso}" class="space-y-6">
+        <form th:action="@{/pages/Admin/cursoGuardar}" method="post" th:object="${curso}" class="space-y-6">
             <input type="hidden" th:field="*{id}" />
 
             <div class="space-y-6">
@@ -38,36 +38,45 @@
                 </div>
 
                 <!-- Campo Nivel Educativo -->
-                <div>
-                    <label for="nivelEducativo" class="block text-sm font-semibold text-gray-700 mb-1">Nivel Educativo</label>
-                    <select id="nivelEducativo" th:field="*{nivelEducativo.id}" required
+                <div class="flex-1">
+                    <label for="filtroNivel" class="block text-sm font-medium text-gray-700 mb-1">
+                        Seleccione el nivel educativo
+                    </label>
+                    <select
+                            id="filtroNivel"
+                            name="nivelEducativo"
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
-                        <option value="">Seleccione un nivel educativo</option>
-                        <option th:each="nivel : ${nivelesEducativos}"
+                        <option value="">Todos los niveles</option>
+                        <option th:each="nivel : ${niveles}"
                                 th:value="${nivel.id}"
-                                th:text="${nivel.nombre}">
-                        </option>
+                                th:text="${nivel.nombre}"
+                                th:selected="${nivel.id} == ${param.nivelEducativo}"></option>
                     </select>
                 </div>
 
                 <!-- Campo Materias -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-3">Materias del Curso</label>
-                    <div class="border border-gray-300 rounded-lg p-4 max-h-40 overflow-y-auto">
-                        <div th:each="materia : ${materias}" class="flex items-center mb-2">
-                            <input type="checkbox"
-                                   th:id="'materia_' + ${materia.id}"
-                                   th:value="${materia.id}"
-                                   name="materiasSeleccionadas"
-                                   class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                            <label th:for="'materia_' + ${materia.id}"
-                                   th:text="${materia.nombre}"
-                                   class="text-sm text-gray-700 cursor-pointer">
-                            </label>
-                        </div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-2">Seleccione las materias que pertenecen a este curso</p>
+                <div class="flex-1">
+                    <label for="materiasSeleccionadas" class="block text-sm font-medium text-gray-700 mb-1">
+                        Seleccione las Materias del Curso
+                    </label>
+
+                    <select id="materiasSeleccionadas"
+                            name="materiasSeleccionadas"
+                            multiple
+                            size="6"
+                            class="w-full px-3 py-2 border border-blue-400 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm transition">
+                        <option th:each="materia : ${materias}"
+                                th:value="${materia.id}"
+                                th:text="${materia.nombre}"
+                                th:selected="${curso.materias != null} ? ${#lists.contains(curso.materias, materia)} : false">
+                        </option>
+                    </select>
+
+                    <p class="text-sm text-gray-500 mt-2">
+                        Mantenga presionada la tecla <strong>Ctrl</strong> (Windows) o <strong>Cmd</strong> (Mac) para seleccionar varias opciones.
+                    </p>
                 </div>
+
             </div>
 
             <div class="pt-6">

@@ -35,6 +35,7 @@ public class CursoService {
         cursoRepository.deleteById(id);
     }
 
+
     // Obtener número total de cursos
     public int obtenerNumeroCursos() {
         return cursoRepository.findAll().size();
@@ -55,4 +56,19 @@ public class CursoService {
     public List<Curso> findByNivelEducativoNombre(String nombreNivel) {
         return cursoRepository.findByNivelEducativo_Nombre(nombreNivel);
     }
+
+
+    public List<Curso> filtrarCursos(String nombre, Long nivelId) {
+        if (nombre != null && !nombre.isEmpty() && nivelId != null) {
+            return cursoRepository.findByNombreContainingIgnoreCaseAndNivelEducativo_Id(nombre, nivelId);
+        } else if (nombre != null && !nombre.isEmpty()) {
+            return cursoRepository.findByNombreContainingIgnoreCase(nombre);
+        } else if (nivelId != null) {
+            return cursoRepository.findByNivelEducativo_Id(nivelId);
+        } else {
+            return cursoRepository.findAll();
+        }
+    }
+
+
 }

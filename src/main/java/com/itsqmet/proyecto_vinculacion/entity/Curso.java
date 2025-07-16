@@ -18,13 +18,20 @@ public class Curso {
 
     private String nombre;
 
-    //Conexion con curso
-    @OneToMany(mappedBy = "curso", fetch = FetchType.LAZY)
+    // Relación ManyToMany con Materia y tabla intermedia curso_materia
+    @ManyToMany
+    @JoinTable(
+            name = "curso_materia",
+            joinColumns = @JoinColumn(name = "curso_id"),
+            inverseJoinColumns = @JoinColumn(name = "materia_id")
+    )
     private List<Materia> materias;
 
-    //Conexion con nivel Educativo
     @ManyToOne
     @JoinColumn(name = "nivel_educativo_id")
     private NivelEducativo nivelEducativo;
+
+
+
 
 }

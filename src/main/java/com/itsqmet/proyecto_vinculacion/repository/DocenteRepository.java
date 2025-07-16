@@ -13,6 +13,7 @@ public interface DocenteRepository extends JpaRepository <Docente, Long> {
     Optional <Docente> findById(Long id);
     List <Docente> findByNombreContainingIgnoreCase(String nombre);
     List<Docente> findByCedulaContainingIgnoreCase(String cedula);
+
     List<Docente> findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(String nombre, String cedula);
 
 }
