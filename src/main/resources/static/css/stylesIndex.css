@@ -1,15 +1,15 @@
- /* --- Root Variables for Professional Theme --- */
+
         :root {
-            --primary-navy: #1A2F4B;        /* Deep, academic navy */
-            --secondary-blue: #2E4B7C;      /* Richer, supportive blue */
-            --tertiary-gray: #E0E6EE;       /* Light, clean background gray */
-            --text-dark: #333333;           /* Standard body text color */
-            --text-light: #F8F8F8;          /* Light text on dark backgrounds */
-            --accent-gold: #C0A46F;         /* Subtle, elegant gold accent */
-            --border-color: rgba(0, 0, 0, 0.08); /* Lighter, crisp border */
-            --shadow-subtle: rgba(0, 0, 0, 0.06); /* Even lighter shadows */
-            --shadow-medium: rgba(0, 0, 0, 0.12); /* Adjusted medium shadow */
-            --shadow-heavy: rgba(0, 0, 0, 0.25);  /* Slightly less harsh heavy shadow */
+            --primary-navy: #1A2F4B;
+            --secondary-blue: #2E4B7C;
+            --tertiary-gray: #E0E6EE;
+            --text-dark: #333333;
+            --text-light: #F8F8F8;
+            --accent-gold: #C0A46F;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-subtle: rgba(0, 0, 0, 0.06);
+            --shadow-medium: rgba(0, 0, 0, 0.12);
+            --shadow-heavy: rgba(0, 0, 0, 0.25);
         }
 
         body {
