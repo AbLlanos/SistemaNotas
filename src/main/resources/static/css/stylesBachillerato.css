@@ -12,6 +12,16 @@
             --bg-body: #f3f4f6; /* Gray-100 for overall page background */
             --bg-card: #ffffff; /* White for cards */
             --border-color: #e5e7eb; /* Gray-200 for borders */
+
+            /* New: Trimester Colors */
+            --trim1-header-bg: #4f46e5; /* indigo-600 */
+            --trim1-cell-bg-light: #eef2ff; /* indigo-50 */
+
+            --trim2-header-bg: #0d9488; /* teal-600 */
+            --trim2-cell-bg-light: #e0f2f7; /* teal-50 */
+
+            --trim3-header-bg: #ca8a04; /* amber-600 */
+            --trim3-cell-bg-light: #fffbeb; /* amber-50 */
         }
 
         body {
@@ -45,30 +55,61 @@
 
         /* Specific styles for table cells - PRESERVING PADDING AND LINE BREAKS */
         th {
-            /* Keep existing padding for spacing */
-            padding: 1.25rem 1.5rem; /* More vertical, generous horizontal */
-            white-space: nowrap; /* Keep text on one line unless forced by <br> */
-            text-overflow: ellipsis; /* Add ellipsis if still overflows */
-            overflow: hidden; /* Hide overflowed content */
-            vertical-align: middle; /* Center content vertically */
-            line-height: 1.3; /* A bit more space between lines if wrapping (due to <br>) */
-            color: white; /* Ensure header text is white */
-            font-weight: 700; /* Bolder for headers */
-            font-size: 0.875rem; /* text-sm, slightly larger than default xs */
-            text-transform: uppercase;
-            letter-spacing: 0.05em; /* tracking-wider */
-        }
-
-        td {
-            /* Keep existing padding for spacing */
-            padding: 1rem 1.25rem; /* Generous padding for data cells */
+            padding: 1.25rem 1.5rem; /* Keep existing padding for spacing */
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
             vertical-align: middle;
-            font-size: 0.9375rem; /* Slightly larger than text-sm for better readability */
+            line-height: 1.3;
+            color: white; /* Ensure header text is white */
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem 1.25rem; /* Keep existing padding for spacing */
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            vertical-align: middle;
+            font-size: 0.9375rem;
             color: var(--text-medium);
         }
+
+        /* New: Trimester specific colors for headers and cells */
+        th.trim1 {
+            background-color: var(--trim1-header-bg);
+        }
+        td.trim1 {
+            background-color: var(--trim1-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim1 { /* Ensure hover still works over trimester background */
+            background-color: #d1d5db; /* A slightly darker gray to ensure visibility on hover */
+        }
+
+
+        th.trim2 {
+            background-color: var(--trim2-header-bg);
+        }
+        td.trim2 {
+            background-color: var(--trim2-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim2 {
+            background-color: #d1d5db;
+        }
+
+        th.trim3 {
+            background-color: var(--trim3-header-bg);
+        }
+        td.trim3 {
+            background-color: var(--trim3-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim3 {
+            background-color: #d1d5db;
+        }
+
 
         /* Responsive adjustments for table cells (ensure they don't get too small) */
         @media (max-width: 1024px) {
@@ -104,3 +145,6 @@
         .animate-fade-in {
             animation: fadeIn 0.8s ease-out forwards;
         }
+        th.trim1, td.trim1 { background-color: #ebf8ff; }
+          th.trim2, td.trim2 { background-color: #f0fff4; }
+          th.trim3, td.trim3 { background-color: #fffbeb; }
