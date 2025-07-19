@@ -9,6 +9,10 @@ public class NotaCompletaDTO {
     private String areaMateria;
     private String nombreCurso;
 
+    // NUEVOS CAMPOS PARA BINDING
+    private String nombrePeriodo;         // valor del <select name="nombrePeriodo">
+    private String trimestreSeleccionado;
+
     public String getNombreCurso() {
         return nombreCurso;
     }
@@ -18,7 +22,7 @@ public class NotaCompletaDTO {
     }
 
     // Primer trimestre
-    
+
     private Double notaNumericaPrimerTrim;
     private String notaCualitativaPrimerTrim;
 
