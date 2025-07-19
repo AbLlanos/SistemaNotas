@@ -1,0 +1,150 @@
+ /* Define custom CSS variables for consistent theming */
+        :root {
+            --primary-blue-dark: #1a4f8d; /* Deeper blue for main elements */
+            --primary-blue-medium: #2a63ad; /* Medium blue */
+            --primary-blue-light: #e0f2fe; /* Light blue for backgrounds (blue-50) */
+            --accent-green: #10b981; /* Emerald-500 for success/create */
+            --accent-red: #ef4444; /* Red-500 for danger/delete */
+            --accent-purple: #8b5cf6; /* Purple-500 for PDF */
+            --text-dark: #1f2937; /* Gray-900 */
+            --text-medium: #374151; /* Gray-700 */
+            --text-light: #6b7280; /* Gray-500 */
+            --bg-body: #f3f4f6; /* Gray-100 for overall page background */
+            --bg-card: #ffffff; /* White for cards */
+            --border-color: #e5e7eb; /* Gray-200 for borders */
+
+            /* New: Trimester Colors */
+            --trim1-header-bg: #4f46e5; /* indigo-600 */
+            --trim1-cell-bg-light: #eef2ff; /* indigo-50 */
+
+            --trim2-header-bg: #0d9488; /* teal-600 */
+            --trim2-cell-bg-light: #e0f2f7; /* teal-50 */
+
+            --trim3-header-bg: #ca8a04; /* amber-600 */
+            --trim3-cell-bg-light: #fffbeb; /* amber-50 */
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif; /* Clean, modern, and highly readable for body text */
+            background-color: var(--bg-body);
+            color: var(--text-medium);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif; /* Strong, professional for headings */
+            color: var(--text-dark);
+        }
+
+        /* Custom scrollbar styling for better aesthetics */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 10px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: var(--primary-blue-medium);
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-blue-dark);
+        }
+
+        /* Specific styles for table cells - PRESERVING PADDING AND LINE BREAKS */
+        th {
+            padding: 1.25rem 1.5rem; /* Keep existing padding for spacing */
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            vertical-align: middle;
+            line-height: 1.3;
+            color: white; /* Ensure header text is white */
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem 1.25rem; /* Keep existing padding for spacing */
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            vertical-align: middle;
+            font-size: 0.9375rem;
+            color: var(--text-medium);
+        }
+
+        /* New: Trimester specific colors for headers and cells */
+        th.trim1 {
+            background-color: var(--trim1-header-bg);
+        }
+        td.trim1 {
+            background-color: var(--trim1-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim1 { /* Ensure hover still works over trimester background */
+            background-color: #d1d5db; /* A slightly darker gray to ensure visibility on hover */
+        }
+
+
+        th.trim2 {
+            background-color: var(--trim2-header-bg);
+        }
+        td.trim2 {
+            background-color: var(--trim2-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim2 {
+            background-color: #d1d5db;
+        }
+
+        th.trim3 {
+            background-color: var(--trim3-header-bg);
+        }
+        td.trim3 {
+            background-color: var(--trim3-cell-bg-light);
+        }
+        tr.hover\\:bg-blue-50:hover td.trim3 {
+            background-color: #d1d5db;
+        }
+
+
+        /* Responsive adjustments for table cells (ensure they don't get too small) */
+        @media (max-width: 1024px) {
+            th {
+                padding: 1rem 1.2rem;
+            }
+            td {
+                padding: 0.85rem 1rem;
+            }
+        }
+        @media (max-width: 768px) {
+            th {
+                padding: 0.75rem 0.9rem;
+            }
+            td {
+                padding: 0.7rem 0.8rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        th.trim1, td.trim1 { background-color: #ebf8ff; }
+          th.trim2, td.trim2 { background-color: #f0fff4; }
+          th.trim3, td.trim3 { background-color: #fffbeb; }
