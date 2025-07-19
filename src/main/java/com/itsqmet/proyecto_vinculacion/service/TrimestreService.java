@@ -10,23 +10,36 @@ import java.util.List;
 @Service
 public class TrimestreService {
 
+    //Aprobado
+
     @Autowired
     private TrimestreRepository trimestreRepository;
 
-    public List<Trimestre> obtenerTodos() {
+
+    // 1. Mostrar todos
+    public List<Trimestre> listarTodosPeriodos() {
         return trimestreRepository.findAll();
     }
 
-    public Trimestre guardar(Trimestre trimestre) {
+    // 2. Guardar
+    public Trimestre guardarTrimestre(Trimestre trimestre) {
         return trimestreRepository.save(trimestre);
     }
 
-    public Trimestre buscarPorId(Long id) {
+    // 3. Eliminar por ID
+    public Trimestre buscarTrimestrePorId(Long id) {
         return trimestreRepository.findById(id).orElse(null);
     }
 
+    // 4. Buscar por ID
     public void eliminar(Long id) {
         trimestreRepository.deleteById(id);
+    }
+
+    // 5. Consultas adicionales
+
+    public List<Trimestre> buscarPorNombreContiene(String nombre) {
+        return trimestreRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
     public Trimestre buscarPorNombre(String nombre) {

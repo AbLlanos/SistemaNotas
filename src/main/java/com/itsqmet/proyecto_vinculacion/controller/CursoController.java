@@ -50,7 +50,7 @@ public class CursoController {
     public String mostrarCursoForm(Model model) {
 
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
-        List<Materia> materia = materiaService.obtenerTodasLasMaterias();
+        List<Materia> materia = materiaService.listarTodasMaterias();
 
         model.addAttribute("niveles", niveles);
         model.addAttribute("curso", new Curso());
@@ -65,7 +65,7 @@ public class CursoController {
         Optional<Curso> cursoOptional = cursoService.buscarCursoPorId(id);
 
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
-        List<Materia> materia = materiaService.obtenerTodasLasMaterias();
+        List<Materia> materia = materiaService.listarTodasMaterias();
 
         model.addAttribute("niveles", niveles);
         model.addAttribute("curso", new Curso());

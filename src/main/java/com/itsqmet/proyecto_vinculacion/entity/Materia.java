@@ -30,8 +30,11 @@ public class Materia {
     @JsonIgnore
     private List<Curso> cursos;
 
+
+
     // Otras relaciones
     @OneToMany(mappedBy = "materia", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Asistencia> asistencias;
 
 }

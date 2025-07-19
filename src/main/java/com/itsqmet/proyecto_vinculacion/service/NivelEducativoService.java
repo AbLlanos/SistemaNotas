@@ -10,10 +10,14 @@ import java.util.List;
 @Service
 public class NivelEducativoService {
 
+    //Aprobado
+
     @Autowired
     private NivelEducativoRepository nivelEducativoRepository;
 
+    // 1. Mostrar todos
     public List<NivelEducativo> listarTodos() {
         return nivelEducativoRepository.findAll();
     }
+
 }

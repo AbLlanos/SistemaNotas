@@ -2,61 +2,45 @@ package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
 import com.itsqmet.proyecto_vinculacion.repository.CursoRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CursoService {
+
+    //APROBADO
+
     @Autowired
     private CursoRepository cursoRepository;
 
-    // Mostrar todos los cursos
-    public List<Curso> mostrarCursos() {
+    /* 1. Mostrar todos */
+    public List<Curso> listarTodosCursos() {
         return cursoRepository.findAll();
     }
 
-    // Buscar por ID
-    public Optional<Curso> buscarCursoPorId(Long id) {
-        return cursoRepository.findById(id);
-    }
-
-    // Guardar curso
+    // 2. Guardar
     public Curso guardarCurso(Curso curso) {
         return cursoRepository.save(curso);
     }
 
-    // Eliminar curso por ID
+    // 3. Eliminar por ID
     public void eliminarCurso(Long id) {
         cursoRepository.deleteById(id);
     }
 
-
-    // Obtener número total de cursos
-    public int obtenerNumeroCursos() {
-        return cursoRepository.findAll().size();
+    // 4. Buscar ID
+    public Optional<Curso> buscarCursoPorId(Long id) {
+        return cursoRepository.findById(id);
     }
 
-    // Obtener curso con estudiantes (transaccional)
-    @Transactional
-    public Curso obtenerCursoConEstudiantes(Long id) {
-        return cursoRepository.findById(id).orElseThrow();
-    }
-
-    // Obtener curso con materias (transaccional)
-    @Transactional
-    public Curso obtenerCursoConMaterias(Long id) {
-        return cursoRepository.findById(id).orElseThrow();
-    }
+    // 5. Consultas adicionales
 
     public List<Curso> findByNivelEducativoNombre(String nombreNivel) {
         return cursoRepository.findByNivelEducativo_Nombre(nombreNivel);
     }
-
 
     public List<Curso> filtrarCursos(String nombre, Long nivelId) {
         if (nombre != null && !nombre.isEmpty() && nivelId != null) {
@@ -69,6 +53,7 @@ public class CursoService {
             return cursoRepository.findAll();
         }
     }
+
 
 
 }

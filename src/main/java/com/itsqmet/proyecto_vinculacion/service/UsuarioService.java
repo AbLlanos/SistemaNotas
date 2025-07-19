@@ -12,12 +12,4 @@ public class UsuarioService {
 @Autowired
 private UsuarioRepository usuarioRepository;
 
-    //VALIDAR SI EXISTE POR CEDULA
-    public Optional<Usuario> obtenerPorCedulaExacta(String cedula){
-        return usuarioRepository.findByCedula(cedula);
-    }
-    //VALIDAR SI EXISTE PRO CORREO
-    public Optional<Usuario> obtenerPorEmailExacto(String email){
-        return usuarioRepository.findByEmail(email);
-    }
 }

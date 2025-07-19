@@ -12,6 +12,9 @@ import java.util.List;
 @Service
 public class NotasService {
 
+    //Aprobado
+    //Mas importarte
+
     @Autowired
     private AsistenciaRepository asistenciaRepository;
 
@@ -34,22 +37,30 @@ public class NotasService {
     @Autowired
     private PeriodoAcademicoService periodoAcademicoService;
 
-
+    // 1. Mostrar todos
     public List<Notas> listarTodasLasNotas() {
         return notasRepository.findAll();
     }
 
+    // 2. Guardar
     public Notas guardarNota(Notas nota) {
         return notasRepository.save(nota);
     }
 
+    // 3. Buscar por ID
     public Notas buscarNotaPorId(Long id) {
         return notasRepository.findById(id).orElse(null);
     }
 
+    // 4. Eliminar por ID
     public void eliminarNota(Long id) {
         notasRepository.deleteById(id);
     }
+
+    // 5. Consultas adicionales
+
+
+    /*Filtro universal conectado a especification para facilitar el filtrado dinamico de los todos los campos */
 
     public List<Notas> buscarNotasPorFiltros(String nombrePeriodo,
                                              String nombreCurso,
@@ -89,22 +100,33 @@ public class NotasService {
 
         return notas.stream().map(n -> {
             NotaCompletaDTO dto = new NotaCompletaDTO();
-
             dto.setIdNota(n.getId());
 
             // Datos del estudiante
             if (n.getEstudiante() != null) {
                 dto.setCedulaEstudiante(n.getEstudiante().getCedula());
-                dto.setNombreCompletoEstudiante(n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido());
+                dto.setNombreCompletoEstudiante(
+                        n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido());
             } else {
                 dto.setCedulaEstudiante("---");
                 dto.setNombreCompletoEstudiante("---");
             }
 
-            // "Área" como nombre de la materia
+            // Nombre de la materia
             dto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
 
-            // Nota y cualitativa (por ejemplo solo para primer trimestre, si quieres, modifica para otros trimestres)
+            // Nombre(s) de curso(s)
+            String cursosTexto = "---";
+            if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
+                cursosTexto = n.getMateria().getCursos()
+                        .stream()
+                        .map(Curso::getNombre)
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("---");
+            }
+            dto.setNombreCurso(cursosTexto);
+
+            // Nota y cualitativa
             dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
             dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
 
@@ -186,6 +208,7 @@ public class NotasService {
 
 
 
+
     @Transactional
     public void guardarNotasDesdeFormulario(NotaCompletaDTO form) {
         Estudiante estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
@@ -223,8 +246,23 @@ public class NotasService {
                                           Integer faltasJustificadas, Integer faltasInjustificadas, Integer atrasos,
                                           String comportamientoTexto) {
 
-        // Guardar Nota
-        Notas nota = new Notas();
+        // --- Guardar o actualizar Nota ---
+        Notas nota = notasRepository
+                .findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre)
+                .orElse(new Notas());
+
+        // Actualizar campos por trimestre
+        if ("Primero".equalsIgnoreCase(trimestre.getNombre())) {
+            nota.setNotaNumerica(notaNum);
+            nota.setNotaCualitativa(notaCual);
+        } else if ("Segundo".equalsIgnoreCase(trimestre.getNombre())) {
+            nota.setNotaNumerica(notaNum);
+            nota.setNotaCualitativa(notaCual);
+        } else if ("Tercero".equalsIgnoreCase(trimestre.getNombre())) {
+            nota.setNotaNumerica(notaNum);
+            nota.setNotaCualitativa(notaCual);
+        }
+
         nota.setEstudiante(estudiante);
         nota.setMateria(materia);
         nota.setPeriodoAcademico(periodo);
@@ -233,7 +271,7 @@ public class NotasService {
         nota.setNotaCualitativa(notaCual);
         notasRepository.save(nota);
 
-        // Guardar Asistencia
+        // --- Guardar o actualizar Asistencia ---
         Asistencia asistencia = asistenciaRepository
                 .findByEstudianteAndMateriaAndTrimestreAndPeriodo(estudiante, materia, trimestre, periodo)
                 .orElse(new Asistencia());
@@ -246,10 +284,9 @@ public class NotasService {
         asistencia.setFaltasJustificadas(faltasJustificadas);
         asistencia.setFaltasInjustificadas(faltasInjustificadas);
         asistencia.setAtrasos(atrasos);
-
         asistenciaRepository.save(asistencia);
 
-        // Guardar Comportamiento
+        // --- Guardar o actualizar Comportamiento ---
         Comportamiento comportamiento = comportamientoRepository
                 .findByEstudianteAndTrimestreAndPeriodo(estudiante, trimestre, periodo)
                 .orElse(new Comportamiento());
@@ -258,8 +295,38 @@ public class NotasService {
         comportamiento.setTrimestre(trimestre);
         comportamiento.setPeriodo(periodo);
         comportamiento.setComportamiento(comportamientoTexto);
-
         comportamientoRepository.save(comportamiento);
+    }
+
+
+
+
+
+
+
+
+
+
+    public NotaCompletaDTO obtenerNotaCompletaPorId(Long idNota) {
+        Notas nota = buscarNotaPorId(idNota);
+        if (nota == null) {
+            throw new RuntimeException("Nota no encontrada con id: " + idNota);
+        }
+
+        String nombreCurso = "---";
+        if (nota.getMateria() != null && nota.getMateria().getCursos() != null && !nota.getMateria().getCursos().isEmpty()) {
+            nombreCurso = nota.getMateria().getCursos().get(0).getNombre();
+        }
+
+        List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
+                nota.getPeriodoAcademico().getNombre(),
+                nombreCurso,
+                nota.getMateria().getNombre(),
+                nota.getEstudiante().getCedula(),
+                null
+        );
+
+        return dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
     }
 
 

@@ -1,4 +1,4 @@
-package com.itsqmet.proyecto_vinculacion.repository;
+package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
 import com.itsqmet.proyecto_vinculacion.entity.Materia;
