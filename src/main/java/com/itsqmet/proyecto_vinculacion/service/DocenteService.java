@@ -11,31 +11,36 @@ import java.util.Optional;
 
 @Service
 public class DocenteService {
+
+    //APROBADO
+
     @Autowired
     private DocenteRepository docenteRepository;
-    //cifrar la contraseña
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    //Mostrar los docentes
-    public List<Docente> mostrarDocente(){
+    //1. Mostrar todos
+    public List<Docente> listarTodosDocentes(){
         return docenteRepository.findAll();
     }
 
-    //Guardar docente
+    //2. Guardar
     public  Docente guardarDocente(Docente docente){
         return docenteRepository.save(docente);
     }
 
-    //Eliminar el docente
+    //3. Eliminar por ID
     public void eliminarDocente(Long id){
         docenteRepository.deleteById(id);
     }
 
-    //Buscar docente por ID
+    //4. Buscar por ID
     public Optional<Docente> buscarDocenteId(Long id){
         return  docenteRepository.findById(id);
     }
+
+    // 5. Consultas adicionales
 
     //Buscar docente por Nombre
     public List<Docente> buscarPorNombre(String nombre) {

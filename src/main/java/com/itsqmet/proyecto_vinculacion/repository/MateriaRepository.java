@@ -7,7 +7,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MateriaRepository extends JpaRepository<Materia, Long> {
+
     Optional<Materia> findByNombre(String nombre);
-    List<Materia> findByCurso_NivelEducativo_Nombre(String nombreNivel);
+
+    List<Materia> findByCursosNivelEducativoNombre(String nombreNivel);
+
+    Optional<Materia> findById(Long id);
+
+
+
+    List<Materia> findByNombreContainingIgnoreCase(String nombre);
+
+    List<Materia> findDistinctByCursosNombre(String nombreCurso);
+
+    List<Materia> findByCursosNombre(String nombreCurso);
+
+    List<Materia> findByCursosId(Long cursoId);
+
 
 }

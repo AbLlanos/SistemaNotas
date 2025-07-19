@@ -4,357 +4,210 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Listado de Notas</title>
+    <title>Vista de administrador</title>
 </head>
 
+<body class="bg-gray-100">
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Obtener parámetros de URL
-      const params = new URLSearchParams(window.location.search);
-      const trimestre = params.get("nombreTrimestre");
-      const materia = params.get("nombreMateria");
-      const cedula = params.get("cedula");
+<!-- NAVBAR ADAPTADO -->
+<!-- NAVBAR ADAPTADO CON DEGRADADO Y BOTÓN MEJORADO -->
+<nav class="bg-gradient-to-r from-blue-700 to-blue-900 p-3 fixed w-full top-0 left-0 z-20 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
 
-      // Verifica si al menos uno de los filtros está presente
-      const mostrarColumnas = trimestre || materia || cedula;
+        <!-- Logo y texto -->
+        <a href="#"   class="flex items-center space-x-4">
 
-      // Columnas a ocultar (por clase)
-      const columnas = document.querySelectorAll(
-        "th:nth-child(n+8), td:nth-child(n+8):not(:last-child)"
-      );
+                <img src="/img/img000.jpg" width="30" height="30" alt="Logo" class="h-10 rounded-full"/>
+                <div>
+                    <form th:action="@{/logout}" method="post">
+                    <span class="block text-xl text-white font-semibold">Bienvenido:</span>
+                    <span class="block text-2xl text-yellow-300 font-bold">Nombre</span>
+                    </form>
+                </div>
 
-      columnas.forEach(col => {
-        col.style.display = mostrarColumnas ? "table-cell" : "none";
-      });
-    });
-</script>
-
-
-<body class="bg-gray-100 p-8">
-
-
-
-<!--1. Barra de navegación -->
-<nav class="bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-200">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-
-        <!-- Logo -->
-        <a href="#" class="flex items-center space-x-3">
-            <img src="/imagenes/img001-logo.png" alt="Logo" class="h-8"/>
-            <span class="self-center text-3xl font-semibold whitespace-nowrap text-white">Bienvenido:</span>
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-blue-500">Nombre</span>
         </a>
 
         <!-- Botón de cierre de sesión -->
-        <div class="flex md:order-2">
-            <form th:action="@{/logout}" method="post">
-                <button type="submit"
-                        class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit"
+                    class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-full px-6 py-2 text-base transition-transform transform hover:scale-110 duration-300 ease-in-out shadow-md">
+                Cerrar sesión
+            </button>
+        </form>
     </div>
 </nav>
 
 
+<div class="pt-20">
 
+    <div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
+        <h2 class="text-3xl font-bold text-black mb-8 text-center">🎓 NIVELES EDUCATIVOS</h2>
 
+        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
 
+            <!-- Inicial -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+                <img src="https://www.usat.edu.pe/web/wp-content/uploads/2022/06/educacion_inicial-importancia.jpg"
+                     alt="Educación Inicial" class="w-full h-52 object-cover rounded-t-2xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/Inicial/educacionInicialVista}">
+                        <button class="w-full bg-pink-300 hover:bg-pink-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Educación Inicial
+                        </button>
+                    </a>
+                </div>
+            </div>
 
+            <!-- Educación Básica -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfTZh31gNDbTk69d2tos21-byhEbi3xBjh-g&s"
+                     alt="Educación Básica" class="w-full h-52 object-cover rounded-t-2xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/EducacionBasica/educacionBasicaVista}">
+                        <button class="w-full bg-green-300 hover:bg-green-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Educación Básica
+                        </button>
+                    </a>
+                </div>
+            </div>
 
+            <!-- Bachillerato General -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0jtrLp-TzcQVGoqhhqvk-WPbVhDq9llAVQ&s"
+                     alt="Bachillerato General" class="w-full h-52 object-cover rounded-t-2xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/Bachillerato/bachilleratoVista}">
+                        <button class="w-full bg-red-400 hover:bg-red-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Bachillerato General
+                        </button>
+                    </a>
+                </div>
+            </div>
 
+            <!-- Bachillerato Técnico -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+                <img src="https://educacion.gob.ec/wp-content/uploads/2020/11/Boletin-docentes-BT.jpg"
+                     alt="Bachillerato Técnico" class="w-full h-52 object-cover rounded-t-2xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista}">
+                        <button class="w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Bachillerato Técnico
+                        </button>
+                    </a>
+                </div>
+            </div>
 
-
-<!-- JS: Mostrar u ocultar columnas
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Obtener valores desde el DOM o URL
-        const params = new URLSearchParams(window.location.search);
-
-        const periodo = params.get("nombrePeriodo");
-        const curso = params.get("nombreCurso");
-        const materia = params.get("nombreMateria");
-        const cedula = params.get("cedula");
-
-        // Columnas de evaluación
-        const columnasEvaluacion = [
-            "col-deber", "col-taller", "col-pruebas",
-            "col-participacion", "col-examen", "col-notaTotal", "col-recuperacion"
-        ];
-
-        // Columnas de acción
-        const columnasAccion = ["Editar", "Eliminar"];
-
-        // Función para mostrar u ocultar columnas por texto o clase
-        function toggleColumnas({ showEvaluacion = false, showAcciones = false }) {
-            columnasEvaluacion.forEach(clase => {
-                document.querySelectorAll("." + clase).forEach(col => {
-                    col.classList.toggle("hidden", !showEvaluacion);
-                });
-            });
-
-            const ths = document.querySelectorAll("thead th");
-            const idxEditar = Array.from(ths).findIndex(th => th.textContent.trim() === "Editar");
-            const idxEliminar = Array.from(ths).findIndex(th => th.textContent.trim() === "Eliminar");
-
-            document.querySelectorAll("tbody tr").forEach(tr => {
-                if (idxEditar >= 0) {
-                    tr.children[idxEditar].classList.toggle("hidden", !showAcciones);
-                }
-                if (idxEliminar >= 0) {
-                    tr.children[idxEliminar].classList.toggle("hidden", !showAcciones);
-                }
-            });
-
-            if (idxEditar >= 0) ths[idxEditar].classList.toggle("hidden", !showAcciones);
-            if (idxEliminar >= 0) ths[idxEliminar].classList.toggle("hidden", !showAcciones);
-        }
-
-        // Determinar visibilidad según combinaciones
-        if (periodo && curso && materia && cedula) {
-            // Todos los filtros
-            toggleColumnas({ showEvaluacion: true, showAcciones: true });
-        } else if (periodo && curso && materia) {
-            toggleColumnas({ showEvaluacion: true, showAcciones: true });
-        } else if (periodo && cedula) {
-            toggleColumnas({ showEvaluacion: true, showAcciones: true });
-        } else if (periodo && curso) {
-            toggleColumnas({ showEvaluacion: true, showAcciones: false });
-        } else {
-            toggleColumnas({ showEvaluacion: false, showAcciones: false });
-        }
-    });
-</script>
--->
-<!-- Estilo auxiliar para ocultar columnas
-<style>
-    .hidden {
-        display: none;
-    }
-</style>
--->
-
-
-
-
-<!--Seccion para Educación Básica General -->
-
-
-<div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
-    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">🏫 Niveles Educativos</h2>
-
-    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
-
-        <!-- Educación Inicial -->
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-bold text-indigo-700 mb-1">🧒 Educación Inicial</h3>
-            <p class="text-gray-600 mb-4 text-sm">Gestión académica de estudiantes de nivel inicial</p>
-            <a th:href="@{/pages/Admin/Inicial/educacionInicialVista}">
-                <button class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
-                    Ir
-                </button>
-            </a>
         </div>
-
-        <!-- Educación Básica -->
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-bold text-indigo-700 mb-1">📗 Educación Básica</h3>
-            <p class="text-gray-600 mb-4 text-sm">Administración de notas y materias de educación básica</p>
-            <a th:href="@{/pages/Admin/EducacionBasica/educacionBasicaVista}">
-                <button class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
-                    Ir
-                </button>
-            </a>
-        </div>
-
-        <!-- Bachillerato General -->
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-bold text-indigo-700 mb-1">🏫 Bachillerato General</h3>
-            <p class="text-gray-600 mb-4 text-sm">Seguimiento académico de bachillerato general</p>
-            <a th:href="@{/pages/Admin/Bachillerato/bachilleratoVista}">
-                <button class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
-                    Ir
-                </button>
-            </a>
-        </div>
-
-        <!-- Bachillerato Técnico -->
-        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow hover:shadow-lg transition">
-            <h3 class="text-lg font-bold text-indigo-700 mb-1">⚙️ Bachillerato Técnico</h3>
-            <p class="text-gray-600 mb-4 text-sm">Control de materias y notas del bachillerato técnico</p>
-            <a th:href="@{/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista}">
-                <button class="w-full text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg text-sm px-4 py-2 transition">
-                    Ir
-                </button>
-            </a>
-        </div>
-
     </div>
+
 </div>
 
 
+<div class="bg-gray-300 py-5 ">
 
+    <div class="max-w-7xl mx-auto mt-14 mb-20">
+        <h2 class="text-3xl font-bold text-black mb-8 text-center">📚 PANEL DE GESTION ACADÉMICA</h2>
 
+        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
-<div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
-    <h2 class="text-3xl font-bold text-black mb-8 text-center">🎓 NIVELES EDUCATIVOS</h2>
-
-    <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-
-        <!-- Inicial -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-            <img src="https://www.usat.edu.pe/web/wp-content/uploads/2022/06/educacion_inicial-importancia.jpg" alt="Educación Inicial" class="w-full h-52 object-cover rounded-t-2xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Niveles/inicialVista}">
-                    <button class="w-full bg-pink-300 hover:bg-pink-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Inicial
-                    </button>
-                </a>
+            <!-- CARD GENÉRICA -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://st3.depositphotos.com/4431055/16123/i/450/depositphotos_161237680-stock-photo-young-female-student.jpg"
+                     alt="Añadir Estudiante" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/estudianteVista}">
+                        <button class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Estudiante
+                        </button>
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Educación Básica -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfTZh31gNDbTk69d2tos21-byhEbi3xBjh-g&s" alt="Educación Básica" class="w-full h-52 object-cover rounded-t-2xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Niveles/educacionBasicaVista}">
-                    <button class="w-full bg-green-300 hover:bg-green-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Educación Básica
-                    </button>
-                </a>
+            <!-- Repite para docente -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBEjoCLHr_-pKvAoIEKfKND0YJKkB7G_IVHw&s"
+                     alt="Añadir Docente" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/docenteVista}">
+                        <button class="w-full bg-green-700 hover:bg-green-900 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Docente
+                        </button>
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Bachillerato General -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0jtrLp-TzcQVGoqhhqvk-WPbVhDq9llAVQ&s" alt="Bachillerato General" class="w-full h-52 object-cover rounded-t-2xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Niveles/bachilleratoGeneralVista}">
-                    <button class="w-full bg-red-400 hover:bg-red-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Bachillerato General
-                    </button>
-                </a>
+            <!-- Materia -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://img.freepik.com/vector-gratis/asignaturas-colegio_23-2147511892.jpg"
+                     alt="Añadir Materia" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/materiaVista}">
+                        <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Materia
+                        </button>
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- Bachillerato Técnico -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-            <img src="https://educacion.gob.ec/wp-content/uploads/2020/11/Boletin-docentes-BT.jpg" alt="Bachillerato Técnico" class="w-full h-52 object-cover rounded-t-2xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Niveles/bachilleratoTecnicoVista}">
-                    <button class="w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Bachillerato Técnico
-                    </button>
-                </a>
+            <!-- Curso -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://blog.adecco.com.mx/wp-content/uploads/2019/05/cursos-adecco-capacitacion-personal-1-1.png"
+                     alt="Añadir Curso" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/cursoVista}">
+                        <button class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Curso
+                        </button>
+                    </a>
+                </div>
             </div>
-        </div>
 
+            <!-- Periodo académico -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://static.vecteezy.com/system/resources/previews/023/860/496/non_2x/education-path-finding-passion-to-study-decision-to-take-academic-course-concept-teens-finding-direction-to-go-at-signpost-locating-on-graduation-cap-vector.jpg"
+                     alt="Añadir Periodo Académico" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/periodoAcademicoVista}">
+                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Periodo Académico
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Trimestre -->
+            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
+                <img src="https://i0.wp.com/www3.gobiernodecanarias.org/medusa/edublog/ceippintornestor/wp-content/uploads/sites/886/2024/04/tercer-trimestre.jpg?ssl=1"
+                     alt="Añadir Trimestre" class="w-full h-52 object-cover rounded-t-3xl">
+                <div class="p-5">
+                    <a th:href="@{/pages/Admin/trimestreVista}">
+                        <button class="w-full bg-amber-800 hover:bg-orange-900 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
+                            Añadir Trimestre
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+        </div>
     </div>
+
 </div>
 
 
+<div class="p-7 ">
 
-
-
-
-<div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
-    <h2 class="text-3xl font-bold text-black mb-8 text-center">📚 PANEL DE GESTION ACADEMICA</h2>
-
-    <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-
-        <!-- CARD GENÉRICA -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://st3.depositphotos.com/4431055/16123/i/450/depositphotos_161237680-stock-photo-young-female-student.jpg" alt="Añadir Estudiante" class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/estudianteVista}">
-                    <button class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Estudiante
-                    </button>
-                </a>
-            </div>
+    <nav class="bg-gradient-to-r from-blue-700 to-blue-900 p-6 shadow-lg rounded-2xl">
+        <div class="container mx-auto flex flex-wrap items-center justify-between">
+            <span class="text-white font-extrabold text-3xl tracking-tight">Gestión de perfiles</span>
+            <a th:href="@{/pages/Admin/vistaAdmin}"
+               class="bg-white text-blue-800 font-semibold px-6 py-2 rounded-full shadow-md hover:bg-blue-100 transition duration-300 ease-in-out transform hover:scale-105">
+                Ir a perfiles
+            </a>
         </div>
+    </nav>
 
-        <!-- Repite para docente -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBEjoCLHr_-pKvAoIEKfKND0YJKkB7G_IVHw&s" alt="Añadir Docente" class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/docenteVista}">
-                    <button class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Docente
-                    </button>
-                </a>
-            </div>
-        </div>
-
-        <!-- Materia -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://img.freepik.com/vector-gratis/asignaturas-colegio_23-2147511892.jpg" alt="Añadir Materia" class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/materiaVista}">
-                    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Materia
-                    </button>
-                </a>
-            </div>
-        </div>
-
-        <!-- Curso -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://blog.adecco.com.mx/wp-content/uploads/2019/05/cursos-adecco-capacitacion-personal-1-1.png" alt="Añadir Curso" class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/cursoVista}">
-                    <button class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Curso
-                    </button>
-                </a>
-            </div>
-        </div>
-
-        <!-- Periodo académico -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://static.vecteezy.com/system/resources/previews/023/860/496/non_2x/education-path-finding-passion-to-study-decision-to-take-academic-course-concept-teens-finding-direction-to-go-at-signpost-locating-on-graduation-cap-vector.jpg" alt="Añadir Periodo Académico"  class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/periodoAcademicoVista}">
-                    <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Periodo Académico
-                    </button>
-                </a>
-            </div>
-        </div>
-
-        <!-- Trimestre -->
-        <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-            <img src="https://i0.wp.com/www3.gobiernodecanarias.org/medusa/edublog/ceippintornestor/wp-content/uploads/sites/886/2024/04/tercer-trimestre.jpg?ssl=1" alt="Añadir Trimestre"  class="w-full h-52 object-cover rounded-t-3xl">
-            <div class="p-5">
-                <a th:href="@{/pages/Admin/trimestreVista}">
-                    <button class="w-full bg-amber-800 hover:bg-orange-900 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                        Añadir Trimestre
-                    </button>
-                </a>
-            </div>
-        </div>
-
-    </div>
 </div>
-
-
-
-<!--Scrits-->
-
-<!--1.Filtro de cursos y materias por Nivel Educativos-->
-
-
-
-<!--2.Filtro de columnas que se muestran por filtros-->
-
-
-
-
-
-
 
 </body>
 

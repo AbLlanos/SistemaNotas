@@ -28,7 +28,7 @@ public class DocenteController {
         List<Docente> docentes;
 
         if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
-            docentes = docenteService.mostrarDocente();
+            docentes = docenteService.listarTodosDocentes();
         } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
             docentes = docenteService.buscarPorNombre(nombre);
         } else if ((nombre == null || nombre.isEmpty()) && cedula != null && !cedula.isEmpty()) {

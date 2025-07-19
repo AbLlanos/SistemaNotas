@@ -1,6 +1,5 @@
 package com.itsqmet.proyecto_vinculacion.controller;
 
-import com.itsqmet.proyecto_vinculacion.dto.FiltroDTO;
 import com.itsqmet.proyecto_vinculacion.dto.NotaCompletaDTO;
 import com.itsqmet.proyecto_vinculacion.entity.*;
 import com.itsqmet.proyecto_vinculacion.service.*;
@@ -11,11 +10,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
+@RequestMapping("/pages/Admin")
 public class AdminController {
 
     @Autowired
@@ -45,35 +43,8 @@ public class AdminController {
 
     //1. Sistema de notas
 
-    @GetMapping("/pages/Admin/vistaAdmin")
-    public String vistaAdmin(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model
-    ) {
-        // Obtener datos para filtros
-        List<PeriodoAcademico> aniosLectivos = periodoAcademicoService.listarTodos();
-        List<Curso> cursos = cursoService.mostrarCursos();
-        List<Materia> materias1 = materiaService.obtenerTodasLasMaterias();
-        List<Trimestre> trimestres = trimestreService.obtenerTodos();
-
-        // Obtener notas filtradas (o todas si no hay filtros)
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre);
-
-        // Añadir todo al modelo para Thymeleaf
-        model.addAttribute("aniosLectivos", aniosLectivos);
-        model.addAttribute("cursos", cursos);
-        model.addAttribute("materias1", materias1);
-        model.addAttribute("trimestres", trimestres);
-        model.addAttribute("notas", notas);
-
-        // Parámetros actuales para mantener selección en filtros
-        model.addAttribute("param", new FiltroDTO(nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre));
-
+    @GetMapping("/vistaAdmin")
+    public String vistaAdmin(){
         return "pages/Admin/vistaAdmin";
     }
 
@@ -81,6 +52,35 @@ public class AdminController {
 
 
 
+
+    //Ruta educacion inicial
+
+    @GetMapping("/Inicial/educacionInicialVista")
+    public String vistaAdminEducaionInicial(
+            @RequestParam(required = false) String nombrePeriodo,
+            @RequestParam(required = false) String nombreCurso,
+            @RequestParam(required = false) String nombreMateria,
+            @RequestParam(required = false) String cedula,
+            @RequestParam(required = false) String nombreTrimestre,
+            Model model) {
+
+        String nombreNivel = "EducacionInicial";
+
+        List<Notas> notas = notasService.buscarNotasPorFiltros(
+                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
+        );
+
+        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
+        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
+
+        model.addAttribute("notas", notas);
+        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+        model.addAttribute("cursos", cursosFiltrados);
+        model.addAttribute("materias", materiasFiltradas);
+
+        return "pages/Admin/Inicial/educacionInicialVista";
+    }
 
 
 
@@ -92,7 +92,7 @@ public class AdminController {
 
     //Ruta educaion basica
 
-    @GetMapping("/pages/Admin/EducacionBasica/educacionBasicaVista")
+    @GetMapping("/EducacionBasica/educacionBasicaVista")
     public String vistaAdminEscuela(
             @RequestParam(required = false) String nombrePeriodo,
             @RequestParam(required = false) String nombreCurso,
@@ -111,8 +111,8 @@ public class AdminController {
         List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
 
         model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodos());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
+        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
         model.addAttribute("cursos", cursosFiltrados);
         model.addAttribute("materias", materiasFiltradas);
 
@@ -134,7 +134,7 @@ public class AdminController {
 
     //Ruta bachillerato
 
-    @GetMapping("/pages/Admin/Bachillerato/bachilleratoVista")
+    @GetMapping("/Bachillerato/bachilleratoVista")
     public String vistaAdminBachillerato(
             @RequestParam(required = false) String nombrePeriodo,
             @RequestParam(required = false) String nombreCurso,
@@ -143,16 +143,20 @@ public class AdminController {
             @RequestParam(required = false) String nombreTrimestre,
             Model model) {
 
+        // Obtener las notas aplicando los filtros seleccionados.
         List<NotaCompletaDTO> notasCompletas = notasService.obtenerNotasCompletas(
                 nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre);
 
+        // Se añade la lista de notas filtradas al modelo para mostrar en la tabla.
         model.addAttribute("notas", notasCompletas);
 
-        // Otros atributos para filtros
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodos());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
+        // Cargar datos de filtros dinámicos: periodos, trimestres, cursos y materias.
+        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
         model.addAttribute("cursos", cursoService.findByNivelEducativoNombre("BachilleratoGeneral"));
         model.addAttribute("materias", materiaService.findByCursoNivelEducativoNombre("BachilleratoGeneral"));
+
+
 
         return "pages/Admin/Bachillerato/bachilleratoVista";
     }
@@ -160,11 +164,11 @@ public class AdminController {
 
     @GetMapping("/notas/nuevo")
     public String mostrarFormularioNota(Model model) {
-        model.addAttribute("notaCompletaDTO", new NotaCompletaDTO()); // para binding opcional
-        model.addAttribute("estudiantes", estudianteService.obtenerTodos());
-        model.addAttribute("materias", materiaService.obtenerTodasLasMaterias());
-        model.addAttribute("periodos", periodoAcademicoService.listarTodos());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
+        model.addAttribute("nota", new NotaCompletaDTO());
+        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
+        model.addAttribute("materias", materiaService.listarTodasMaterias());
+        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
 
@@ -173,23 +177,22 @@ public class AdminController {
     @PostMapping("/notas/guardar")
     public String guardarNotaCompleta(@ModelAttribute NotaCompletaDTO notaCompletaDTO) {
         notasService.guardarNotasDesdeFormulario(notaCompletaDTO);
-        return "redirect:/pages/Admin/Bachillerato/bachilleratoVista"; // o la vista que muestre notas
+        return "redirect:/Bachillerato/bachilleratoVista";
     }
-
 
     @GetMapping("/notas/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
-        Notas nota = notasService.buscarNotaPorId(id);
-        model.addAttribute("nota", nota);
+        NotaCompletaDTO notaCompletaDTO = notasService.obtenerNotaCompletaPorId(id);
+        model.addAttribute("nota", notaCompletaDTO);
 
-        // También carga listas para selects, si tienes
-        model.addAttribute("estudiantes", estudianteService.obtenerTodos());
-        model.addAttribute("materias", materiaService.obtenerTodasLasMaterias());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
-        model.addAttribute("periodos", periodoAcademicoService.listarTodos());
+        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
+        model.addAttribute("materias", materiaService.listarTodasMaterias());
+        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
 
-        return "notas/editarNota"; // plantilla Thymeleaf con el formulario
+        return "pages/Admin/Bachillerato/bachilleratoForm";
     }
+
 
 
 
@@ -201,7 +204,7 @@ public class AdminController {
 
     //Ruta Bachillerato Tecnico
 
-    @GetMapping("/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista")
+    @GetMapping("/BachilleratoTecnico/bachilleratoTecnicoVista")
     public String vistaAdminBachilleratoTecnico(
             @RequestParam(required = false) String nombrePeriodo,
             @RequestParam(required = false) String nombreCurso,
@@ -220,54 +223,13 @@ public class AdminController {
         List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
 
         model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodos());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
+        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
         model.addAttribute("cursos", cursosFiltrados);
         model.addAttribute("materias", materiasFiltradas);
 
         return "pages/Admin/Bachillerato/bachilleratoVista";
     }
-
-    //Ruta educacion inicial
-
-    @GetMapping("/pages/Admin/Inicial/educacionInicialVista")
-    public String vistaAdminEducaionInicial(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model) {
-
-        String nombreNivel = "EducacionInicial";
-
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
-
-        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
-        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
-
-        model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodos());
-        model.addAttribute("trimestres", trimestreService.obtenerTodos());
-        model.addAttribute("cursos", cursosFiltrados);
-        model.addAttribute("materias", materiasFiltradas);
-
-        return "pages/Admin/Inicial/educacionInicialVista";
-    }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

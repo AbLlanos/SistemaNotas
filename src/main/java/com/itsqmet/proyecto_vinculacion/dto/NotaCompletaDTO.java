@@ -7,23 +7,36 @@ public class NotaCompletaDTO {
     private String cedulaEstudiante;
     private String nombreCompletoEstudiante;
     private String areaMateria;
+    private String nombreCurso;
+
+    public String getNombreCurso() {
+        return nombreCurso;
+    }
+
+    public void setNombreCurso(String nombreCurso) {
+        this.nombreCurso = nombreCurso;
+    }
 
     // Primer trimestre
+    
     private Double notaNumericaPrimerTrim;
     private String notaCualitativaPrimerTrim;
+
     private Integer asistenciaPrimerTrim;
     private Integer faltasJustificadasPrimerTrim;
     private Integer faltasInjustificadasPrimerTrim;
     private Integer atrasosPrimerTrim;
     private String comportamientoPrimerTrim;
-
     private Integer totalAsistenciaPrimerTrim;
 
 
 
+
     // Segundo trimestre
+
     private Double notaNumericaSegundoTrim;
     private String notaCualitativaSegundoTrim;
+
     private Integer asistenciaSegundoTrim;
     private Integer faltasJustificadasSegundoTrim;
     private Integer faltasInjustificadasSegundoTrim;
@@ -33,58 +46,20 @@ public class NotaCompletaDTO {
     private Integer setTotalAsistenciaSegundoTrim;
 
     // Tercer trimestre
+
     private Double notaNumericaTercerTrim;
     private String notaCualitativaTercerTrim;
+
     private Integer asistenciaTercerTrim;
     private Integer faltasJustificadasTercerTrim;
     private Integer faltasInjustificadasTercerTrim;
     private Integer atrasosTercerTrim;
-
-    public Integer getSetTotalAsistenciaSegundoTrim() {
-        return setTotalAsistenciaSegundoTrim;
-    }
-
-    public void setSetTotalAsistenciaSegundoTrim(Integer setTotalAsistenciaSegundoTrim) {
-        this.setTotalAsistenciaSegundoTrim = setTotalAsistenciaSegundoTrim;
-    }
-
-    public Integer getSetTotalAsistenciaTercerTrim() {
-        return setTotalAsistenciaTercerTrim;
-    }
-
-    public void setSetTotalAsistenciaTercerTrim(Integer setTotalAsistenciaTercerTrim) {
-        this.setTotalAsistenciaTercerTrim = setTotalAsistenciaTercerTrim;
-    }
-
     private String comportamientoTercerTrim;
-
     private Integer setTotalAsistenciaTercerTrim;
 
 
-    public NotaCompletaDTO() {}
-
-    // Getters y setters para todos los campos
-
     public Long getIdNota() {
         return idNota;
-    }
-
-    public Integer getTotalAsistenciaPrimerTrim() {
-        return totalAsistenciaPrimerTrim;
-    }
-
-    public String getComportamientoPrimerTrim() {
-        return comportamientoPrimerTrim;
-    }
-
-
-
-    public void setComportamientoPrimerTrim(String comportamientoPrimerTrim) {
-        this.comportamientoPrimerTrim = comportamientoPrimerTrim;
-    }
-
-    public void setTotalAsistenciaPrimerTrim(Integer totalAsistenciaPrimerTrim) {
-        this.totalAsistenciaPrimerTrim = totalAsistenciaPrimerTrim;
     }
 
     public void setIdNota(Long idNota) {
@@ -163,7 +138,21 @@ public class NotaCompletaDTO {
         this.atrasosPrimerTrim = atrasosPrimerTrim;
     }
 
-    // Repite lo mismo para segundo y tercer trimestre...
+    public String getComportamientoPrimerTrim() {
+        return comportamientoPrimerTrim;
+    }
+
+    public void setComportamientoPrimerTrim(String comportamientoPrimerTrim) {
+        this.comportamientoPrimerTrim = comportamientoPrimerTrim;
+    }
+
+    public Integer getTotalAsistenciaPrimerTrim() {
+        return totalAsistenciaPrimerTrim;
+    }
+
+    public void setTotalAsistenciaPrimerTrim(Integer totalAsistenciaPrimerTrim) {
+        this.totalAsistenciaPrimerTrim = totalAsistenciaPrimerTrim;
+    }
 
     public Double getNotaNumericaSegundoTrim() {
         return notaNumericaSegundoTrim;
@@ -221,6 +210,14 @@ public class NotaCompletaDTO {
         this.comportamientoSegundoTrim = comportamientoSegundoTrim;
     }
 
+    public Integer getSetTotalAsistenciaSegundoTrim() {
+        return setTotalAsistenciaSegundoTrim;
+    }
+
+    public void setSetTotalAsistenciaSegundoTrim(Integer setTotalAsistenciaSegundoTrim) {
+        this.setTotalAsistenciaSegundoTrim = setTotalAsistenciaSegundoTrim;
+    }
+
     public Double getNotaNumericaTercerTrim() {
         return notaNumericaTercerTrim;
     }
@@ -275,5 +272,13 @@ public class NotaCompletaDTO {
 
     public void setComportamientoTercerTrim(String comportamientoTercerTrim) {
         this.comportamientoTercerTrim = comportamientoTercerTrim;
+    }
+
+    public Integer getSetTotalAsistenciaTercerTrim() {
+        return setTotalAsistenciaTercerTrim;
+    }
+
+    public void setSetTotalAsistenciaTercerTrim(Integer setTotalAsistenciaTercerTrim) {
+        this.setTotalAsistenciaTercerTrim = setTotalAsistenciaTercerTrim;
     }
 }
