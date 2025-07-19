@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class NotasService {
 
@@ -93,116 +97,123 @@ public class NotasService {
 
         List<Notas> notas = notasRepository.findAll(spec);
 
-        // Buscar los trimestres Primero, Segundo y Tercero
-        Trimestre t1 = trimestreService.buscarPorNombre("Primero");
-        Trimestre t2 = trimestreService.buscarPorNombre("Segundo");
-        Trimestre t3 = trimestreService.buscarPorNombre("Tercero");
+        // Mapa clave = "cedulaEstudiante|materia|periodo" para agrupar por estudiante y materia
+        Map<String, NotaCompletaDTO> mapaNotas = new LinkedHashMap<>();
 
-        return notas.stream().map(n -> {
-            NotaCompletaDTO dto = new NotaCompletaDTO();
-            dto.setIdNota(n.getId());
+        for (Notas n : notas) {
+            String key = n.getEstudiante().getCedula() + "|" +
+                    n.getMateria().getNombre() + "|" +
+                    n.getPeriodoAcademico().getNombre();
 
-            // Datos del estudiante
-            if (n.getEstudiante() != null) {
-                dto.setCedulaEstudiante(n.getEstudiante().getCedula());
-                dto.setNombreCompletoEstudiante(
-                        n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido());
-            } else {
-                dto.setCedulaEstudiante("---");
-                dto.setNombreCompletoEstudiante("---");
-            }
+            NotaCompletaDTO dto = mapaNotas.computeIfAbsent(key, k -> {
+                NotaCompletaDTO nuevoDto = new NotaCompletaDTO();
+                nuevoDto.setIdNota(n.getId());
 
-            // Nombre de la materia
-            dto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
-
-            // Nombre(s) de curso(s)
-            String cursosTexto = "---";
-            if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
-                cursosTexto = n.getMateria().getCursos()
-                        .stream()
-                        .map(Curso::getNombre)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("---");
-            }
-            dto.setNombreCurso(cursosTexto);
-
-            // Nota y cualitativa
-            dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
-            dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
-
-            if (n.getEstudiante() != null && n.getMateria() != null && n.getPeriodoAcademico() != null) {
-
-                // Primer trimestre
-                if (t1 != null) {
-                    asistenciaRepository.findByEstudianteAndMateriaAndTrimestreAndPeriodo(
-                            n.getEstudiante(), n.getMateria(), t1, n.getPeriodoAcademico()
-                    ).ifPresent(a -> {
-                        dto.setAsistenciaPrimerTrim(a.getAsistencias());
-                        dto.setFaltasJustificadasPrimerTrim(a.getFaltasJustificadas());
-                        dto.setFaltasInjustificadasPrimerTrim(a.getFaltasInjustificadas());
-                        dto.setAtrasosPrimerTrim(a.getAtrasos());
-
-                        dto.setTotalAsistenciaPrimerTrim(
-                                (a.getAsistencias() != null ? a.getAsistencias() : 0) +
-                                        (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
-                                        (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
-                        );
-                    });
-
-                    comportamientoRepository.findByEstudianteAndTrimestreAndPeriodo(
-                            n.getEstudiante(), t1, n.getPeriodoAcademico()
-                    ).ifPresent(c -> dto.setComportamientoPrimerTrim(c.getComportamiento()));
+                // Datos del estudiante
+                if (n.getEstudiante() != null) {
+                    nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
+                    nuevoDto.setNombreCompletoEstudiante(
+                            n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido());
+                } else {
+                    nuevoDto.setCedulaEstudiante("---");
+                    nuevoDto.setNombreCompletoEstudiante("---");
                 }
 
-                // Segundo trimestre
-                if (t2 != null) {
-                    asistenciaRepository.findByEstudianteAndMateriaAndTrimestreAndPeriodo(
-                            n.getEstudiante(), n.getMateria(), t2, n.getPeriodoAcademico()
-                    ).ifPresent(a -> {
-                        dto.setAsistenciaSegundoTrim(a.getAsistencias());
-                        dto.setFaltasJustificadasSegundoTrim(a.getFaltasJustificadas());
-                        dto.setFaltasInjustificadasSegundoTrim(a.getFaltasInjustificadas());
-                        dto.setAtrasosSegundoTrim(a.getAtrasos());
-
-                        dto.setSetTotalAsistenciaSegundoTrim(
-                                (a.getAsistencias() != null ? a.getAsistencias() : 0) +
-                                        (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
-                                        (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
-                        );
-                    });
-
-                    comportamientoRepository.findByEstudianteAndTrimestreAndPeriodo(
-                            n.getEstudiante(), t2, n.getPeriodoAcademico()
-                    ).ifPresent(c -> dto.setComportamientoSegundoTrim(c.getComportamiento()));
+                // Materia y curso
+                nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
+                String cursosTexto = "---";
+                if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
+                    cursosTexto = n.getMateria().getCursos()
+                            .stream()
+                            .map(Curso::getNombre)
+                            .reduce((a, b) -> a + ", " + b)
+                            .orElse("---");
                 }
+                nuevoDto.setNombreCurso(cursosTexto);
 
-                // Tercer trimestre
-                if (t3 != null) {
-                    asistenciaRepository.findByEstudianteAndMateriaAndTrimestreAndPeriodo(
-                            n.getEstudiante(), n.getMateria(), t3, n.getPeriodoAcademico()
-                    ).ifPresent(a -> {
-                        dto.setAsistenciaTercerTrim(a.getAsistencias());
-                        dto.setFaltasJustificadasTercerTrim(a.getFaltasJustificadas());
-                        dto.setFaltasInjustificadasTercerTrim(a.getFaltasInjustificadas());
-                        dto.setAtrasosTercerTrim(a.getAtrasos());
+                return nuevoDto;
+            });
 
-                        dto.setSetTotalAsistenciaTercerTrim(
-                                (a.getAsistencias() != null ? a.getAsistencias() : 0) +
-                                        (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
-                                        (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
-                        );
-                    });
-
-                    comportamientoRepository.findByEstudianteAndTrimestreAndPeriodo(
-                            n.getEstudiante(), t3, n.getPeriodoAcademico()
-                    ).ifPresent(c -> dto.setComportamientoTercerTrim(c.getComportamiento()));
+            // --- Asignar notas, asistencia y comportamiento por trimestre ---
+            if (n.getTrimestre() != null) {
+                String trimestre = n.getTrimestre().getNombre().toLowerCase();
+                switch (trimestre) {
+                    case "primero" -> {
+                        dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
+                        dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
+                        asignarAsistenciaYComportamiento(dto, n, "primer");
+                    }
+                    case "segundo" -> {
+                        dto.setNotaNumericaSegundoTrim(n.getNotaNumerica());
+                        dto.setNotaCualitativaSegundoTrim(n.getNotaCualitativa());
+                        asignarAsistenciaYComportamiento(dto, n, "segundo");
+                    }
+                    case "tercero" -> {
+                        dto.setNotaNumericaTercerTrim(n.getNotaNumerica());
+                        dto.setNotaCualitativaTercerTrim(n.getNotaCualitativa());
+                        asignarAsistenciaYComportamiento(dto, n, "tercero");
+                    }
                 }
             }
+        }
 
-            return dto;
-        }).toList();
+        return new ArrayList<>(mapaNotas.values());
     }
 
+    /**
+     * Método auxiliar para setear asistencia y comportamiento según trimestre
+     */
+    private void asignarAsistenciaYComportamiento(NotaCompletaDTO dto, Notas n, String trimestreClave) {
+        asistenciaRepository.findByEstudianteAndMateriaAndTrimestreAndPeriodo(
+                n.getEstudiante(), n.getMateria(), n.getTrimestre(), n.getPeriodoAcademico()
+        ).ifPresent(a -> {
+            switch (trimestreClave) {
+                case "primer" -> {
+                    dto.setAsistenciaPrimerTrim(a.getAsistencias());
+                    dto.setFaltasJustificadasPrimerTrim(a.getFaltasJustificadas());
+                    dto.setFaltasInjustificadasPrimerTrim(a.getFaltasInjustificadas());
+                    dto.setAtrasosPrimerTrim(a.getAtrasos());
+                    dto.setTotalAsistenciaPrimerTrim(
+                            (a.getAsistencias() != null ? a.getAsistencias() : 0) +
+                                    (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
+                                    (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
+                    );
+                }
+                case "segundo" -> {
+                    dto.setAsistenciaSegundoTrim(a.getAsistencias());
+                    dto.setFaltasJustificadasSegundoTrim(a.getFaltasJustificadas());
+                    dto.setFaltasInjustificadasSegundoTrim(a.getFaltasInjustificadas());
+                    dto.setAtrasosSegundoTrim(a.getAtrasos());
+                    dto.setSetTotalAsistenciaSegundoTrim(
+                            (a.getAsistencias() != null ? a.getAsistencias() : 0) +
+                                    (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
+                                    (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
+                    );
+                }
+                case "tercero" -> {
+                    dto.setAsistenciaTercerTrim(a.getAsistencias());
+                    dto.setFaltasJustificadasTercerTrim(a.getFaltasJustificadas());
+                    dto.setFaltasInjustificadasTercerTrim(a.getFaltasInjustificadas());
+                    dto.setAtrasosTercerTrim(a.getAtrasos());
+                    dto.setSetTotalAsistenciaTercerTrim(
+                            (a.getAsistencias() != null ? a.getAsistencias() : 0) +
+                                    (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
+                                    (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
+                    );
+                }
+            }
+        });
+
+        comportamientoRepository.findByEstudianteAndTrimestreAndPeriodo(
+                n.getEstudiante(), n.getTrimestre(), n.getPeriodoAcademico()
+        ).ifPresent(c -> {
+            switch (trimestreClave) {
+                case "primer" -> dto.setComportamientoPrimerTrim(c.getComportamiento());
+                case "segundo" -> dto.setComportamientoSegundoTrim(c.getComportamiento());
+                case "tercero" -> dto.setComportamientoTercerTrim(c.getComportamiento());
+            }
+        });
+    }
 
 
 
