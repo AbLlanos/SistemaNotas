@@ -1,15 +1,14 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;  // Importa esto
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Table(name = "materia")
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Materia {
@@ -20,21 +19,23 @@ public class Materia {
 
     private String nombre;
 
-    // Conexión con docente
-    @ManyToOne
+    /* Docente responsable (opcional). */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "docente_id")
     private Docente docente;
 
-    // Esta relación puede generar ciclo al serializar, ponle @JsonIgnore
-    @ManyToMany(mappedBy = "materias")
+    /* Nivel educativo al que pertenece esta materia (para filtrar en formularios). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nivel_educativo_id")
+    private NivelEducativo nivelEducativo;
+
+    /* Relación inversa: cursos que incluyen esta materia. */
+    @ManyToMany(mappedBy = "materias", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Curso> cursos;
 
-
-
-    // Otras relaciones
+    /* Otras relaciones */
     @OneToMany(mappedBy = "materia", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Asistencia> asistencias;
-
 }
