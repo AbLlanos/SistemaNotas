@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="${curso.id} != null ? 'Editar Curso' : 'Registro de Curso'">Registro de Curso</title>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-purple-100 min-h-screen">
 
@@ -12,7 +12,8 @@
     <div class="container mx-auto flex flex-wrap items-center justify-between">
         <span class="text-white font-bold text-3xl"
               th:text="${curso.id} != null ? 'Editar Curso' : 'Curso'">Curso</span>
-        <a th:href="@{/pages/Admin/cursoVista}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
+        <a th:href="@{/pages/Admin/cursoVista}"
+           class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
             Regresar
         </a>
     </div>
@@ -21,15 +22,19 @@
 <section class="flex justify-center mt-10 px-4 pb-5">
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10">
 
-        <!-- =====================
-             FORMULARIO FILTRO (GET) para materias, estudiantes y niveles
-             ===================== -->
-        <form th:action="@{/pages/Admin/cursoForm}" method="get" class="space-y-6 mb-8">
+        <!-- ======================================================
+             FORMULARIO FILTRO (GET) - refresca listas al cambiar select
+             ====================================================== -->
+        <form th:action="${curso.id} != null ?
+                           @{/pages/Admin/cursoForm/{id}(id=${curso.id})} :
+                           @{/pages/Admin/cursoForm}"
+              method="get"
+              class="space-y-6 mb-8">
 
-            <!-- Nivel educativo (filtra materias y estudiantes) -->
+            <!-- Nivel educativo -->
             <div>
                 <label for="nivelSelect" class="block text-sm font-medium text-gray-700 mb-1">
-                    Nivel educativo (filtra listas)
+                    Nivel educativo (filtra Materias y Estudiantes)
                 </label>
                 <select id="nivelSelect" name="nivelId"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
@@ -43,15 +48,16 @@
                 </select>
             </div>
 
-            <!-- Periodo Académico (opcional filtro) -->
+            <!-- Periodo (solo para mantener selección visible mientras filtras;
+                 el que se guarda está en el form POST) -->
             <div>
-                <label for="periodoSelect" class="block text-sm font-semibold text-gray-700 mb-1">
-                    Periodo Académico
+                <label for="periodoFiltro" class="block text-sm font-semibold text-gray-700 mb-1">
+                    Periodo (opcional)
                 </label>
-                <select id="periodoSelect" name="periodoId"
+                <select id="periodoFiltro" name="periodoId"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                         onchange="this.form.submit()">
-                    <option value="">-- Seleccione periodo --</option>
+                    <option value="">-- Sin filtro --</option>
                     <option th:each="per : ${periodos}"
                             th:value="${per.id}"
                             th:text="${per.nombre}"
@@ -60,17 +66,18 @@
                 </select>
             </div>
 
-            <!-- Botón para aplicar filtro manualmente si prefieres -->
+            <!-- Botón accesible (oculto visualmente) para navegadores sin JS -->
             <button type="submit"
-                    class="py-2 px-4 bg-blue-700 text-white rounded hover:bg-blue-800 transition">
-                Aplicar filtro
-            </button>
+                    class="sr-only">Aplicar filtro</button>
         </form>
 
-        <!-- =====================
-             FORMULARIO CREAR / EDITAR CURSO (POST)
-             ===================== -->
-        <form th:action="@{/pages/Admin/cursoGuardar}" method="post" th:object="${curso}" class="space-y-6">
+        <!-- ======================================================
+             FORMULARIO CREAR / EDITAR CURSO (POST) - guarda
+             ====================================================== -->
+        <form th:action="@{/pages/Admin/cursoGuardar}"
+              method="post"
+              th:object="${curso}"
+              class="space-y-6">
 
             <input type="hidden" th:field="*{id}" />
 
@@ -79,10 +86,10 @@
                 <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre del Curso</label>
                 <input type="text" id="nombre" th:field="*{nombre}" required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                       placeholder="Ej: 1ro BG A / Segundo de Bachillerato" />
+                       placeholder="Ej: 1ro BG A / Segundo Bachillerato" />
             </div>
 
-            <!-- Periodo Académico -->
+            <!-- Periodo Académico (este se guarda) -->
             <div>
                 <label for="periodoSelectForm" class="block text-sm font-semibold text-gray-700 mb-1">
                     Periodo Académico
@@ -98,9 +105,9 @@
                 </select>
             </div>
 
-            <!-- Nivel educativo -->
+            <!-- Nivel educativo (este se guarda con el curso) -->
             <div>
-                <label for="nivelSelectForm" class="block text-sm font-medium text-gray-700 mb-1">
+                <label for="nivelSelectForm" class="block text-sm font-semibold text-gray-700 mb-1">
                     Nivel educativo
                 </label>
                 <select id="nivelSelectForm" name="nivelId"
@@ -114,7 +121,7 @@
                 </select>
             </div>
 
-            <!-- Materias (multi) -->
+            <!-- Materias filtradas -->
             <div>
                 <label for="materiasSeleccionadas" class="block text-sm font-medium text-gray-700 mb-1">
                     Materias del Curso
@@ -130,12 +137,10 @@
                             th:selected="${curso.materias != null and #lists.contains(curso.materias, materia)}">
                     </option>
                 </select>
-                <p class="text-sm text-gray-500 mt-2">
-                    Ctrl / Cmd para selección múltiple.
-                </p>
+                <p class="text-sm text-gray-500 mt-2">Ctrl / Cmd para selección múltiple.</p>
             </div>
 
-            <!-- Estudiantes (multi) -->
+            <!-- Estudiantes filtrados -->
             <div>
                 <label for="estudiantesSeleccionados" class="block text-sm font-medium text-gray-700 mb-1">
                     Estudiantes inscritos
@@ -151,16 +156,13 @@
                             th:selected="${curso.estudiantes != null and #lists.contains(curso.estudiantes, est)}">
                     </option>
                 </select>
-                <p class="text-sm text-gray-500 mt-2">
-                    Ctrl / Cmd para selección múltiple.
-                </p>
+                <p class="text-sm text-gray-500 mt-2">Ctrl / Cmd para selección múltiple.</p>
             </div>
 
-            <div class="pt-6">
-                <button type="submit" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
-                    [[${curso.id} != null ? 'Actualizar Curso' : 'Registrar Curso']]
-                </button>
-            </div>
+            <button type="submit"
+                    class="bg-green-600 text-white w-full py-3 rounded hover:bg-green-700 transition">
+                [[${curso.id} != null ? 'Actualizar Curso' : 'Registrar Curso']]
+            </button>
         </form>
 
     </div>
