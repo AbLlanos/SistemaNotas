@@ -116,6 +116,14 @@ public class EstudianteService {
     }
 
 
+    public List<Estudiante> obtenerEstudiantesPorIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return estudianteRepository.findAllById(ids);
+    }
+
+
     //OCULTAR ESTUDAINTES EN CASO DE SER NECESESARIO
 
         /* =========================
