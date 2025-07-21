@@ -20,5 +20,7 @@ public interface NotasRepository extends JpaRepository<Notas, Long>, JpaSpecific
                                                                               PeriodoAcademico periodoAcademico, Trimestre trimestre);
 
     List<Notas> findByEstudianteAndPeriodoAcademicoNombre(Estudiante estudiante, String nombrePeriodo);
+
+
 }
 

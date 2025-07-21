@@ -20,6 +20,18 @@ public class Comportamiento {
     @ManyToOne
     private PeriodoAcademico periodo;
 
+    @ManyToOne
+    @JoinColumn(name = "materia_id")
+    private Materia materia;
+
+    public Materia getMateria() {
+        return materia;
+    }
+
+    public void setMateria(Materia materia) {
+        this.materia = materia;
+    }
+
     public Long getId() {
         return id;
     }

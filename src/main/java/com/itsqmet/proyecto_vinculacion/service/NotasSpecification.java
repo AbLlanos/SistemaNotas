@@ -22,7 +22,7 @@ public class NotasSpecification {
             Predicate predicate = cb.conjunction();
 
             Join<Notas, Materia> joinMateria = root.join("materia");
-            Join<Materia, Curso> joinCurso = joinMateria.join("cursos");
+            Join<Materia, Curso> joinCurso = joinMateria.join("cursos", JoinType.LEFT);
 
             if (nombreCurso != null && !nombreCurso.isBlank()) {
                 predicate = cb.and(predicate,
@@ -52,4 +52,5 @@ public class NotasSpecification {
             return predicate;
         };
     }
+
 }

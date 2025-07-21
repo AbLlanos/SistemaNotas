@@ -178,7 +178,8 @@
 
                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                         <div class="flex items-center justify-center space-x-3">
-             <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}" ...>Editar</a>
+                            <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}"
+                               class="text-blue-600 hover:text-blue-800">Editar</a>
 
 
                             <!-- Eliminar -->
@@ -214,16 +215,6 @@
                             </div>
                         </div>
                     </td>
-                    <div class="flex gap-2 mt-4">
-                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Primer Trimestre')}"
-                           class="px-3 py-1 bg-blue-600 text-white rounded">PDF 1er Trim</a>
-                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Segundo Trimestre')}"
-                           class="px-3 py-1 bg-green-600 text-white rounded">PDF 2do Trim</a>
-                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Tercer Trimestre')}"
-                           class="px-3 py-1 bg-yellow-600 text-white rounded">PDF 3er Trim</a>
-                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='todos')}"
-                           class="px-3 py-1 bg-purple-600 text-white rounded">PDF Todos</a>
-                    </div>
                 </tr>
                 </tbody>
             </table>
@@ -238,6 +229,23 @@
         <a th:href="@{/pages/Admin/notas/nuevo}" class="inline-flex items-center px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
 
             <i class="fas fa-plus-circle mr-2"></i> Crear Nuevo Registro
+        </a>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Primer Trimestre')}"
+           class="px-3 py-1 bg-blue-600 text-white rounded">PDF 1er Trim</a>
+        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Segundo Trimestre')}"
+           class="px-3 py-1 bg-green-600 text-white rounded">PDF 2do Trim</a>
+        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Tercer Trimestre')}"
+           class="px-3 py-1 bg-yellow-600 text-white rounded">PDF 3er Trim</a>
+        <a th:href="@{/pages/Admin/admin/reporte-notas(
+    periodo=${param.nombrePeriodo},
+    cedula=${param.cedula},
+    trimestre=${param.nombreTrimestre} ?: 'todos'
+)}"
+           class="btn btn-primary" target="_blank">
+            Generar Reporte PDF General
         </a>
     </div>
 

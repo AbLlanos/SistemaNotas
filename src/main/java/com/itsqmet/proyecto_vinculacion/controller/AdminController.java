@@ -215,10 +215,8 @@ public class AdminController {
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
 
-
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
-
 
 
 
