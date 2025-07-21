@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class Estudiante extends Usuario {
 
-    /* Cursos en los que está inscrito este estudiante (lado dueño). */
     @ManyToMany
     @JoinTable(
             name = "estudiante_curso",
@@ -22,12 +21,10 @@ public class Estudiante extends Usuario {
     )
     private List<Curso> cursos;
 
-    /* Nivel educativo (sirve para filtrar cursos/materias válidos en UI). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nivel_educativo_id")
     private NivelEducativo nivelEducativo;
 
-    /* Relación con asistencias (y de ahí puedes derivar notas, etc.). */
     @OneToMany(mappedBy = "estudiante", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Asistencia> asistencias;

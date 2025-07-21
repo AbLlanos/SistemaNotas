@@ -19,17 +19,14 @@ public class Curso {
 
     private String nombre;
 
-    /* Nivel educativo (para filtrar estudiantes/materias válidos). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nivel_educativo_id")
     private NivelEducativo nivelEducativo;
 
-    /* Periodo Académico al que corresponde este curso (ciclo escolar). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "periodo_academico_id")
     private PeriodoAcademico periodoAcademico;
 
-    /* Materias que se imparten en este curso. Curso es el lado dueño del join-table. */
     @ManyToMany
     @JoinTable(
             name = "curso_materia",
@@ -38,8 +35,11 @@ public class Curso {
     )
     private List<Materia> materias;
 
-    /* Estudiantes inscritos. Estudiante es el lado dueño; aquí solo inverso. */
     @ManyToMany(mappedBy = "cursos", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Estudiante> estudiantes;
 }
+
+
+
+

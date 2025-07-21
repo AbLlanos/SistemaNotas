@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class EstudianteController {
     /* ==========================================
        3. Guardar Estudiante (nuevo o editado)
        ========================================== */
-    @PostMapping("/pages/Admin/guardarEstudiante") // <-- cambia ruta para evitar conflicto
+    @PostMapping("/pages/Admin/guardarEstudiante")
     public String guardarEstudiante(
             @ModelAttribute Estudiante estudiante,
             @RequestParam(name = "nivelId", required = false) Long nivelId,
@@ -100,7 +101,7 @@ public class EstudianteController {
 
             // Nivel
             if (nivelId != null) {
-                NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null); // <-- nombre correcto
+                NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null);
                 estudiante.setNivelEducativo(nivel);
             } else {
                 estudiante.setNivelEducativo(null);
@@ -108,10 +109,23 @@ public class EstudianteController {
 
             // Cursos
             if (cursosIds == null) cursosIds = Collections.emptyList();
+
             List<Curso> cursos = cursoService.obtenerCursosPorIds(cursosIds);
             estudiante.setCursos(cursos);
 
+            // Agrega el estudiante a la lista de cada curso (relación inversa)
+            for (Curso curso : cursos) {
+                if (curso.getEstudiantes() == null) {
+                    curso.setEstudiantes(new ArrayList<>());
+                }
+                if (!curso.getEstudiantes().contains(estudiante)) {
+                    curso.getEstudiantes().add(estudiante);
+                }
+            }
+
+            // Guarda el estudiante
             estudianteService.guardarEstudiante(estudiante);
+
             redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al guardar el estudiante: " + e.getMessage());

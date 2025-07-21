@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -96,9 +97,9 @@ public class CursoController {
 
 
 
-    // ------------------------------------------------------------
-    // 3. Formulario editar curso
-    // ------------------------------------------------------------
+    // ----------------------------------------
+// Mostrar formulario para editar curso
+// ----------------------------------------
     @GetMapping("/pages/Admin/cursoForm/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id,
                                           @RequestParam(value = "nivelId", required = false) Long overrideNivelId,
@@ -124,7 +125,7 @@ public class CursoController {
 
         List<Materia> materias = materiaService.listarPorNivelId(nivelId);
 
-        // Aquí también cambiar a estudiantes visibles para ese nivel
+        // También cambiar a estudiantes visibles para ese nivel
         List<Estudiante> estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
 
         model.addAttribute("niveles", niveles);
@@ -137,10 +138,9 @@ public class CursoController {
         return "pages/Admin/cursoForm";
     }
 
-
     // ------------------------------------------------------------
-    // 4. Guardar curso (nuevo o editado)
-    // ------------------------------------------------------------
+// 4. Guardar curso (nuevo o editado)
+// ------------------------------------------------------------
     @PostMapping("/pages/Admin/cursoGuardar")
     public String guardarCurso(@ModelAttribute Curso curso,
                                @RequestParam(value = "materiasSeleccionadas", required = false) List<Long> materiasIds,
@@ -151,40 +151,74 @@ public class CursoController {
                     ? cursoService.buscarCursoPorId(curso.getId()).orElse(new Curso())
                     : new Curso();
 
+            // Lista original estudiantes antes de cambios
+            List<Estudiante> estudiantesActuales = new ArrayList<>();
+            if (cursoPersistido.getEstudiantes() != null) {
+                estudiantesActuales.addAll(cursoPersistido.getEstudiantes());
+            }
+
             cursoPersistido.setNombre(curso.getNombre());
             cursoPersistido.setPeriodoAcademico(curso.getPeriodoAcademico());
             cursoPersistido.setNivelEducativo(curso.getNivelEducativo());
 
-            // Materias (puede hacerse antes sin problema)
+            // Materias
             if (materiasIds != null && !materiasIds.isEmpty()) {
                 cursoPersistido.setMaterias(materiaService.obtenerMateriasPorIds(materiasIds));
             } else {
-                cursoPersistido.setMaterias(List.of());
+                cursoPersistido.setMaterias(new ArrayList<>());
             }
 
-            // 🟡 Paso 1: Guardar el curso SIN estudiantes para que tenga ID
-            cursoPersistido.setEstudiantes(List.of()); // necesario para evitar errores al persistir
+            // Guardar sin estudiantes para tener ID
+            cursoPersistido.setEstudiantes(new ArrayList<>());
             cursoService.guardarCurso(cursoPersistido);
 
-            // 🟢 Paso 2: Si hay estudiantes, asociarlos al curso y sincronizar relación inversa
             if (estudiantesIds != null && !estudiantesIds.isEmpty()) {
-                List<Estudiante> estudiantes = estudianteService.obtenerPorIds(estudiantesIds);
-                cursoPersistido.setEstudiantes(estudiantes);
+                List<Estudiante> estudiantesSeleccionados = estudianteService.obtenerPorIds(estudiantesIds);
 
-                for (Estudiante e : estudiantes) {
-                    if (e.getCursos() == null) {
-                        e.setCursos(new java.util.ArrayList<>());
-                    }
-                    if (!e.getCursos().contains(cursoPersistido)) {
-                        e.getCursos().add(cursoPersistido);
+                // Detectar estudiantes que se removieron
+                List<Estudiante> estudiantesARemover = new ArrayList<>();
+                for (Estudiante actual : estudiantesActuales) {
+                    if (!estudiantesIds.contains(actual.getId())) {
+                        estudiantesARemover.add(actual);
                     }
                 }
 
-                // Guardar todos los estudiantes con la relación
-                estudianteService.guardarTodos(estudiantes);
+                // Remover estudiantes del curso y relación inversa
+                estudiantesActuales.removeAll(estudiantesARemover);
+                for (Estudiante remover : estudiantesARemover) {
+                    if (remover.getCursos() != null) {
+                        remover.getCursos().remove(cursoPersistido);
+                    }
+                }
+                estudianteService.guardarTodos(estudiantesARemover);
+
+                // Agregar nuevos estudiantes sin duplicar y actualizar relación inversa
+                for (Estudiante nuevo : estudiantesSeleccionados) {
+                    if (!estudiantesActuales.contains(nuevo)) {
+                        estudiantesActuales.add(nuevo);
+                    }
+                    if (nuevo.getCursos() == null) {
+                        nuevo.setCursos(new ArrayList<>());
+                    }
+                    if (!nuevo.getCursos().contains(cursoPersistido)) {
+                        nuevo.getCursos().add(cursoPersistido);
+                    }
+                }
+                estudianteService.guardarTodos(estudiantesSeleccionados);
+
+                cursoPersistido.setEstudiantes(estudiantesActuales);
+
+            } else {
+                // Si no se seleccionó ninguno, eliminar todos
+                for (Estudiante e : estudiantesActuales) {
+                    if (e.getCursos() != null) {
+                        e.getCursos().remove(cursoPersistido);
+                    }
+                }
+                estudianteService.guardarTodos(estudiantesActuales);
+                cursoPersistido.setEstudiantes(new ArrayList<>());
             }
 
-            // 🟣 Paso 3 (opcional): volver a guardar el curso por si se requiere actualizar relación bidireccional
             cursoService.guardarCurso(cursoPersistido);
 
             redirectAttributes.addFlashAttribute("success", "Curso guardado correctamente.");
@@ -194,6 +228,7 @@ public class CursoController {
 
         return "redirect:/pages/Admin/cursoVista";
     }
+
 
 
 
