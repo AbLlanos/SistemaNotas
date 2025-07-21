@@ -1,28 +1,145 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-    <style>
-        @import url('https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.min.css')
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <title>Estudiantes</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <title>Lista de Estudiantes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Lista de estudiantes</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
-<div>
-    <h1>Añadir estudiante</h1>
-    <a th:href="@{/pages/Admin/estudianteForm}">
-        <button type="button"
-                class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center bg-red-500 hover:bg-red-600 focus:ring-red-700">
-            Ir
-        </button>
-    </a>
-</div>
+<nav class="bg-blue-700 p-6">
+    <div class="container mx-auto flex flex-wrap items-center justify-between">
+        <span class="text-white font-bold text-3xl">Lista de Estudiantes</span>
+        <a th:href="@{/pages/Admin/vistaAdmin}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
+            Regresar
+        </a>
+    </div>
+</nav>
+
+<main class="container mx-auto flex-1 mt-8">
+
+    <div class="max-w-7xl mx-auto mb-8 rounded-lg border border-gray-300 shadow-md bg-white">
+
+        <div class="mb-4 text-center bg-blue-50 rounded-t-lg p-4">
+            <h4 class="text-3xl font-semibold text-blue-800">Estudiantes Registrados</h4>
+        </div>
+
+        <!-- Filtro por nombre y cédula -->
+        <div class="px-6 pb-6">
+
+            <form th:action="@{/pages/Admin/estudianteVista}" method="get" class="space-y-6">
+                <div class="flex flex-wrap gap-4">
+                    <!-- Nombre -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Nombre</label>
+                        <input type="text" id="filtroNombre" name="nombre"
+                               placeholder="Ingrese nombre"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                               th:value="${paramNombre}" />
+                    </div>
+                    <!-- Cédula -->
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="filtroCedula" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cédula</label>
+                        <input type="text" id="filtroCedula" name="cedula"
+                               placeholder="Ingrese cédula"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                               th:value="${paramCedula}" />
+                    </div>
+                    <!-- Mostrar ocultos -->
+                    <div class="flex items-end">
+                        <label class="inline-flex items-center space-x-2">
+                            <input type="checkbox" name="mostrarOcultos"
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                   th:checked="${mostrarOcultos}" />
+                            <span class="text-sm text-gray-700">Mostrar ocultos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-center pt-2">
+                    <button type="submit"
+                            class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+                        Filtrar
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="overflow-x-auto bg-white rounded shadow max-h-[300px] overflow-y-auto custom-scrollbar">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-blue-100 sticky top-0 z-10">
+            <tr>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">ID</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Nombre</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Apellido</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Cédula</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Dirección</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Email</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Nivel</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Cursos</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            <tr th:if="${#lists.isEmpty(estudiantes)}">
+                <td colspan="10" class="px-4 py-4 text-center text-gray-500 italic">
+                    No se encontraron datos.
+                </td>
+            </tr>
+            <tr th:each="estudiante : ${estudiantes}" class="hover:bg-blue-50" th:unless="${#lists.isEmpty(estudiantes)}">
+                <td class="px-4 py-2" th:text="${estudiante.id}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.nombre}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.apellido}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.cedula}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.direccion}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.email}"></td>
+                <td class="px-4 py-2" th:text="${estudiante.nivelEducativo != null ? estudiante.nivelEducativo.nombre : '---'}"></td>
+
+                <!-- Cursos -->
+                <td class="px-4 py-2">
+                    <th:block th:if="${estudiante.cursos != null and !#lists.isEmpty(estudiante.cursos)}"
+                              th:each="c, stat : ${estudiante.cursos}">
+                        <span th:text="${c.nombre}"></span><span th:if="${!stat.last}">, </span>
+                    </th:block>
+                    <span th:if="${estudiante.cursos == null or #lists.isEmpty(estudiante.cursos)}">---</span>
+                </td>
+
+                <!-- Visible -->
+                <td class="px-4 py-2 text-center">
+                    <span th:if="${estudiante.visible}" class="text-green-700 font-semibold">Sí</span>
+                    <span th:unless="${estudiante.visible}" class="text-red-600 font-semibold">No</span>
+                </td>
+
+                <!-- Controles -->
+                <td class="px-4 py-2 flex space-x-2">
+                    <a th:href="@{/editarEstudiante/{id}(id=${estudiante.id})}"
+                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
+                    <a th:href="@{/eliminarEstudiante/{id}(id=${estudiante.id})}"
+                       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                       onclick="return confirm('¿Eliminar este estudiante?');">Eliminar</a>
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="flex justify-end space-x-4 mt-6">
+        <a th:href="@{/pages/Admin/estudianteForm}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+            Nuevo Estudiante
+        </a>
+        <a th:href="@{/generar-pdf-estudiantes}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow">
+            Generar PDF
+        </a>
+    </div>
+
+</main>
 
 </body>
 </html>

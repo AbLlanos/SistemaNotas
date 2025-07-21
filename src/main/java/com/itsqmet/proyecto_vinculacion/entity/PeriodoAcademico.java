@@ -1,14 +1,14 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Table(name = "periodo_academico")
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PeriodoAcademico {
@@ -19,8 +19,13 @@ public class PeriodoAcademico {
 
     private String nombre;
 
-    // Conexión con Notas
-    @OneToMany(mappedBy = "periodoAcademico")
+    /* Notas registradas en este periodo (por materia, estudiante, trimestre). */
+    @OneToMany(mappedBy = "periodoAcademico", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Notas> notas;
 
+    /* Cursos creados en este periodo. */
+    @OneToMany(mappedBy = "periodoAcademico", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Curso> cursos;
 }

@@ -21,4 +21,11 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     List<Curso> findByNombreContainingIgnoreCase(String nombre);
 
+    // NUEVO: por periodo
+    List<Curso> findByPeriodoAcademico_Id(Long periodoId);
+
+    // NUEVO combinado
+    List<Curso> findByPeriodoAcademico_IdAndNivelEducativo_Id(Long periodoId, Long nivelId);
+
+
 }

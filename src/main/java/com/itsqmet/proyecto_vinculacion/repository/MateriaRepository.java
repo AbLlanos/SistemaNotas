@@ -22,7 +22,12 @@ public interface MateriaRepository extends JpaRepository<Materia, Long> {
 
     List<Materia> findByCursosNombre(String nombreCurso);
 
-    List<Materia> findByCursosId(Long cursoId);
+    // Todas las materias de un nivel educativo por nombre de nivel
+    List<Materia> findByNivelEducativo_Nombre(String nombre);
+
+    // Todas las materias de un nivel educativo por ID de nivel
+    List<Materia> findByNivelEducativo_Id(Long id);
+
 
 
 }

@@ -1,10 +1,14 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
+import com.itsqmet.proyecto_vinculacion.entity.Curso;
+import com.itsqmet.proyecto_vinculacion.entity.Docente;
 import com.itsqmet.proyecto_vinculacion.entity.Materia;
 import com.itsqmet.proyecto_vinculacion.repository.MateriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +19,15 @@ import java.util.Optional;
 @Service
 public class MateriaService {
 
-    // Repositorio de Materia para acceso a la base de datos.
     @Autowired
     private MateriaRepository materiaRepository;
+
+    @Autowired
+    private DocenteService docenteService;
+
+    @Autowired
+    private CursoService cursoService;
+
 
     // 1. Listar todas las materias.
     public List<Materia> listarTodasMaterias() {
@@ -35,7 +45,7 @@ public class MateriaService {
     }
 
     // 4. Buscar una materia por su ID.
-    public Optional<Materia> buscarPeriodoPorId(Long id) {
+    public Optional<Materia> buscarMateriaPorId(Long id) {
         return materiaRepository.findById(id);
     }
 
@@ -58,4 +68,31 @@ public class MateriaService {
     public List<Materia> buscarPorNombreCurso(String nombreCurso) {
         return materiaRepository.findByCursosNombre(nombreCurso);
     }
+
+    // 9. Filtrar materias por nombre, docente y curso.
+    public List<Materia> filtrarPorNombreYDocente(String nombre, Long docenteId) {
+        List<Materia> materias = materiaRepository.findAll();
+
+        return materias.stream()
+                .filter(m -> nombre == null || nombre.isBlank() ||
+                        m.getNombre() != null && m.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                .filter(m -> docenteId == null ||
+                        (m.getDocente() != null && m.getDocente().getId().equals(docenteId)))
+                .toList();
+    }
+
+    // 10. Buscar materias por nivel educativo (nuevo)
+    public List<Materia> findByNivelEducativoNombre(String nombreNivel) {
+        return materiaRepository.findByNivelEducativo_Nombre(nombreNivel);
+    }
+
+    // ==================== NUEVO ====================
+    /** Materias por nivel educativo (para filtrar en formulario de Curso). */
+    public List<Materia> listarPorNivelId(Long nivelId) {
+        if (nivelId == null) {
+            return listarTodasMaterias();
+        }
+        return materiaRepository.findByNivelEducativo_Id(nivelId);
+    }
+
 }
