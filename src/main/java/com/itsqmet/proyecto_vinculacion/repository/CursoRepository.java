@@ -26,4 +26,6 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     // NUEVO combinado
     List<Curso> findByPeriodoAcademico_IdAndNivelEducativo_Id(Long periodoId, Long nivelId);
+
+
 }

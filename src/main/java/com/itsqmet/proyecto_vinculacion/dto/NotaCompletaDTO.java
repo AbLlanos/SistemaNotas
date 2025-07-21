@@ -3,15 +3,39 @@ package com.itsqmet.proyecto_vinculacion.dto;
 public class NotaCompletaDTO {
 
     private Long idNota;
-
+    private String nombreEstudiante;
     private String cedulaEstudiante;
     private String nombreCompletoEstudiante;
     private String areaMateria;
     private String nombreCurso;
+    private String cedula;
 
-    // NUEVOS CAMPOS PARA BINDING
-    private String nombrePeriodo;         // valor del <select name="nombrePeriodo">
-    private String trimestreSeleccionado;
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
+
+    private String nombrePeriodo;
+
+    public String getNombreEstudiante() {
+        return nombreEstudiante;
+    }
+
+    public void setNombreEstudiante(String nombreEstudiante) {
+        this.nombreEstudiante = nombreEstudiante;
+    }
+
+    public String getNombrePeriodo() {
+        return nombrePeriodo;
+    }
+
+    public void setNombrePeriodo(String nombrePeriodo) {
+        this.nombrePeriodo = nombrePeriodo;
+    }
+
 
     public String getNombreCurso() {
         return nombreCurso;
@@ -47,7 +71,7 @@ public class NotaCompletaDTO {
     private Integer atrasosSegundoTrim;
     private String comportamientoSegundoTrim;
 
-    private Integer setTotalAsistenciaSegundoTrim;
+    private Integer TotalAsistenciaSegundoTrim;
 
     // Tercer trimestre
 
@@ -59,8 +83,23 @@ public class NotaCompletaDTO {
     private Integer faltasInjustificadasTercerTrim;
     private Integer atrasosTercerTrim;
     private String comportamientoTercerTrim;
-    private Integer setTotalAsistenciaTercerTrim;
+    private Integer TotalAsistenciaTercerTrim;
 
+    public Integer getTotalAsistenciaSegundoTrim() {
+        return TotalAsistenciaSegundoTrim;
+    }
+
+    public void setTotalAsistenciaSegundoTrim(Integer totalAsistenciaSegundoTrim) {
+        TotalAsistenciaSegundoTrim = totalAsistenciaSegundoTrim;
+    }
+
+    public Integer getTotalAsistenciaTercerTrim() {
+        return TotalAsistenciaTercerTrim;
+    }
+
+    public void setTotalAsistenciaTercerTrim(Integer totalAsistenciaTercerTrim) {
+        TotalAsistenciaTercerTrim = totalAsistenciaTercerTrim;
+    }
 
     public Long getIdNota() {
         return idNota;
@@ -214,13 +253,6 @@ public class NotaCompletaDTO {
         this.comportamientoSegundoTrim = comportamientoSegundoTrim;
     }
 
-    public Integer getSetTotalAsistenciaSegundoTrim() {
-        return setTotalAsistenciaSegundoTrim;
-    }
-
-    public void setSetTotalAsistenciaSegundoTrim(Integer setTotalAsistenciaSegundoTrim) {
-        this.setTotalAsistenciaSegundoTrim = setTotalAsistenciaSegundoTrim;
-    }
 
     public Double getNotaNumericaTercerTrim() {
         return notaNumericaTercerTrim;
@@ -278,11 +310,5 @@ public class NotaCompletaDTO {
         this.comportamientoTercerTrim = comportamientoTercerTrim;
     }
 
-    public Integer getSetTotalAsistenciaTercerTrim() {
-        return setTotalAsistenciaTercerTrim;
-    }
 
-    public void setSetTotalAsistenciaTercerTrim(Integer setTotalAsistenciaTercerTrim) {
-        this.setTotalAsistenciaTercerTrim = setTotalAsistenciaTercerTrim;
-    }
 }

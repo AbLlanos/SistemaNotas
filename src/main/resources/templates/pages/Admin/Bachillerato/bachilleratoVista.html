@@ -88,13 +88,16 @@
                         <input type="text" id="cedula" name="cedula" th:value="${param.cedula}" placeholder="Ej: 1234567890" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm"/>
                     </div>
 
-                    <div>
-                        <label for="nombreTrimestre" class="block text-sm font-semibold text-gray-800 mb-2">Semestre</label>
-                        <select id="nombreTrimestre" name="nombreTrimestre" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
-                            <option value="">-- Seleccione Semestre --</option>
-                            <option th:each="trimestre : ${trimestres}" th:value="${trimestre.nombre}" th:text="${trimestre.nombre}" th:selected="${trimestre.nombre == param.nombreTrimestre}"></option>
-                        </select>
-                    </div>
+                    <label for="nombreTrimestre" class="block text-sm font-semibold text-gray-800 mb-2">Semestre</label>
+                    <select id="nombreTrimestre" name="nombreTrimestre"
+                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <option value="">-- Seleccione Semestre --</option>
+                        <option th:each="tri : ${trimestres}"
+                                th:value="${tri}"
+                                th:text="${tri}"
+                                th:selected="${tri == param.nombreTrimestre}">
+                        </option>
+                    </select>
                 </div>
 
                 <div class="flex justify-center pt-4">
@@ -177,26 +180,50 @@
                         <div class="flex items-center justify-center space-x-3">
              <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}" ...>Editar</a>
 
-  
-                            <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
+
+                            <!-- Eliminar -->
+                            <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post"
+                                  onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
                                 <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             </form>
-                            <a th:href="@{/admin/generar-pdf(
-                                    idNota=${nota.idNota},
-                                    periodo=${nombrePeriodo},
-                                    curso=${nombreCurso},
-                                    materia=${nombreMateria},
-                                    cedula=${cedula},
-                                    trimestre=${nombreTrimestre}
-                                  )}"
-                               target="_blank"
-                               class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition duration-150 ease-in-out shadow-sm">
-                                <i class="fas fa-file-pdf mr-1"></i> PDF
-                            </a>
+
+                            <!-- PDF botones -->
+                            <div class="flex flex-col space-y-1">
+                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Primer Trimestre')}"
+                                   target="_blank"
+                                   class="inline-flex items-center px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700">
+                                    1er Trim
+                                </a>
+                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Segundo Trimestre')}"
+                                   target="_blank"
+                                   class="inline-flex items-center px-2 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-700">
+                                    2do Trim
+                                </a>
+                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Tercer Trimestre')}"
+                                   target="_blank"
+                                   class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white text-xs font-bold rounded hover:bg-yellow-700">
+                                    3er Trim
+                                </a>
+                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='todos')}"
+                                   target="_blank"
+                                   class="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
+                                    Todos
+                                </a>
+                            </div>
                         </div>
                     </td>
+                    <div class="flex gap-2 mt-4">
+                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Primer Trimestre')}"
+                           class="px-3 py-1 bg-blue-600 text-white rounded">PDF 1er Trim</a>
+                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Segundo Trimestre')}"
+                           class="px-3 py-1 bg-green-600 text-white rounded">PDF 2do Trim</a>
+                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='Tercer Trimestre')}"
+                           class="px-3 py-1 bg-yellow-600 text-white rounded">PDF 3er Trim</a>
+                        <a th:href="@{/pages/Admin/admin/reporte-notas(cedula=${param.cedula}, periodo=${param.nombrePeriodo}, trimestre='todos')}"
+                           class="px-3 py-1 bg-purple-600 text-white rounded">PDF Todos</a>
+                    </div>
                 </tr>
                 </tbody>
             </table>
@@ -218,44 +245,31 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-<script>
-    // Mapa que relaciona nombre del trimestre con clase CSS de columna
+<script th:inline="javascript">
     const mapaTrim = {
       "Primer Trimestre": "trim1",
       "Segundo Trimestre": "trim2",
       "Tercer Trimestre": "trim3",
-      "": ""  // empty for showing all
+      "": ""  // mostrar todo
     };
 
     function mostrarColumnasPorTrimestre(nombreTrimestre) {
       const trimestres = ['trim1', 'trim2', 'trim3'];
-
-      // Get the class based on the actual trimester name
       const trimClass = mapaTrim[nombreTrimestre] || "";
-
       trimestres.forEach(tc => {
         const show = (tc === trimClass) || (trimClass === "");
-
-        document.querySelectorAll('th.' + tc).forEach(th => {
-          th.style.display = show ? '' : 'none';
-        });
-
-        document.querySelectorAll('td.' + tc).forEach(td => {
-          td.style.display = show ? '' : 'none';
-        });
+        document.querySelectorAll('th.' + tc).forEach(th => th.style.display = show ? '' : 'none');
+        document.querySelectorAll('td.' + tc).forEach(td => td.style.display = show ? '' : 'none');
       });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const selectTrimestre = document.getElementById('nombreTrimestre');
-
-      // Set the initial state based on the selected trimester from the Thymeleaf param
-      const initialTrimestre = "[[${param.nombreTrimestre}]]"; // Get value from Thymeleaf model
+      const initialTrimestre = /*[['${param.nombreTrimestre}']]*/ '';  // Thymeleaf inyecta aquí
       if (initialTrimestre) {
         selectTrimestre.value = initialTrimestre;
       }
       mostrarColumnasPorTrimestre(selectTrimestre.value);
-
       selectTrimestre.addEventListener('change', (e) => {
         mostrarColumnasPorTrimestre(e.target.value);
       });

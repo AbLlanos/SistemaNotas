@@ -59,6 +59,7 @@ public class CursoController {
     // ------------------------------------------------------------
     // 2. Formulario nuevo curso (con filtrado opcional por nivel)
     // ------------------------------------------------------------
+
     @GetMapping("/pages/Admin/cursoForm")
     public String mostrarCursoForm(
             @RequestParam(value = "nivelId", required = false) Long nivelId,
@@ -73,10 +74,12 @@ public class CursoController {
 
         if (nivelId != null) {
             materias = materiaService.listarPorNivelId(nivelId);
-            estudiantes = estudianteService.listarPorNivelId(nivelId);
+            // Cambiar a listar solo visibles en ese nivel
+            estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
         } else {
             materias = materiaService.listarTodasMaterias();
-            estudiantes = estudianteService.listarTodosEstudiantes();
+            // Cambiar a listar solo visibles (sin filtro de nivel)
+            estudiantes = estudianteService.listarVisibles();
         }
 
         model.addAttribute("niveles", niveles);
@@ -89,6 +92,7 @@ public class CursoController {
 
         return "pages/Admin/cursoForm";
     }
+
 
 
 
@@ -116,8 +120,12 @@ public class CursoController {
                 ? overrideNivelId
                 : (curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null);
 
+        model.addAttribute("nivelSeleccionado", nivelId);
+
         List<Materia> materias = materiaService.listarPorNivelId(nivelId);
-        List<Estudiante> estudiantes = estudianteService.listarPorNivelId(nivelId);
+
+        // Aquí también cambiar a estudiantes visibles para ese nivel
+        List<Estudiante> estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
 
         model.addAttribute("niveles", niveles);
         model.addAttribute("periodos", periodos);
@@ -129,42 +137,25 @@ public class CursoController {
         return "pages/Admin/cursoForm";
     }
 
+
     // ------------------------------------------------------------
     // 4. Guardar curso (nuevo o editado)
     // ------------------------------------------------------------
     @PostMapping("/pages/Admin/cursoGuardar")
     public String guardarCurso(@ModelAttribute Curso curso,
-                               @RequestParam(value = "periodoId", required = false) Long periodoId,
-                               @RequestParam(value = "nivelId", required = false) Long nivelId,
-                               @RequestParam(value = "nivelEducativo", required = false) Long nivelEducativoCompat, // por si vino con nombre viejo
                                @RequestParam(value = "materiasSeleccionadas", required = false) List<Long> materiasIds,
                                @RequestParam(value = "estudiantesSeleccionados", required = false) List<Long> estudiantesIds,
                                RedirectAttributes redirectAttributes) {
-
         try {
-            Long resolvedNivelId = (nivelId != null ? nivelId : nivelEducativoCompat);
-
             Curso cursoPersistido = (curso.getId() != null)
                     ? cursoService.buscarCursoPorId(curso.getId()).orElse(new Curso())
                     : new Curso();
 
             cursoPersistido.setNombre(curso.getNombre());
 
-            // Nivel
-            if (resolvedNivelId != null) {
-                nivelEducativoService.buscarNivelPorId(resolvedNivelId)
-                        .ifPresent(cursoPersistido::setNivelEducativo);
-            } else {
-                cursoPersistido.setNivelEducativo(null);
-            }
-
-            // Periodo
-            if (periodoId != null) {
-                periodoAcademicoService.buscarPeriodoPorId(periodoId)
-                        .ifPresent(cursoPersistido::setPeriodoAcademico);
-            } else {
-                cursoPersistido.setPeriodoAcademico(null);
-            }
+            // Asignar directamente el objeto Periodo y Nivel que vienen en curso
+            cursoPersistido.setPeriodoAcademico(curso.getPeriodoAcademico());
+            cursoPersistido.setNivelEducativo(curso.getNivelEducativo());
 
             // Materias
             if (materiasIds != null && !materiasIds.isEmpty()) {

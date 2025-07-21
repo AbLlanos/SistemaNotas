@@ -14,44 +14,57 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class EstudianteController {
 
-    @Autowired
-    private EstudianteService estudianteService;
-
-    @Autowired
-    private NivelEducativoService nivelEducativoService;
-
-    @Autowired
-    private CursoService cursoService;
+    @Autowired private EstudianteService estudianteService;
+    @Autowired private NivelEducativoService nivelEducativoService;
+    @Autowired private CursoService cursoService;
 
     /* ==========================================
-       1. Vista principal con filtros por nombre/cedula
+       1. Vista principal con filtros + visibilidad
        ========================================== */
     @GetMapping("/pages/Admin/estudianteVista")
     public String mostrarEstudianteVista(
             Model model,
             @RequestParam(name = "nombre", required = false) String nombre,
-            @RequestParam(name = "cedula", required = false) String cedula) {
+            @RequestParam(name = "cedula", required = false) String cedula,
+            @RequestParam(name = "mostrarOcultos", required = false, defaultValue = "false") boolean mostrarOcultos) {
 
         List<Estudiante> estudiantes;
-        if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
-            estudiantes = estudianteService.listarTodosEstudiantes();
-        } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
-            estudiantes = estudianteService.buscarPorNombre(nombre);
-        } else if ((nombre == null || nombre.isEmpty()) && cedula != null && !cedula.isEmpty()) {
-            estudiantes = estudianteService.buscarPorCedulaFiltro(cedula);
+
+        if (mostrarOcultos) {
+            // incluir NO visibles
+            if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
+                estudiantes = estudianteService.listarTodosEstudiantes();
+            } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
+                estudiantes = estudianteService.buscarPorNombre(nombre);
+            } else if ((nombre == null || nombre.isEmpty()) && cedula != null && !cedula.isEmpty()) {
+                estudiantes = estudianteService.buscarPorCedulaFiltro(cedula);
+            } else {
+                estudiantes = estudianteService.buscarPorNombreYCedula(nombre, cedula);
+            }
         } else {
-            estudiantes = estudianteService.buscarPorNombreYCedula(nombre, cedula);
+            // sólo visibles
+            if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
+                estudiantes = estudianteService.listarVisibles();
+            } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
+                estudiantes = estudianteService.buscarVisiblesPorNombre(nombre);
+            } else if ((nombre == null || nombre.isEmpty()) && cedula != null && !cedula.isEmpty()) {
+                estudiantes = estudianteService.buscarVisiblesPorCedulaFiltro(cedula);
+            } else {
+                estudiantes = estudianteService.buscarVisiblesPorNombreYCedula(nombre, cedula);
+            }
         }
 
         model.addAttribute("estudiantes", estudiantes);
+        model.addAttribute("paramNombre", nombre);
+        model.addAttribute("paramCedula", cedula);
+        model.addAttribute("mostrarOcultos", mostrarOcultos);
+
         return "pages/Admin/estudianteVista";
     }
-
 
     /* ==========================================
        2. Formulario NUEVO Estudiante
@@ -62,15 +75,11 @@ public class EstudianteController {
             Model model) {
 
         Estudiante est = new Estudiante();  // nuevo
+        est.setVisible(true); // por defecto visible
         model.addAttribute("estudiante", est);
 
-        // niveles siempre
         model.addAttribute("niveles", nivelEducativoService.listarTodos());
-
-        // cursos filtrados por nivel (o todos si null)
         model.addAttribute("cursos", cursoService.listarPorNivelId(nivelId));
-
-        // para que el select recuerde la selección
         model.addAttribute("nivelSeleccionado", nivelId);
 
         return "pages/Admin/estudianteForm";
@@ -79,7 +88,7 @@ public class EstudianteController {
     /* ==========================================
        3. Guardar Estudiante (nuevo o editado)
        ========================================== */
-    @PostMapping("/guardarEstudiante")
+    @PostMapping("/pages/Admin/guardarEstudiante") // <-- cambia ruta para evitar conflicto
     public String guardarEstudiante(
             @ModelAttribute Estudiante estudiante,
             @RequestParam(name = "nivelId", required = false) Long nivelId,
@@ -91,7 +100,7 @@ public class EstudianteController {
 
             // Nivel
             if (nivelId != null) {
-                NivelEducativo nivel = nivelEducativoService.buscarPorId(nivelId).orElse(null);
+                NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null); // <-- nombre correcto
                 estudiante.setNivelEducativo(nivel);
             } else {
                 estudiante.setNivelEducativo(null);
@@ -111,7 +120,6 @@ public class EstudianteController {
         return "redirect:/pages/Admin/estudianteVista";
     }
 
-
     /* ==========================================
        4. Editar Estudiante
        ========================================== */
@@ -124,7 +132,6 @@ public class EstudianteController {
         Estudiante est = estudianteService.buscarEstudiantePorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado: " + id));
 
-        // Si no llega nivelId (porque cargaste directo "editar"), usa el del estudiante
         if (nivelId == null && est.getNivelEducativo() != null) {
             nivelId = est.getNivelEducativo().getId();
         }
@@ -136,7 +143,6 @@ public class EstudianteController {
 
         return "pages/Admin/estudianteForm";
     }
-
 
     /* ==========================================
        5. Eliminar Estudiante

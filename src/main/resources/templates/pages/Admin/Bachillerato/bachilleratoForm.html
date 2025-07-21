@@ -25,10 +25,6 @@
         </th:block>
     </select>
 
-    <!-- Nombre Completo Estudiante -->
-    <label for="nombreCompletoEstudiante">Nombre Completo Estudiante:</label>
-    <input type="text" id="nombreCompletoEstudiante" name="nombreCompletoEstudiante" required
-           th:value="${nota != null} ? ${nota.nombreCompletoEstudiante} : ''" />
 
     <!-- Materia -->
     <label for="areaMateria">Materia:</label>
@@ -43,6 +39,7 @@
     </select>
 
     <!-- Periodo -->
+
     <label for="periodo">Periodo Académico:</label>
     <select id="periodo" name="nombrePeriodo" required>
         <option value="" disabled th:selected="${nota == null}">Seleccione un periodo</option>
@@ -55,6 +52,9 @@
     </select>
 
     <!-- Trimestre -->
+
+    <div class="hidden">
+
     <label for="trimestre">Trimestre:</label>
     <select id="trimestre" name="trimestre" required>
         <option value="" disabled th:selected="${nota == null}">Seleccione un trimestre</option>
@@ -65,7 +65,7 @@
             </option>
         </th:block>
     </select>
-
+    </div>
     <!-- Primer Trimestre -->
     <h3>Primer Trimestre</h3>
     <label for="notaNumerica1">Nota Numérica:</label>

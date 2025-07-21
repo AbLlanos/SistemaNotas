@@ -24,4 +24,11 @@ public class Usuario {
     private String cedula;
     private String direccion;
 
+    @Column(nullable = false)
+    private Boolean visible = true;
+
+    @PrePersist
+    public void prePersist() {
+        if (visible == null) visible = true;
+    }
 }

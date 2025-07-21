@@ -114,4 +114,49 @@ public class EstudianteService {
         }
         return estudianteRepository.findByNivelEducativo_Id(nivelId);
     }
+
+
+    //OCULTAR ESTUDAINTES EN CASO DE SER NECESESARIO
+
+        /* =========================
+       VISIBLES (para listados)
+       ========================= */
+
+    public List<Estudiante> listarVisibles() {
+        return estudianteRepository.findAll()
+                .stream()
+                .filter(e -> Boolean.TRUE.equals(e.getVisible()))
+                .toList();
+    }
+
+    public List<Estudiante> buscarVisiblesPorNombre(String nombre) {
+        return estudianteRepository.findByNombreContainingIgnoreCase(nombre).stream()
+                .filter(e -> Boolean.TRUE.equals(e.getVisible()))
+                .toList();
+    }
+
+    public List<Estudiante> buscarVisiblesPorCedulaFiltro(String cedula) {
+        return estudianteRepository.findByCedulaContainingIgnoreCase(cedula).stream()
+                .filter(e -> Boolean.TRUE.equals(e.getVisible()))
+                .toList();
+    }
+
+    public List<Estudiante> buscarVisiblesPorNombreYCedula(String nombre, String cedula) {
+        return estudianteRepository
+                .findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(nombre, cedula).stream()
+                .filter(e -> Boolean.TRUE.equals(e.getVisible()))
+                .toList();
+    }
+
+
+    public List<Estudiante> listarVisiblesPorNivelId(Long nivelId) {
+        return estudianteRepository.findByVisibleTrueAndNivelEducativo_Id(nivelId);
+    }
+
+    public List<Estudiante> listarVisiblesPorNivelEducativoNombre(String nombreNivel) {
+        return estudianteRepository.findByVisibleTrueAndNivelEducativoNombre(nombreNivel);
+    }
+
+
+
 }

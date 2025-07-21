@@ -31,4 +31,60 @@ public class Notas {
     @ManyToOne
     private PeriodoAcademico periodoAcademico;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getNotaNumerica() {
+        return notaNumerica;
+    }
+
+    public void setNotaNumerica(Double notaNumerica) {
+        this.notaNumerica = notaNumerica;
+    }
+
+    public String getNotaCualitativa() {
+        return notaCualitativa;
+    }
+
+    public void setNotaCualitativa(String notaCualitativa) {
+        this.notaCualitativa = notaCualitativa;
+    }
+
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+    }
+
+    public Materia getMateria() {
+        return materia;
+    }
+
+    public void setMateria(Materia materia) {
+        this.materia = materia;
+    }
+
+    public Trimestre getTrimestre() {
+        return trimestre;
+    }
+
+    public void setTrimestre(Trimestre trimestre) {
+        this.trimestre = trimestre;
+    }
+
+    public PeriodoAcademico getPeriodoAcademico() {
+        return periodoAcademico;
+    }
+
+    public void setPeriodoAcademico(PeriodoAcademico periodoAcademico) {
+        this.periodoAcademico = periodoAcademico;
+    }
 }
+

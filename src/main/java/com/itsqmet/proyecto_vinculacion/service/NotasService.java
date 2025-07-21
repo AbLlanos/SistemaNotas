@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NotasService {
@@ -62,6 +60,9 @@ public class NotasService {
     }
 
     // 5. Consultas adicionales
+
+
+
 
 
     /*Filtro universal conectado a especification para facilitar el filtrado dinamico de los todos los campos */
@@ -137,23 +138,21 @@ public class NotasService {
             // --- Asignar notas, asistencia y comportamiento por trimestre ---
             if (n.getTrimestre() != null) {
                 String trimestre = n.getTrimestre().getNombre().toLowerCase();
-                switch (trimestre) {
-                    case "primero" -> {
-                        dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
-                        dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
-                        asignarAsistenciaYComportamiento(dto, n, "primer");
-                    }
-                    case "segundo" -> {
-                        dto.setNotaNumericaSegundoTrim(n.getNotaNumerica());
-                        dto.setNotaCualitativaSegundoTrim(n.getNotaCualitativa());
-                        asignarAsistenciaYComportamiento(dto, n, "segundo");
-                    }
-                    case "tercero" -> {
-                        dto.setNotaNumericaTercerTrim(n.getNotaNumerica());
-                        dto.setNotaCualitativaTercerTrim(n.getNotaCualitativa());
-                        asignarAsistenciaYComportamiento(dto, n, "tercero");
-                    }
+
+                if (trimestre.contains("primer")) {
+                    dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
+                    dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
+                    asignarAsistenciaYComportamiento(dto, n, "primer");
+                } else if (trimestre.contains("segundo")) {
+                    dto.setNotaNumericaSegundoTrim(n.getNotaNumerica());
+                    dto.setNotaCualitativaSegundoTrim(n.getNotaCualitativa());
+                    asignarAsistenciaYComportamiento(dto, n, "segundo");
+                } else if (trimestre.contains("tercer") || trimestre.contains("tercero")) {
+                    dto.setNotaNumericaTercerTrim(n.getNotaNumerica());
+                    dto.setNotaCualitativaTercerTrim(n.getNotaCualitativa());
+                    asignarAsistenciaYComportamiento(dto, n, "tercero");
                 }
+
             }
         }
 
@@ -184,7 +183,7 @@ public class NotasService {
                     dto.setFaltasJustificadasSegundoTrim(a.getFaltasJustificadas());
                     dto.setFaltasInjustificadasSegundoTrim(a.getFaltasInjustificadas());
                     dto.setAtrasosSegundoTrim(a.getAtrasos());
-                    dto.setSetTotalAsistenciaSegundoTrim(
+                    dto.setTotalAsistenciaSegundoTrim(
                             (a.getAsistencias() != null ? a.getAsistencias() : 0) +
                                     (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
                                     (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
@@ -195,7 +194,7 @@ public class NotasService {
                     dto.setFaltasJustificadasTercerTrim(a.getFaltasJustificadas());
                     dto.setFaltasInjustificadasTercerTrim(a.getFaltasInjustificadas());
                     dto.setAtrasosTercerTrim(a.getAtrasos());
-                    dto.setSetTotalAsistenciaTercerTrim(
+                    dto.setTotalAsistenciaTercerTrim(
                             (a.getAsistencias() != null ? a.getAsistencias() : 0) +
                                     (a.getFaltasJustificadas() != null ? a.getFaltasJustificadas() : 0) +
                                     (a.getFaltasInjustificadas() != null ? a.getFaltasInjustificadas() : 0)
@@ -224,11 +223,11 @@ public class NotasService {
     public void guardarNotasDesdeFormulario(NotaCompletaDTO form) {
         Estudiante estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
         Materia materia = materiaService.buscarPorNombre(form.getAreaMateria());
-        PeriodoAcademico periodo = periodoAcademicoService.buscarPorNombre("Mayo 2024 - Febrero 2025"); // o form.getNombrePeriodo()
+        PeriodoAcademico periodo = periodoAcademicoService.buscarPorNombre(form.getNombrePeriodo());
 
-        Trimestre t1 = trimestreService.buscarPorNombre("Primero");
-        Trimestre t2 = trimestreService.buscarPorNombre("Segundo");
-        Trimestre t3 = trimestreService.buscarPorNombre("Tercero");
+        Trimestre t1 = trimestreService.buscarPorNombre("Primer Trimestre");
+        Trimestre t2 = trimestreService.buscarPorNombre("Segundo Trimestre");
+        Trimestre t3 = trimestreService.buscarPorNombre("Tercer Trimestre");
 
         if (estudiante == null || materia == null || periodo == null)
             throw new IllegalArgumentException("Faltan datos necesarios.");
@@ -263,13 +262,13 @@ public class NotasService {
                 .orElse(new Notas());
 
         // Actualizar campos por trimestre
-        if ("Primero".equalsIgnoreCase(trimestre.getNombre())) {
+        if ("Primer Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
             nota.setNotaNumerica(notaNum);
             nota.setNotaCualitativa(notaCual);
-        } else if ("Segundo".equalsIgnoreCase(trimestre.getNombre())) {
+        } else if ("Segundo Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
             nota.setNotaNumerica(notaNum);
             nota.setNotaCualitativa(notaCual);
-        } else if ("Tercero".equalsIgnoreCase(trimestre.getNombre())) {
+        } else if ("Tercer Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
             nota.setNotaNumerica(notaNum);
             nota.setNotaCualitativa(notaCual);
         }
@@ -341,6 +340,61 @@ public class NotasService {
     }
 
 
+// --- PDF y Reportes ---
+
+    /**
+     * Retorna lista de NotaCompletaDTO para PDF.
+     * Si materia = null/"" => todas las materias del curso.
+     * Si trimestre = "todos"/null => trae los 3 trimestres.
+     */
+    public List<NotaCompletaDTO> obtenerNotasParaPDF(String periodo,
+                                                     String curso,
+                                                     String materia,
+                                                     String cedula,
+                                                     String trimestre) {
+        // Usamos el método existente que agrupa y llena los 3 trimestres
+        return obtenerNotasCompletas(periodo, curso, materia, cedula, trimestre);
+    }
+
+    /**
+     * Retorna un solo NotaCompletaDTO por idNota.
+     */
+    public NotaCompletaDTO obtenerNotaCompletaPorIdParaPDF(Long idNota) {
+        return obtenerNotaCompletaPorId(idNota);
+    }
+
+    /**
+     * Obtiene el reporte final de todas las materias de un estudiante en un periodo.
+     */
+    public List<NotaCompletaDTO> obtenerReporteFinal(String periodo, String cedula) {
+        Estudiante estudiante = estudianteService.buscarPorCedula(cedula);
+        if (estudiante == null) {
+            return Collections.emptyList();
+        }
+
+        // Aquí NO necesitamos hacer un query manual. Directamente usamos el método agrupador
+        return obtenerNotasCompletas(periodo, null, null, cedula, null);
+    }
+
+    /**
+     * Filtro básico de entidades Notas (solo si necesitas trabajar con Notas directamente).
+     */
+    public List<Notas> filtrarNotas(String nombrePeriodo, String nombreCurso, String nombreMateria, String cedula) {
+        return notasRepository.findAll().stream()
+                .filter(n -> (nombrePeriodo == null || nombrePeriodo.isEmpty() ||
+                        (n.getPeriodoAcademico() != null &&
+                                nombrePeriodo.equals(n.getPeriodoAcademico().getNombre()))))
+                .filter(n -> (nombreCurso == null || nombreCurso.isEmpty() ||
+                        (n.getMateria() != null && n.getMateria().getCursos() != null &&
+                                n.getMateria().getCursos().stream().anyMatch(c -> nombreCurso.equals(c.getNombre())))))
+                .filter(n -> (nombreMateria == null || nombreMateria.isEmpty() ||
+                        (n.getMateria() != null &&
+                                nombreMateria.equals(n.getMateria().getNombre()))))
+                .filter(n -> (cedula == null || cedula.isEmpty() ||
+                        (n.getEstudiante() != null &&
+                                cedula.equals(n.getEstudiante().getCedula()))))
+                .toList();
+    }
 
 
 }
