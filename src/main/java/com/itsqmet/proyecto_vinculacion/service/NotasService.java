@@ -203,8 +203,9 @@ public class NotasService {
             }
         });
 
-        comportamientoRepository.findByEstudianteAndTrimestreAndPeriodo(
-                n.getEstudiante(), n.getTrimestre(), n.getPeriodoAcademico()
+        // --- Comportamiento (con Materia incluida) ---
+        comportamientoRepository.findByEstudianteAndMateriaAndTrimestreAndPeriodo(
+                n.getEstudiante(), n.getMateria(), n.getTrimestre(), n.getPeriodoAcademico()
         ).ifPresent(c -> {
             switch (trimestreClave) {
                 case "primer" -> dto.setComportamientoPrimerTrim(c.getComportamiento());
@@ -221,57 +222,80 @@ public class NotasService {
 
     @Transactional
     public void guardarNotasDesdeFormulario(NotaCompletaDTO form) {
-        Estudiante estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
-        Materia materia = materiaService.buscarPorNombre(form.getAreaMateria());
-        PeriodoAcademico periodo = periodoAcademicoService.buscarPorNombre(form.getNombrePeriodo());
 
+        // 1. Determinar si estamos EDITANDO (idNota != null) o CREANDO
+        Estudiante estudiante;
+        Materia materia;
+        PeriodoAcademico periodo;
+
+        if (form.getIdNota() != null) {
+            // Recupera una nota existente para extraer la clave real
+            Notas base = notasRepository.findById(form.getIdNota()).orElse(null);
+            if (base == null) {
+                throw new IllegalArgumentException("No se encontró la nota base con id=" + form.getIdNota());
+            }
+            estudiante = base.getEstudiante();
+            materia = base.getMateria();
+            periodo = base.getPeriodoAcademico();
+        } else {
+            // Crear nuevo registro (3 filas: 1 por trimestre)
+            estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
+            materia = materiaService.buscarPorNombre(form.getAreaMateria());
+            periodo = periodoAcademicoService.buscarPorNombre(form.getNombrePeriodo());
+        }
+
+        if (estudiante == null || materia == null || periodo == null) {
+            throw new IllegalArgumentException("Faltan datos necesarios (estudiante/materia/periodo).");
+        }
+
+        // 2. Trimestres
         Trimestre t1 = trimestreService.buscarPorNombre("Primer Trimestre");
         Trimestre t2 = trimestreService.buscarPorNombre("Segundo Trimestre");
         Trimestre t3 = trimestreService.buscarPorNombre("Tercer Trimestre");
 
-        if (estudiante == null || materia == null || periodo == null)
-            throw new IllegalArgumentException("Faltan datos necesarios.");
-
-        guardarNotaYRelacionados(estudiante, materia, periodo, t1,
+        // 3. Guardar/actualizar (upsert) por trimestre
+        upsertNotaYRelacionados(
+                estudiante, materia, periodo, t1,
                 form.getNotaNumericaPrimerTrim(), form.getNotaCualitativaPrimerTrim(),
                 form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
                 form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
-                form.getComportamientoPrimerTrim());
+                form.getComportamientoPrimerTrim()
+        );
 
-        guardarNotaYRelacionados(estudiante, materia, periodo, t2,
+        upsertNotaYRelacionados(
+                estudiante, materia, periodo, t2,
                 form.getNotaNumericaSegundoTrim(), form.getNotaCualitativaSegundoTrim(),
                 form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
                 form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
-                form.getComportamientoSegundoTrim());
+                form.getComportamientoSegundoTrim()
+        );
 
-        guardarNotaYRelacionados(estudiante, materia, periodo, t3,
+        upsertNotaYRelacionados(
+                estudiante, materia, periodo, t3,
                 form.getNotaNumericaTercerTrim(), form.getNotaCualitativaTercerTrim(),
                 form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
                 form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
-                form.getComportamientoTercerTrim());
+                form.getComportamientoTercerTrim()
+        );
     }
 
-    private void guardarNotaYRelacionados(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
-                                          Trimestre trimestre, Double notaNum, String notaCual, Integer asistencias,
-                                          Integer faltasJustificadas, Integer faltasInjustificadas, Integer atrasos,
-                                          String comportamientoTexto) {
-
-        // --- Guardar o actualizar Nota ---
+    private void upsertNotaYRelacionados(
+            Estudiante estudiante,
+            Materia materia,
+            PeriodoAcademico periodo,
+            Trimestre trimestre,
+            Double notaNum,
+            String notaCual,
+            Integer asistencias,
+            Integer faltasJustificadas,
+            Integer faltasInjustificadas,
+            Integer atrasos,
+            String comportamientoTexto
+    ) {
+        // --- Nota ---
         Notas nota = notasRepository
                 .findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre)
-                .orElse(new Notas());
-
-        // Actualizar campos por trimestre
-        if ("Primer Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
-            nota.setNotaNumerica(notaNum);
-            nota.setNotaCualitativa(notaCual);
-        } else if ("Segundo Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
-            nota.setNotaNumerica(notaNum);
-            nota.setNotaCualitativa(notaCual);
-        } else if ("Tercer Trimestre".equalsIgnoreCase(trimestre.getNombre())) {
-            nota.setNotaNumerica(notaNum);
-            nota.setNotaCualitativa(notaCual);
-        }
+                .orElseGet(Notas::new);
 
         nota.setEstudiante(estudiante);
         nota.setMateria(materia);
@@ -279,12 +303,12 @@ public class NotasService {
         nota.setTrimestre(trimestre);
         nota.setNotaNumerica(notaNum);
         nota.setNotaCualitativa(notaCual);
-        notasRepository.save(nota);
+        nota = notasRepository.save(nota);
 
-        // --- Guardar o actualizar Asistencia ---
+        // --- Asistencia ---
         Asistencia asistencia = asistenciaRepository
                 .findByEstudianteAndMateriaAndTrimestreAndPeriodo(estudiante, materia, trimestre, periodo)
-                .orElse(new Asistencia());
+                .orElseGet(Asistencia::new);
 
         asistencia.setEstudiante(estudiante);
         asistencia.setMateria(materia);
@@ -296,16 +320,19 @@ public class NotasService {
         asistencia.setAtrasos(atrasos);
         asistenciaRepository.save(asistencia);
 
-        // --- Guardar o actualizar Comportamiento ---
+        // --- Comportamiento ---
         Comportamiento comportamiento = comportamientoRepository
-                .findByEstudianteAndTrimestreAndPeriodo(estudiante, trimestre, periodo)
+                .findByEstudianteAndMateriaAndTrimestreAndPeriodo(estudiante, materia, trimestre, periodo)
                 .orElse(new Comportamiento());
 
         comportamiento.setEstudiante(estudiante);
+        comportamiento.setMateria(materia);
         comportamiento.setTrimestre(trimestre);
         comportamiento.setPeriodo(periodo);
         comportamiento.setComportamiento(comportamientoTexto);
+
         comportamientoRepository.save(comportamiento);
+
     }
 
 
