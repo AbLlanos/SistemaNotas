@@ -115,9 +115,11 @@ public class PDFGeneratorService {
         document.add(new Paragraph("\n"));
 
         // --- TABLA PRINCIPAL (Notas y Cualitativas) ---
-        float[] columnWidths = {3, 2, 2, 2, 2, 2, 2};
+        float[] columnWidths = {3, 3, 3, 2, 2, 2, 2, 2, 2};
         Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
 
+        tablaNotas.addHeaderCell("Estudiante");
+        tablaNotas.addHeaderCell("Periodo");
         tablaNotas.addHeaderCell("Materia");
         tablaNotas.addHeaderCell("Nota 1T");
         tablaNotas.addHeaderCell("Cualitativa 1T");
@@ -127,19 +129,21 @@ public class PDFGeneratorService {
         tablaNotas.addHeaderCell("Cualitativa 3T");
 
         for (NotaCompletaDTO dto : notas) {
+            tablaNotas.addCell(dto.getNombreEstudiante() != null ? dto.getNombreEstudiante() : "---");
+            tablaNotas.addCell(dto.getNombrePeriodo() != null ? dto.getNombrePeriodo() : "---");
             tablaNotas.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
 
             // Primer trimestre
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
 
             // Segundo trimestre
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
 
             // Tercer trimestre
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell( mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
         }
 
         document.add(tablaNotas);
@@ -170,25 +174,25 @@ public class PDFGeneratorService {
             tablaAsistencias.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
 
             // 1T
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAsistenciaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasJustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasInjustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAtrasosPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getComportamientoPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getComportamientoPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
 
             // 2T
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAsistenciaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasJustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasInjustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAtrasosSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getComportamientoSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getComportamientoSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
 
             // 3T
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAsistenciaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasJustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getFaltasInjustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getAtrasosTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell( mostrarTrimestre(dto.getComportamientoTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            tablaAsistencias.addCell(mostrarTrimestre(dto.getComportamientoTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
         }
 
         document.add(tablaAsistencias);

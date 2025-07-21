@@ -290,12 +290,15 @@ public class AdminController {
 
     @GetMapping("/admin/reporte-notas")
     public void generarReporteNotas(
-            @RequestParam("cedula") String cedula,
-            @RequestParam("periodo") String periodo,
+            @RequestParam(value = "cedula", required = false) String cedula,
+            @RequestParam(value = "periodo", required = false) String periodo,
+            @RequestParam(value = "curso", required = false) String curso,
             @RequestParam(value = "trimestre", required = false, defaultValue = "todos") String trimestre,
             HttpServletResponse response
     ) throws IOException {
-        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, cedula);
+        // Ajusta este método para filtrar por periodo, cedula y curso
+        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
+
         String nombreEstudiante = notas.isEmpty() ? "Estudiante" : notas.get(0).getNombreEstudiante();
 
         response.setContentType("application/pdf");

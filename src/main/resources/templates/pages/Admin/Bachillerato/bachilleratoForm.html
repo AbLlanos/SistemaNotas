@@ -38,14 +38,15 @@
 
 
     <!-- Materia -->
+    <!-- Materia -->
     <label for="areaMateria">Materia:</label>
     <select id="areaMateria" name="areaMateria"
             th:disabled="${nota.idNota != null}" required>
         <option value="" disabled th:selected="${nota.idNota == null}">Seleccione una materia</option>
         <th:block th:each="mat : ${materias}">
             <option th:value="${mat.nombre}"
-                    th:text="${mat.nombre}"
-                    th:selected="${nota.idNota != null} ? (mat.nombre == nota.areaMateria) : false">
+                    th:selected="${nota.idNota != null} ? (mat.nombre == nota.areaMateria) : false"
+                    th:text="${mat.nombre + ' - (' + #strings.listJoin(mat.cursos.![nombre], ', ') + ')'}">
             </option>
         </th:block>
     </select>

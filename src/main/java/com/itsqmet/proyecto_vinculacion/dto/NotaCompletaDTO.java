@@ -1,5 +1,7 @@
 package com.itsqmet.proyecto_vinculacion.dto;
 
+import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
+
 public class NotaCompletaDTO {
 
     private Long idNota;
@@ -9,6 +11,16 @@ public class NotaCompletaDTO {
     private String areaMateria;
     private String nombreCurso;
     private String cedula;
+
+    private PeriodoAcademico periodoAcademico;
+
+    public PeriodoAcademico getPeriodoAcademico() {
+        return periodoAcademico;
+    }
+
+    public void setPeriodoAcademico(PeriodoAcademico periodoAcademico) {
+        this.periodoAcademico = periodoAcademico;
+    }
 
     public String getCedula() {
         return cedula;
