@@ -152,24 +152,25 @@ public class CursoController {
                     : new Curso();
 
             cursoPersistido.setNombre(curso.getNombre());
-
-            // Asignar directamente el objeto Periodo y Nivel que vienen en curso
             cursoPersistido.setPeriodoAcademico(curso.getPeriodoAcademico());
             cursoPersistido.setNivelEducativo(curso.getNivelEducativo());
 
-            // Materias
+            // Materias (puede hacerse antes sin problema)
             if (materiasIds != null && !materiasIds.isEmpty()) {
                 cursoPersistido.setMaterias(materiaService.obtenerMateriasPorIds(materiasIds));
             } else {
                 cursoPersistido.setMaterias(List.of());
             }
 
-            // Estudiantes
+            // 🟡 Paso 1: Guardar el curso SIN estudiantes para que tenga ID
+            cursoPersistido.setEstudiantes(List.of()); // necesario para evitar errores al persistir
+            cursoService.guardarCurso(cursoPersistido);
+
+            // 🟢 Paso 2: Si hay estudiantes, asociarlos al curso y sincronizar relación inversa
             if (estudiantesIds != null && !estudiantesIds.isEmpty()) {
                 List<Estudiante> estudiantes = estudianteService.obtenerPorIds(estudiantesIds);
                 cursoPersistido.setEstudiantes(estudiantes);
 
-                // sincronizar lado dueño
                 for (Estudiante e : estudiantes) {
                     if (e.getCursos() == null) {
                         e.setCursos(new java.util.ArrayList<>());
@@ -178,20 +179,24 @@ public class CursoController {
                         e.getCursos().add(cursoPersistido);
                     }
                 }
+
+                // Guardar todos los estudiantes con la relación
                 estudianteService.guardarTodos(estudiantes);
-            } else {
-                cursoPersistido.setEstudiantes(List.of());
             }
 
+            // 🟣 Paso 3 (opcional): volver a guardar el curso por si se requiere actualizar relación bidireccional
             cursoService.guardarCurso(cursoPersistido);
-            redirectAttributes.addFlashAttribute("success", "Curso guardado correctamente.");
 
+            redirectAttributes.addFlashAttribute("success", "Curso guardado correctamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al guardar el curso: " + e.getMessage());
         }
 
         return "redirect:/pages/Admin/cursoVista";
     }
+
+
+
 
     // ------------------------------------------------------------
     // 5. Eliminar curso
