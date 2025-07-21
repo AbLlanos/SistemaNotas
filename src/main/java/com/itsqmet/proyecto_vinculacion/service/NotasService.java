@@ -120,6 +120,17 @@ public class NotasService {
                     nuevoDto.setNombreCompletoEstudiante("---");
                 }
 
+                nuevoDto.setNombreEstudiante(
+                        n.getEstudiante() != null
+                                ? n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido()
+                                : "---"
+                );
+                nuevoDto.setNombrePeriodo(
+                        n.getPeriodoAcademico() != null
+                                ? n.getPeriodoAcademico().getNombre()
+                                : "---"
+                );
+
                 // Materia y curso
                 nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
                 String cursosTexto = "---";
@@ -131,6 +142,9 @@ public class NotasService {
                             .orElse("---");
                 }
                 nuevoDto.setNombreCurso(cursosTexto);
+
+                // **Asignar nombrePeriodo para evitar el error en Thymeleaf**
+                nuevoDto.setNombrePeriodo(n.getPeriodoAcademico() != null ? n.getPeriodoAcademico().getNombre() : "---");
 
                 return nuevoDto;
             });
@@ -152,7 +166,6 @@ public class NotasService {
                     dto.setNotaCualitativaTercerTrim(n.getNotaCualitativa());
                     asignarAsistenciaYComportamiento(dto, n, "tercero");
                 }
-
             }
         }
 
@@ -393,14 +406,14 @@ public class NotasService {
     /**
      * Obtiene el reporte final de todas las materias de un estudiante en un periodo.
      */
-    public List<NotaCompletaDTO> obtenerReporteFinal(String periodo, String cedula) {
+    public List<NotaCompletaDTO> obtenerReporteFinal(String periodo, String curso, String cedula) {
         Estudiante estudiante = estudianteService.buscarPorCedula(cedula);
         if (estudiante == null) {
             return Collections.emptyList();
         }
 
-        // Aquí NO necesitamos hacer un query manual. Directamente usamos el método agrupador
-        return obtenerNotasCompletas(periodo, null, null, cedula, null);
+        // Ahora sí usamos el parámetro curso
+        return obtenerNotasCompletas(periodo, curso, null, cedula, null);
     }
 
     /**
