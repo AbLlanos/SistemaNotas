@@ -58,7 +58,7 @@
                     <div>
                         <label for="nombrePeriodo" class="block text-sm font-semibold text-gray-800 mb-2">Periodo
                             Académico</label>
-                        <select id="nombrePeriodo" name="nombrePeriodo"
+                        <select id="nombrePeriodo"  name="nombrePeriodo"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
                             <option value="">-- Seleccione el periodo académico --</option>
                             <option th:each="periodo : ${aniosLectivos}" th:value="${periodo.nombre}"
@@ -636,6 +636,75 @@
             cargarMateriasPorCurso(cursoIdInicial, materiaInicial);
         }
     });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const periodoSelect = document.getElementById('nombrePeriodo');
+    const cursoSelect   = document.getElementById('nombreCurso');
+    const materiaSelect = document.getElementById('nombreMateria');
+
+    function resetCursos() {
+        cursoSelect.innerHTML = '<option value="">-- Seleccione el curso --</option>';
+        resetMaterias(); // Reset materias también
+    }
+
+    function resetMaterias() {
+        materiaSelect.innerHTML = '<option value="">-- Seleccione la materia --</option>';
+    }
+
+    async function cargarCursosPorPeriodo(nombrePeriodo, cursoSeleccionado) {
+        if (!nombrePeriodo) {
+            resetCursos();
+            return;
+        }
+
+        cursoSelect.innerHTML = '<option value="">Cargando cursos...</option>';
+        try {
+            const resp = await fetch(`/pages/Admin/periodo/${nombrePeriodo}/cursos`);
+            if (!resp.ok) throw new Error('Error HTTP ' + resp.status);
+            const data = await resp.json();
+
+            resetCursos();
+            data.forEach(curso => {
+                const opt = document.createElement('option');
+                opt.value = curso.nombre;
+                opt.textContent = curso.nombre;
+                opt.dataset.id = curso.id;
+
+                if (cursoSeleccionado && curso.nombre === cursoSeleccionado) {
+                    opt.selected = true;
+                }
+
+                cursoSelect.appendChild(opt);
+            });
+
+            // Si se selecciona un curso automáticamente, cargar materias también
+            const cursoId = cursoSeleccionado ? data.find(c => c.nombre === cursoSeleccionado)?.id : null;
+            if (cursoId) {
+                cargarMateriasPorCurso(cursoId, /*[[${param.nombreMateria}]]*/ null);
+            }
+
+        } catch (err) {
+            console.error(err);
+            cursoSelect.innerHTML = '<option value="">(Error al cargar cursos)</option>';
+        }
+    }
+
+    periodoSelect.addEventListener('change', () => {
+        const nombrePeriodo = periodoSelect.value;
+        cargarCursosPorPeriodo(nombrePeriodo, null);
+    });
+
+    // Si ya había un periodo seleccionado
+    const periodoInicial = /*[[${param.nombrePeriodo}]]*/ null;
+    const cursoInicial   = /*[[${param.nombreCurso}]]*/ null;
+
+    if (periodoInicial) {
+        cargarCursosPorPeriodo(periodoInicial, cursoInicial);
+    }
+});
+
 </script>
 
 </body>

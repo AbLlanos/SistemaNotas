@@ -118,4 +118,16 @@ public class CursoService {
         return cursoRepository.findByNombreIgnoreCase(nombreCurso)
                 .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado nombre=" + nombreCurso));
     }
+
+    // CursoService.java
+    public List<Curso> obtenerCursosPorPeriodo(String nombrePeriodo) {
+        return cursoRepository.findByPeriodoAcademicoNombre(nombrePeriodo);
+    }
+
+    public List<Curso> obtenerCursosPorPeriodoID(Long periodoAcademicoId) {
+        return cursoRepository.findByPeriodoAcademico_Id(periodoAcademicoId);
+    }
+
+
+
 }

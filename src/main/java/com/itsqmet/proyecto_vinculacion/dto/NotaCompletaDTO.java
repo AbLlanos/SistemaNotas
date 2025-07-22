@@ -24,6 +24,7 @@ public class NotaCompletaDTO {
 
     private PeriodoAcademico periodoAcademico; // no se bindea directamente, sólo informativo
     private String nombrePeriodo;              // se llena desde Curso (data-periodo)
+    private Long periodoAcademicoId;
 
     // ---------- Primer Trimestre ----------
     private Double  notaNumericaPrimerTrim;

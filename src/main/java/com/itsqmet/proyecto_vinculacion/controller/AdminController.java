@@ -192,74 +192,26 @@ public class AdminController {
 
 
 
-    @GetMapping("/notas/nuevo")
-    public String mostrarFormularioNota(
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String nombrePeriodo,
-            Model model) {
+    @GetMapping("/notas/nueva")
+    public String mostrarFormularioNuevaNota(Model model) {
+        NotaCompletaDTO notaCompletaDTO = new NotaCompletaDTO();
+        model.addAttribute("nota", notaCompletaDTO);
 
-        NotaCompletaDTO dto = new NotaCompletaDTO();
-        dto.setCedulaEstudiante(cedula);
-        dto.setNombreCurso(nombreCurso);
-        dto.setAreaMateria(nombreMateria);
-        dto.setNombrePeriodo(nombrePeriodo);
-
-        // cursos
-        List<Curso> cursos;
-        try {
-            cursos = cursoService.listarCursosBachillerato();
-            if (cursos == null || cursos.isEmpty()) {
-                cursos = cursoService.listarTodosCursos();
-            }
-        } catch (Exception ex) {
-            cursos = cursoService.listarTodosCursos();
-        }
-        model.addAttribute("cursos", cursos);
-
-        // materias (si curso)
-        List<Materia> materias;
-        try {
-            materias = (nombreCurso != null && !nombreCurso.isBlank())
-                    ? materiaService.findByCursoNombre(nombreCurso)
-                    : List.of();
-        } catch (Exception ex) {
-            materias = List.of();
-        }
-        model.addAttribute("materias", materias);
-
-        // estudiantes (si curso)
-        List<Estudiante> estudiantes;
-        try {
-            estudiantes = (nombreCurso != null && !nombreCurso.isBlank())
-                    ? estudianteService.listarPorNombreCurso(nombreCurso)
-                    : estudianteService.listarTodosEstudiantes();
-        } catch (Exception ex) {
-            estudiantes = estudianteService.listarTodosEstudiantes();
-        }
-        model.addAttribute("estudiantes", estudiantes);
-
-        // periodos (por si necesitas mostrar algo)
+        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("materias", materiaService.listarTodasMaterias());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+        model.addAttribute("cursos", cursoService.listarTodosCursos()); // Inicialmente todos
 
-        model.addAttribute("nota", dto);
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
 
-
-
-
+    // Guardar nota (tanto nueva como editada)
     @PostMapping("/notas/guardar")
     public String guardarNotaCompleta(@ModelAttribute NotaCompletaDTO notaCompletaDTO) {
         notasService.guardarNotasDesdeFormulario(notaCompletaDTO);
         return "redirect:/Bachillerato/bachilleratoVista";
     }
-
-
-
-
 
     @GetMapping("/notas/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
@@ -267,13 +219,19 @@ public class AdminController {
         model.addAttribute("nota", notaCompletaDTO);
 
         model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
-        model.addAttribute("cursos", cursoService.listarTodosCursos()); // <-- nuevo
         model.addAttribute("materias", materiaService.listarTodasMaterias());
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
 
+        if (notaCompletaDTO.getPeriodoAcademicoId() != null) {
+            model.addAttribute("cursos", cursoService.obtenerCursosPorPeriodoID(notaCompletaDTO.getPeriodoAcademicoId()));
+        } else {
+            model.addAttribute("cursos", cursoService.listarTodosCursos());
+        }
+
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
+
 
 
 
@@ -394,6 +352,18 @@ public class AdminController {
                 .toList();
     }
 
+
+    @GetMapping("/periodo/{nombre}/cursos")
+    @ResponseBody
+    public List<Curso> listarCursosPorPeriodo(@PathVariable String nombre) {
+        return cursoService.obtenerCursosPorPeriodo(nombre);
+    }
+
+    @GetMapping("/cursos/porPeriodo/{id}")
+    @ResponseBody
+    public List<Curso> obtenerCursosPorPeriodo(@PathVariable Long id) {
+        return cursoService.obtenerCursosPorPeriodoID(id);
+    }
 
 
 

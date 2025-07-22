@@ -452,6 +452,9 @@ public class NotasService {
 
 
 
+
+
+
     public NotaCompletaDTO obtenerNotaCompletaPorId(Long idNota) {
         Notas nota = buscarNotaPorId(idNota);
         if (nota == null) {
@@ -459,8 +462,17 @@ public class NotasService {
         }
 
         String nombreCurso = "---";
+        Long cursoId = null;
+        Long periodoId = null;
+
         if (nota.getMateria() != null && nota.getMateria().getCursos() != null && !nota.getMateria().getCursos().isEmpty()) {
-            nombreCurso = nota.getMateria().getCursos().get(0).getNombre();
+            Curso curso = nota.getMateria().getCursos().get(0);
+            nombreCurso = curso.getNombre();
+            cursoId = curso.getId();
+
+            if (curso.getPeriodoAcademico() != null) {
+                periodoId = curso.getPeriodoAcademico().getId();
+            }
         }
 
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
@@ -471,8 +483,20 @@ public class NotasService {
                 null
         );
 
-        return dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
+        NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
+        dto.setCursoId(cursoId);
+        dto.setPeriodoAcademicoId(periodoId);
+        dto.setNombrePeriodo(nota.getPeriodoAcademico().getNombre());
+
+        return dto;
     }
+
+
+
+
+
+
+
 
 
 // --- PDF y Reportes ---

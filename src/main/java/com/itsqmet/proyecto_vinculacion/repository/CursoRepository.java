@@ -31,4 +31,9 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
     List<Curso> findByNivelEducativo_NombreIgnoreCase(String nombreNivel);
 
     Optional<Curso> findByNombreIgnoreCase(String nombre);
+
+
+    List<Curso> findByPeriodoAcademicoNombre(String nombrePeriodo);
+
+
 }
