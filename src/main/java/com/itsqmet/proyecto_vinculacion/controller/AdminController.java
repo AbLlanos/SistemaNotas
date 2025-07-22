@@ -341,14 +341,24 @@ public class AdminController {
             @RequestParam(value = "trimestre", required = false, defaultValue = "todos") String trimestre,
             HttpServletResponse response
     ) throws IOException {
-        // Ajusta este método para filtrar por periodo, cedula y curso
+
+        // Obtén la lista completa de notas con filtro periodo, curso y cédula
         List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
 
-        String nombreEstudiante = notas.isEmpty() ? "Estudiante" : notas.get(0).getNombreEstudiante();
+        if (notas.isEmpty()) {
+            // Manejar caso sin datos, tal vez lanzar excepción o enviar PDF vacío
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No se encontraron notas para los filtros indicados.");
+            return;
+        }
 
+        // Extrae nombre del estudiante del primer registro (asumimos que es el mismo para todas las notas)
+        String nombreEstudiante = notas.get(0).getNombreEstudiante();
+
+        // Configura respuesta HTTP para PDF en línea
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "inline; filename=reporte-notas.pdf");
 
+        // Llama al servicio que genera el PDF y escribe en el output stream de la respuesta HTTP
         pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
     }
 

@@ -9,10 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ComportamientoFinalRepository extends JpaRepository<ComportamientoFinal, Long> {
+    Optional<ComportamientoFinal> findByEstudianteAndCursoAndPeriodo(Estudiante estudiante, Curso curso, PeriodoAcademico periodo);
+    Optional<ComportamientoFinal> findByEstudianteIdAndCursoIdAndPeriodoId(Long estudianteId, Long cursoId, Long periodoId);
 
-    Optional<ComportamientoFinal> findByEstudianteAndCursoAndPeriodo(
-            Estudiante estudiante,
-            Curso curso,
-            PeriodoAcademico periodo
-    );
 }
+
+
+

@@ -22,6 +22,9 @@ public class NotasService {
     private AsistenciaRepository asistenciaRepository;
 
     @Autowired
+    private ComportamientoFinalRepository comportamientoFinalRepository;
+
+    @Autowired
     private ComportamientoRepository comportamientoRepository;
 
     @Autowired
@@ -602,45 +605,137 @@ public class NotasService {
     /**
      * Retorna un solo NotaCompletaDTO por idNota.
      */
+
+
+
     public NotaCompletaDTO obtenerNotaCompletaPorIdParaPDF(Long idNota) {
-        return obtenerNotaCompletaPorId(idNota);
+        Notas nota = buscarNotaPorId(idNota);
+        if (nota == null) {
+            throw new RuntimeException("Nota no encontrada con id: " + idNota);
+        }
+
+        String nombreCurso = "---";
+        Curso cursoRelacionado = null;
+        if (nota.getMateria() != null && nota.getMateria().getCursos() != null && !nota.getMateria().getCursos().isEmpty()) {
+            cursoRelacionado = nota.getMateria().getCursos().get(0);
+            nombreCurso = cursoRelacionado.getNombre();
+        }
+
+        List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
+                nota.getPeriodoAcademico().getNombre(),
+                nombreCurso,
+                nota.getMateria().getNombre(),
+                nota.getEstudiante().getCedula(),
+                null
+        );
+
+        NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
+
+        dto.setIdNota(nota.getId());
+        dto.setCursoId(cursoRelacionado != null ? cursoRelacionado.getId() : null);
+        dto.setPeriodoAcademicoId(nota.getPeriodoAcademico() != null ? nota.getPeriodoAcademico().getId() : null);
+        dto.setNombrePeriodo(nota.getPeriodoAcademico() != null ? nota.getPeriodoAcademico().getNombre() : null);
+        dto.setMateriaId(nota.getMateria() != null ? nota.getMateria().getId() : null);
+        dto.setAreaMateria(nota.getMateria() != null ? nota.getMateria().getNombre() : null);
+
+        if (nota.getEstudiante() != null) {
+            Estudiante e = nota.getEstudiante();
+            dto.setCedulaEstudiante(e.getCedula());
+            dto.setNombreEstudiante(e.getNombre());
+            dto.setNombreCompletoEstudiante(((e.getNombre() != null ? e.getNombre() : "") + " " +
+                    (e.getApellido() != null ? e.getApellido() : "")).trim());
+
+            // Recuperar comportamiento final usando entidades completas:
+            if (cursoRelacionado != null && nota.getPeriodoAcademico() != null) {
+                comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(e, cursoRelacionado, nota.getPeriodoAcademico())
+                        .ifPresentOrElse(cf -> {
+                            dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
+                            dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
+                            dto.setComportamientoFinalVariable3(cf.getComportamientoTercerTrim());
+                        }, () -> {
+                            // Opcional: valores por defecto si no hay comportamiento
+                            dto.setComportamientoFinalVariable1("--");
+                            dto.setComportamientoFinalVariable2("--");
+                            dto.setComportamientoFinalVariable3("--");
+                        });
+            }
+        }
+
+        return dto;
     }
 
     /**
      * Obtiene el reporte final de todas las materias de un estudiante en un periodo.
      */
-    public List<NotaCompletaDTO> obtenerReporteFinal(String periodo, String curso, String cedula) {
-        Estudiante estudiante = estudianteService.buscarPorCedula(cedula);
-        if (estudiante == null) {
-            return Collections.emptyList();
+    public List<NotaCompletaDTO> obtenerReporteFinal(String nombrePeriodo, String nombreCurso, String cedulaEstudiante) {
+
+        System.out.println("DEBUG obtenerReporteFinal(): periodo=" + nombrePeriodo +
+                " | curso=" + nombreCurso + " | cedula=" + cedulaEstudiante);
+
+        // Resolver entidades
+        PeriodoAcademico periodo = (nombrePeriodo != null && !nombrePeriodo.isBlank())
+                ? periodoAcademicoService.buscarPorNombre(nombrePeriodo)
+                : null;
+
+        Estudiante est = (cedulaEstudiante != null && !cedulaEstudiante.isBlank())
+                ? estudianteService.buscarPorCedula(cedulaEstudiante)
+                : null;
+
+        Curso curso = null;
+        if (periodo != null && nombreCurso != null && !nombreCurso.isBlank()) {
+            // Ideal: método que busque curso por nombre + periodo
+            curso = cursoService.buscarCursoPorPeriodoAndNombre(periodo, nombreCurso);
+        }
+        if (curso == null && nombreCurso != null && !nombreCurso.isBlank()) {
+            // fallback: por nombre solamente
+            curso = cursoService.buscarPorNombre(nombreCurso);
         }
 
-        // Ahora sí usamos el parámetro curso
-        return obtenerNotasCompletas(periodo, curso, null, cedula, null);
+        if (periodo == null || est == null) {
+            System.out.println("DEBUG obtenerReporteFinal(): Falta periodo o estudiante. Retornando lista vacía.");
+            return java.util.Collections.emptyList();
+        }
+
+        // Obtener todas las materias del reporte (pasamos materia=null para TODAS)
+        // Ajusta si tu método requiere exactamente null vs ""
+        List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
+                nombrePeriodo,
+                nombreCurso,
+                null,                // MATERIA = TODAS
+                cedulaEstudiante,
+                null                 // trimestreSeleccionado (null = todos)
+        );
+
+        System.out.println("DEBUG obtenerReporteFinal(): size dtos antes de compFinal = " + dtos.size());
+
+        // Recuperar comportamiento final (si hay curso)
+        if (curso != null) {
+            comportamientoCursoFinalRepository
+                    .findByEstudianteAndCursoAndPeriodo(est, curso, periodo)
+                    .ifPresent(cf -> {
+                        System.out.println("DEBUG obtenerReporteFinal(): compFinal encontrado -> "
+                                + cf.getComportamientoPrimerTrim() + ", "
+                                + cf.getComportamientoSegundoTrim() + ", "
+                                + cf.getComportamientoTercerTrim());
+                        // Copiar en todos los DTO
+                        for (NotaCompletaDTO dto : dtos) {
+                            dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
+                            dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
+                            dto.setComportamientoFinalVariable3(cf.getComportamientoTercerTrim());
+                        }
+                    });
+        } else {
+            System.out.println("DEBUG obtenerReporteFinal(): curso nulo; no se busca comportamiento final.");
+        }
+
+        return dtos;
     }
-
-    /**
-     * Filtro básico de entidades Notas (solo si necesitas trabajar con Notas directamente).
-     */
-    public List<Notas> filtrarNotas(String nombrePeriodo, String nombreCurso, String nombreMateria, String cedula) {
-        return notasRepository.findAll().stream()
-                .filter(n -> (nombrePeriodo == null || nombrePeriodo.isEmpty() ||
-                        (n.getPeriodoAcademico() != null &&
-                                nombrePeriodo.equals(n.getPeriodoAcademico().getNombre()))))
-                .filter(n -> (nombreCurso == null || nombreCurso.isEmpty() ||
-                        (n.getMateria() != null && n.getMateria().getCursos() != null &&
-                                n.getMateria().getCursos().stream().anyMatch(c -> nombreCurso.equals(c.getNombre())))))
-                .filter(n -> (nombreMateria == null || nombreMateria.isEmpty() ||
-                        (n.getMateria() != null &&
-                                nombreMateria.equals(n.getMateria().getNombre()))))
-                .filter(n -> (cedula == null || cedula.isEmpty() ||
-                        (n.getEstudiante() != null &&
-                                cedula.equals(n.getEstudiante().getCedula()))))
-                .toList();
-    }
-
-
 }
+
+
+
+
+
 
 
 
