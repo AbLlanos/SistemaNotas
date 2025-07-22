@@ -21,6 +21,7 @@ public interface NotasRepository extends JpaRepository<Notas, Long>, JpaSpecific
 
     List<Notas> findByEstudianteAndPeriodoAcademicoNombre(Estudiante estudiante, String nombrePeriodo);
 
+    boolean existsByEstudianteAndMateriaAndPeriodoAcademico(Estudiante estudiante, Materia materia, PeriodoAcademico periodo);
 
 }
 

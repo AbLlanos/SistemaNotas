@@ -1,6 +1,7 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
+import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
 import com.itsqmet.proyecto_vinculacion.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -128,6 +129,16 @@ public class CursoService {
         return cursoRepository.findByPeriodoAcademico_Id(periodoAcademicoId);
     }
 
+
+    public Curso buscarPorNombre(String nombre) {
+        return cursoRepository.findByNombre(nombre)
+                .orElse(null);
+    }
+
+    public Curso buscarCursoPorPeriodoAndNombre(PeriodoAcademico periodo, String nombre) {
+        return cursoRepository.findByPeriodoAcademicoAndNombre(periodo, nombre)
+                .orElse(null);
+    }
 
 
 }

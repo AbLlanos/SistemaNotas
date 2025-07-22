@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -304,32 +305,32 @@ public class NotasService {
             estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
         }
 
+        // ----- Resolver curso -----  // *** NEW ***
+        Curso curso = null;
+        if (form.getCursoId() != null) {
+            curso = cursoService.buscarCursoPorId(form.getCursoId()).orElse(null);
+        }
+        if (curso == null && form.getNombreCurso() != null && !form.getNombreCurso().isBlank()) {
+            curso = cursoService.buscarPorNombre(form.getNombreCurso()); // crea este método si no existe
+        }
+
         // ----- Resolver materia -----
         Materia materia = null;
-        // preferimos ID (select HTML)
         if (form.getMateriaId() != null) {
-            materia = materiaService.buscarPorId(form.getMateriaId()); // define en tu service
+            materia = materiaService.buscarPorId(form.getMateriaId());
         }
-        // fallback por nombre texto
         if (materia == null && form.getAreaMateria() != null && !form.getAreaMateria().isBlank()) {
             materia = materiaService.buscarPorNombre(form.getAreaMateria());
         }
 
         // ----- Resolver periodo -----
         PeriodoAcademico periodo = null;
-        // Si enviamos cursoId, podemos obtenerlo y leer su periodo
-        if (form.getCursoId() != null) {
-            Curso curso = cursoService.buscarCursoPorId(form.getCursoId())
-                    .orElse(null);
-            if (curso != null) {
-                periodo = curso.getPeriodoAcademico();
-                // también podemos tomar nombreCurso si venía vacío
-                if (form.getNombreCurso() == null || form.getNombreCurso().isBlank()) {
-                    form.setNombreCurso(curso.getNombre());
-                }
+        if (curso != null) { // usa curso ya resuelto
+            periodo = curso.getPeriodoAcademico();
+            if (form.getNombreCurso() == null || form.getNombreCurso().isBlank()) {
+                form.setNombreCurso(curso.getNombre());
             }
         }
-        // fallback por nombrePeriodo texto
         if (periodo == null && form.getNombrePeriodo() != null && !form.getNombrePeriodo().isBlank()) {
             periodo = periodoAcademicoService.buscarPorNombre(form.getNombrePeriodo());
         }
@@ -343,11 +344,20 @@ public class NotasService {
             if (estudiante == null) estudiante = base.getEstudiante();
             if (materia == null)    materia    = base.getMateria();
             if (periodo == null)    periodo    = base.getPeriodoAcademico();
+            if (curso == null)      curso      = cursoService.buscarCursoPorPeriodoAndNombre(periodo, base.getMateria().getNombre()); // <-- ajusta; o deja null si no aplica
         }
 
-        // ----- Validación final -----
+        // ----- Validación final mínima para notas (igual que antes) -----
         if (estudiante == null || materia == null || periodo == null) {
             throw new IllegalArgumentException("Faltan datos necesarios (estudiante/materia/periodo).");
+        }
+
+        // **VALIDAR SI YA EXISTE REGISTRO**
+        if (form.getIdNota() == null) {
+            boolean existe = notasRepository.existsByEstudianteAndMateriaAndPeriodoAcademico(estudiante, materia, periodo);
+            if (existe) {
+                throw new IllegalStateException("Ya existe un registro de notas para este estudiante, materia y periodo.");
+            }
         }
 
         // ----- Trimestres -----
@@ -382,6 +392,53 @@ public class NotasService {
                 form.getComportamientoTercerTrim(),
                 form.getTotalAsistenciaTercerTrim()
         );
+
+        // ----- Guardar Comportamiento Final por Curso (si hay curso y algún campo lleno) ----- // *** NEW ***
+        if (curso != null &&
+                (notBlank(form.getComportamientoFinalVariable1())
+                        || notBlank(form.getComportamientoFinalVariable2())
+                        || notBlank(form.getComportamientoFinalVariable3()))) {
+
+            upsertComportamientoCursoFinal(
+                    estudiante,
+                    curso,
+                    periodo,
+                    form.getComportamientoFinalVariable1(),
+                    form.getComportamientoFinalVariable2(),
+                    form.getComportamientoFinalVariable3()
+            );
+        }
+    }
+
+
+
+    @Autowired
+    private ComportamientoFinalRepository comportamientoCursoFinalRepository;
+
+    private void upsertComportamientoCursoFinal(
+            Estudiante estudiante,
+            Curso curso,
+            PeriodoAcademico periodo,
+            String comp1,
+            String comp2,
+            String comp3
+    ) {
+        ComportamientoFinal ent = comportamientoCursoFinalRepository
+                .findByEstudianteAndCursoAndPeriodo(estudiante, curso, periodo)
+                .orElseGet(ComportamientoFinal::new);
+
+        ent.setEstudiante(estudiante);
+        ent.setCurso(curso);
+        ent.setPeriodo(periodo);
+        ent.setComportamientoPrimerTrim(comp1);
+        ent.setComportamientoSegundoTrim(comp2);
+        ent.setComportamientoTercerTrim(comp3);
+
+        comportamientoCursoFinalRepository.save(ent);
+    }
+
+    private boolean notBlank(String s) {
+        return s != null && !s.trim().isEmpty();
     }
 
 
@@ -453,8 +510,6 @@ public class NotasService {
 
 
 
-
-
     public NotaCompletaDTO obtenerNotaCompletaPorId(Long idNota) {
         Notas nota = buscarNotaPorId(idNota);
         if (nota == null) {
@@ -464,14 +519,14 @@ public class NotasService {
         String nombreCurso = "---";
         Long cursoId = null;
         Long periodoId = null;
+        Curso cursoRelacionado = null; // <--- NUEVO para comportamiento final
 
         if (nota.getMateria() != null && nota.getMateria().getCursos() != null && !nota.getMateria().getCursos().isEmpty()) {
-            Curso curso = nota.getMateria().getCursos().get(0);
-            nombreCurso = curso.getNombre();
-            cursoId = curso.getId();
-
-            if (curso.getPeriodoAcademico() != null) {
-                periodoId = curso.getPeriodoAcademico().getId();
+            cursoRelacionado = nota.getMateria().getCursos().get(0);
+            nombreCurso = cursoRelacionado.getNombre();
+            cursoId = cursoRelacionado.getId();
+            if (cursoRelacionado.getPeriodoAcademico() != null) {
+                periodoId = cursoRelacionado.getPeriodoAcademico().getId();
             }
         }
 
@@ -484,12 +539,41 @@ public class NotasService {
         );
 
         NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
+
+        // asegurar id nota
+        dto.setIdNota(nota.getId());
         dto.setCursoId(cursoId);
         dto.setPeriodoAcademicoId(periodoId);
         dto.setNombrePeriodo(nota.getPeriodoAcademico().getNombre());
+        dto.setMateriaId(nota.getMateria().getId());
+        dto.setAreaMateria(nota.getMateria().getNombre());
+
+        // Estudiante
+        if (nota.getEstudiante() != null) {
+            Estudiante e = nota.getEstudiante();
+            dto.setCedulaEstudiante(e.getCedula());
+            dto.setNombreEstudiante(e.getNombre());
+            dto.setNombreCompletoEstudiante(
+                    ((e.getNombre() != null ? e.getNombre() : "") + " " +
+                            (e.getApellido() != null ? e.getApellido() : "")).trim()
+            );
+
+            // --- Recuperar Comportamiento Final (si existe) --- // NUEVO
+            if (cursoRelacionado != null && periodoId != null) {
+                comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(e, cursoRelacionado, nota.getPeriodoAcademico())
+                        .ifPresent(cf -> {
+                            dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
+                            dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
+                            dto.setComportamientoFinalVariable3(cf.getComportamientoTercerTrim());
+                        });
+            }
+        }
 
         return dto;
     }
+
+
+
 
 
 

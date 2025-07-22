@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -192,7 +193,7 @@ public class AdminController {
 
 
 
-    @GetMapping("/notas/nueva")
+    @GetMapping("/notas/nuevo")
     public String mostrarFormularioNuevaNota(Model model) {
         NotaCompletaDTO notaCompletaDTO = new NotaCompletaDTO();
         model.addAttribute("nota", notaCompletaDTO);
@@ -208,24 +209,53 @@ public class AdminController {
 
     // Guardar nota (tanto nueva como editada)
     @PostMapping("/notas/guardar")
-    public String guardarNotaCompleta(@ModelAttribute NotaCompletaDTO notaCompletaDTO) {
-        notasService.guardarNotasDesdeFormulario(notaCompletaDTO);
-        return "redirect:/Bachillerato/bachilleratoVista";
+    public String guardarNotas(
+            @ModelAttribute("nota") NotaCompletaDTO form,
+            RedirectAttributes redirectAttributes) {
+        try {
+            notasService.guardarNotasDesdeFormulario(form);
+            redirectAttributes.addFlashAttribute("exito", "¡Las notas se guardaron correctamente!");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al guardar las notas: " + e.getMessage());
+        }
+        return "redirect:/notas";
     }
 
     @GetMapping("/notas/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
+        System.out.println("DEBUG: Entrando a mostrarFormularioEditar con idNota=" + id);
+
         NotaCompletaDTO notaCompletaDTO = notasService.obtenerNotaCompletaPorId(id);
+        System.out.println("DEBUG: NotaCompletaDTO obtenido: " + notaCompletaDTO);
+
+        if (notaCompletaDTO != null) {
+            System.out.println("DEBUG: Estudiante = " + notaCompletaDTO.getNombreCompletoEstudiante() +
+                    " | Cedula = " + notaCompletaDTO.getCedulaEstudiante() +
+                    " | Materia = " + notaCompletaDTO.getAreaMateria());
+        }
+
         model.addAttribute("nota", notaCompletaDTO);
 
+        // Listas auxiliares
         model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
+        System.out.println("DEBUG: Total estudiantes = " + estudianteService.listarTodosEstudiantes().size());
+
         model.addAttribute("materias", materiaService.listarTodasMaterias());
+        System.out.println("DEBUG: Total materias = " + materiaService.listarTodasMaterias().size());
+
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        System.out.println("DEBUG: Total periodos = " + periodoAcademicoService.listarTodosPeriodosAcademicos().size());
+
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+        System.out.println("DEBUG: Total trimestres = " + trimestreService.listarTodosPeriodos().size());
 
         if (notaCompletaDTO.getPeriodoAcademicoId() != null) {
+            System.out.println("DEBUG: Cargando cursos para periodo ID = " + notaCompletaDTO.getPeriodoAcademicoId());
             model.addAttribute("cursos", cursoService.obtenerCursosPorPeriodoID(notaCompletaDTO.getPeriodoAcademicoId()));
         } else {
+            System.out.println("DEBUG: No hay PeriodoAcademicoId, listando todos los cursos.");
             model.addAttribute("cursos", cursoService.listarTodosCursos());
         }
 
@@ -339,11 +369,15 @@ public class AdminController {
     @GetMapping("/cursos/{cursoId}/estudiantes")
     @ResponseBody
     public List<EstudianteOptionDTO> getEstudiantesPorCurso(@PathVariable Long cursoId) {
-        // Si prefieres obtenerlos desde el curso:
-        // Curso curso = cursoService.getCursoOrThrow(cursoId);
-        // List<Estudiante> ests = curso.getEstudiantes();  // solo si tienes la relación mapeada en Curso
-        // Como vimos, usamos EstudianteService:
+        System.out.println("DEBUG: Consultando estudiantes del curso con ID=" + cursoId);
+
         List<Estudiante> ests = estudianteService.listarPorCurso(cursoId);
+
+        System.out.println("DEBUG: Estudiantes encontrados = " + ests.size());
+        for (Estudiante e : ests) {
+            System.out.println(" - " + e.getCedula() + " | " + e.getNombre() + " " + e.getApellido());
+        }
+
         return ests.stream()
                 .map(e -> new EstudianteOptionDTO(
                         e.getCedula(),

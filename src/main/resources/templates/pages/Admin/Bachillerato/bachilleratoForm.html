@@ -43,8 +43,12 @@
     <div>
         <label for="areaMateria" class="block mb-1 text-sm font-semibold">Materia</label>
         <select id="areaMateria" th:field="*{materiaId}" class="w-full border rounded px-3 py-2 text-sm" th:disabled="${nota.idNota != null}" required>
-            <option value="" data-nombre="">-- Seleccione una materia --</option>
-            <option th:if="*{idNota != null}" th:value="*{materiaId}" th:attr="data-nombre=*{areaMateria}" th:text="*{areaMateria}" selected></option>
+            <option value="">Seleccionar materia</option>
+            <option th:each="mat : ${listaMaterias}"
+                    th:value="${mat.id}"
+                    th:text="${mat.nombre}"
+                    th:selected="${mat.id == nota.materiaId}">
+            </option>
         </select>
         <input type="hidden" id="materiaNombreHidden" th:field="*{areaMateria}" />
     </div>
@@ -52,25 +56,28 @@
     <!-- ======== Estudiante ======== -->
     <div>
         <label for="cedulaEstudiante" class="block mb-1 text-sm font-semibold">Estudiante</label>
-        <select id="cedulaEstudiante" th:field="*{cedulaEstudiante}" class="w-full border rounded px-3 py-2 text-sm" th:disabled="${nota.idNota != null}" required>
+
+        <!-- SELECT visible sólo en CREAR -->
+        <select id="cedulaEstudiante"
+                th:field="*{cedulaEstudiante}"
+                class="w-full border rounded px-3 py-2 text-sm"
+                th:if="${nota.idNota == null}"
+                required>
             <option value="">-- Seleccione un estudiante --</option>
             <option th:each="est : ${estudiantes}"
                     th:value="${est.cedula}"
-                    th:text="${est.cedula + ' - ' + est.nombre + ' ' + est.apellido}">
+                    th:text="|${est.cedula} - ${est.nombre} ${est.apellido}|"
+                    th:selected="${est.cedula == nota.cedulaEstudiante}">
             </option>
         </select>
-        <input type="hidden" th:if="*{idNota != null}" th:field="*{cedulaEstudiante}" />
+
+        <!-- MODO EDITAR: sólo lectura + hidden -->
+        <div th:if="${nota.idNota != null}">
+            <input type="hidden" th:field="*{cedulaEstudiante}" />
+            <p class="font-semibold text-gray-700"
+               th:text="|${nota.cedulaEstudiante} - ${nota.nombreCompletoEstudiante}|"></p>
+        </div>
     </div>
-
-    <!-- ... resto de campos con th:field en lugar de name para binding ... -->
-
-    <div class="pt-6">
-        <button type="submit"
-                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">
-            <span th:text="*{idNota != null} ? 'Actualizar' : 'Guardar'">Guardar</span>
-        </button>
-    </div>
-
 
     <hr class="my-4"/>
 
@@ -217,134 +224,169 @@
         </div>
     </div>
 
+    <!-- ======= Comportamiento Final por Curso ======= -->
+    <h3 class="text-lg font-semibold mt-6">Comportamiento Final (por Curso)</h3>
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label for="comportamientoFinal1" class="block text-xs font-semibold">Comportamiento Final 1</label>
+            <input type="text" id="comportamientoFinal1" name="comportamientoFinalVariable1"
+                   th:value="${nota.comportamientoFinalVariable1}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="comportamientoFinal2" class="block text-xs font-semibold">Comportamiento Final 2</label>
+            <input type="text" id="comportamientoFinal2" name="comportamientoFinalVariable2"
+                   th:value="${nota.comportamientoFinalVariable2}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="comportamientoFinal3" class="block text-xs font-semibold">Comportamiento Final 3</label>
+            <input type="text" id="comportamientoFinal3" name="comportamientoFinalVariable3"
+                   th:value="${nota.comportamientoFinalVariable3}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
+
+
+    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <div class="pt-6">
         <button type="submit"
                 class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">
             <span th:text="${nota.idNota != null ? 'Actualizar' : 'Guardar'}">Guardar</span>
         </button>
     </div>
+
+
 </form>
 
 <!-- Aquí los scripts quedan igual -->
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const periodoSelect = document.getElementById('periodoSelect');
-      const cursoSelect = document.getElementById('cursoSelect');
-      const materiaSelect = document.getElementById('areaMateria');
-      const estudianteSelect = document.getElementById('cedulaEstudiante');
-      const materiaNombreHidden = document.getElementById('materiaNombreHidden');
+<script th:inline="javascript">
+    const isEdit = /*[[${nota.idNota != null}]]*/ false;
+      document.addEventListener('DOMContentLoaded', function() {
+        const periodoSelect = document.getElementById('periodoSelect');
+        const cursoSelect = document.getElementById('cursoSelect');
+        const materiaSelect = document.getElementById('areaMateria');
+        const estudianteSelect = document.getElementById('cedulaEstudiante');
+        const materiaNombreHidden = document.getElementById('materiaNombreHidden');
 
-      // Guardamos todas las opciones de curso (excepto la primera vacía)
-      const allCursoOptions = Array.from(cursoSelect.querySelectorAll('option[data-periodo-id]'));
+        // Guardamos todas las opciones de curso (excepto la primera vacía)
+        const allCursoOptions = Array.from(cursoSelect.querySelectorAll('option[data-periodo-id]'));
 
-      // Inicialmente limpiamos cursos, materias y estudiantes para que no muestren nada (solo opción vacía)
-      cursoSelect.innerHTML = '<option value="">-- Seleccione un curso --</option>';
-      materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
-      estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-
-      // Cuando cambie Periodo Académico
-      periodoSelect.addEventListener('change', function () {
-        const periodoId = this.value;
-
-        // Limpiar cursos, materias y estudiantes
+        // Inicialmente limpiamos cursos, materias y estudiantes para que no muestren nada (solo opción vacía)
         cursoSelect.innerHTML = '<option value="">-- Seleccione un curso --</option>';
         materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
         estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
 
-        if (!periodoId) return; // Si no hay periodo seleccionado no mostrar cursos
+        // Cuando cambie Periodo Académico
+        periodoSelect.addEventListener('change', function () {
+          const periodoId = this.value;
 
-        // Mostrar solo cursos que coinciden con el periodo seleccionado
-        allCursoOptions.forEach(option => {
-          if (option.getAttribute('data-periodo-id') === periodoId) {
-            cursoSelect.appendChild(option);
+          // Limpiar cursos, materias y estudiantes
+if (!isEdit) {
+    cursoSelect.innerHTML = '<option value="">-- Seleccione un curso --</option>';
+    materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
+    estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+}
+
+          if (!periodoId) return; // Si no hay periodo seleccionado no mostrar cursos
+
+          // Mostrar solo cursos que coinciden con el periodo seleccionado
+          allCursoOptions.forEach(option => {
+            if (option.getAttribute('data-periodo-id') === periodoId) {
+              cursoSelect.appendChild(option);
+            }
+          });
+        });
+
+        // Cuando cambie Curso
+        cursoSelect.addEventListener('change', function() {
+          const cursoId = this.value;
+
+          materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
+          estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+          materiaNombreHidden.value = '';
+
+          if (!cursoId) return; // Si no hay curso seleccionado, no cargamos materias ni estudiantes
+
+          // Cargar materias vía fetch
+          fetch(`/pages/Admin/${cursoId}/materias`)
+            .then(res => {
+              if (!res.ok) throw new Error('Error al consultar materias');
+              return res.json();
+            })
+            .then(data => {
+              data.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.dataset.nombre = m.nombre;
+                opt.textContent = m.nombre;
+                materiaSelect.appendChild(opt);
+              });
+            })
+            .catch(err => {
+              console.error(err);
+              materiaSelect.innerHTML = '<option value="" data-nombre="">(Error cargando materias)</option>';
+            });
+
+          // Cargar estudiantes vía fetch
+          fetch(`/pages/Admin/cursos/${cursoId}/estudiantes`)
+            .then(res => {
+              if (!res.ok) throw new Error('Error al consultar estudiantes');
+              return res.json();
+            })
+            .then(data => {
+              data.forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.cedula;
+                opt.textContent = e.cedula + ' - ' + (e.nombreCompleto || '');
+                estudianteSelect.appendChild(opt);
+              });
+            })
+            .catch(err => {
+              console.error(err);
+              estudianteSelect.innerHTML = '<option value="">(Error cargando estudiantes)</option>';
+            });
+        });
+
+        // Cuando cambia la materia, actualizar campo oculto con nombre
+        materiaSelect.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          if (selectedOption) {
+            materiaNombreHidden.value = selectedOption.dataset.nombre || '';
+          } else {
+            materiaNombreHidden.value = '';
           }
         });
-      });
 
-      // Cuando cambie Curso
-      cursoSelect.addEventListener('change', function() {
-        const cursoId = this.value;
+        // Si estás editando y ya tienes valores, dispara los eventos para cargar selects dependientes
+        if (periodoSelect.value) {
+          periodoSelect.dispatchEvent(new Event('change'));
 
-        materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
-        estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
-        materiaNombreHidden.value = '';
+          // Esperar un poco para cargar cursos y luego setear curso seleccionado
+          setTimeout(() => {
+            if ('[[${nota.cursoId}]]' !== '') {
+              cursoSelect.value = '[[${nota.cursoId}]]';
+              cursoSelect.dispatchEvent(new Event('change'));
 
-        if (!cursoId) return; // Si no hay curso seleccionado, no cargamos materias ni estudiantes
-
-        // Cargar materias vía fetch
-        fetch(`/pages/Admin/${cursoId}/materias`)
-          .then(res => {
-            if (!res.ok) throw new Error('Error al consultar materias');
-            return res.json();
-          })
-          .then(data => {
-            data.forEach(m => {
-              const opt = document.createElement('option');
-              opt.value = m.id;
-              opt.dataset.nombre = m.nombre;
-              opt.textContent = m.nombre;
-              materiaSelect.appendChild(opt);
-            });
-          })
-          .catch(err => {
-            console.error(err);
-            materiaSelect.innerHTML = '<option value="" data-nombre="">(Error cargando materias)</option>';
-          });
-
-        // Cargar estudiantes vía fetch
-        fetch(`/pages/Admin/cursos/${cursoId}/estudiantes`)
-          .then(res => {
-            if (!res.ok) throw new Error('Error al consultar estudiantes');
-            return res.json();
-          })
-          .then(data => {
-            data.forEach(e => {
-              const opt = document.createElement('option');
-              opt.value = e.cedula;
-              opt.textContent = e.cedula + ' - ' + (e.nombreCompleto || '');
-              estudianteSelect.appendChild(opt);
-            });
-          })
-          .catch(err => {
-            console.error(err);
-            estudianteSelect.innerHTML = '<option value="">(Error cargando estudiantes)</option>';
-          });
-      });
-
-      // Cuando cambia la materia, actualizar campo oculto con nombre
-      materiaSelect.addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        if (selectedOption) {
-          materiaNombreHidden.value = selectedOption.dataset.nombre || '';
-        } else {
-          materiaNombreHidden.value = '';
+              // Si tienes materiaId para setear
+              setTimeout(() => {
+                if ('[[${nota.materiaId}]]' !== '') {
+                  materiaSelect.value = '[[${nota.materiaId}]]';
+                  materiaNombreHidden.value = materiaSelect.options[materiaSelect.selectedIndex]?.dataset.nombre || '';
+                }
+              }, 500);
+            }
+          }, 500);
         }
       });
-
-      // Si estás editando y ya tienes valores, dispara los eventos para cargar selects dependientes
-      if (periodoSelect.value) {
-        periodoSelect.dispatchEvent(new Event('change'));
-
-        // Esperar un poco para cargar cursos y luego setear curso seleccionado
-        setTimeout(() => {
-          if ('[[${nota.cursoId}]]' !== '') {
-            cursoSelect.value = '[[${nota.cursoId}]]';
-            cursoSelect.dispatchEvent(new Event('change'));
-
-            // Si tienes materiaId para setear
-            setTimeout(() => {
-              if ('[[${nota.materiaId}]]' !== '') {
-                materiaSelect.value = '[[${nota.materiaId}]]';
-                materiaNombreHidden.value = materiaSelect.options[materiaSelect.selectedIndex]?.dataset.nombre || '';
-              }
-            }, 500);
-          }
-        }, 500);
-      }
-    });
 </script>
 
+<script th:inline="javascript">
+    const exito = /*[[${exito}]]*/ null;
+    const error = /*[[${error}]]*/ null;
+    if (exito) { alert(exito); }
+    if (error) { alert(error); }
+</script>
 
 </body>
 </html>

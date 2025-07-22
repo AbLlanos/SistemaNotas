@@ -59,4 +59,10 @@ public class NotaCompletaDTO {
 
     private String estado;
     private Double promedioFinal;
+
+    private String comportamientoFinalVariable1;
+    private String comportamientoFinalVariable2;
+    private String comportamientoFinalVariable3;
+
+
 }

@@ -3,6 +3,7 @@ package com.itsqmet.proyecto_vinculacion.repository;
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
 import com.itsqmet.proyecto_vinculacion.entity.Docente;
 import com.itsqmet.proyecto_vinculacion.entity.NivelEducativo;
+import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -35,5 +36,8 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     List<Curso> findByPeriodoAcademicoNombre(String nombrePeriodo);
 
+    Optional<Curso> findByNombre(String nombre);
+
+    Optional<Curso> findByPeriodoAcademicoAndNombre(PeriodoAcademico periodo, String nombre);
 
 }
