@@ -56,46 +56,57 @@
             <form method="get" action="/pages/Admin/Bachillerato/bachilleratoVista" id="formFiltros" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div>
-                        <label for="nombrePeriodo" class="block text-sm font-semibold text-gray-800 mb-2">Periodo Académico</label>
+                        <label for="nombrePeriodo" class="block text-sm font-semibold text-gray-800 mb-2">Periodo
+                            Académico</label>
                         <select id="nombrePeriodo" name="nombrePeriodo"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
                             <option value="">-- Seleccione el periodo académico --</option>
-                            <option th:each="periodo : ${aniosLectivos}" th:value="${periodo.nombre}" th:text="${periodo.nombre}"
+                            <option th:each="periodo : ${aniosLectivos}" th:value="${periodo.nombre}"
+                                    th:text="${periodo.nombre}"
                                     th:selected="${periodo.nombre == param.nombrePeriodo}"></option>
                         </select>
                     </div>
 
                     <div>
                         <label for="nombreCurso" class="block text-sm font-semibold text-gray-800 mb-2">Curso</label>
-                        <select id="nombreCurso" name="nombreCurso"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <select id="nombreCurso" name="nombreCurso" class="...">
                             <option value="">-- Seleccione el curso --</option>
-                            <option th:each="curso : ${cursos}" th:value="${curso.nombre}" th:text="${curso.nombre}"
-                                    th:selected="${curso.nombre == param.nombreCurso}"></option>
+                            <option th:each="curso : ${cursos}"
+                                    th:value="${curso.nombre}"
+                                    th:text="${curso.nombre}"
+                                    th:attr="data-id=${curso.id}"
+                                    th:selected="${curso.nombre == param.nombreCurso}">
+                            </option>
                         </select>
+
                     </div>
 
                     <div>
-                        <label for="nombreMateria" class="block text-sm font-semibold text-gray-800 mb-2">Asignatura</label>
-                        <select id="nombreMateria" name="nombreMateria"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <label for="nombreMateria"
+                               class="block text-sm font-semibold text-gray-800 mb-2">Asignatura</label>
+                        <select id="nombreMateria" name="nombreMateria" class="...">
                             <option value="">-- Seleccione la materia --</option>
-                            <option th:each="materia : ${materias}" th:value="${materia.nombre}" th:text="${materia.nombre}"
-                                    th:selected="${materia.nombre == param.nombreMateria}"></option>
+                            <option th:each="materia : ${materias}"
+                                    th:value="${materia.nombre}"
+                                    th:text="${materia.nombre}"
+                                    th:selected="${materia.nombre == param.nombreMateria}">
+                            </option>
                         </select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="cedula" class="block text-sm font-semibold text-gray-800 mb-2">Cédula del Estudiante</label>
+                        <label for="cedula" class="block text-sm font-semibold text-gray-800 mb-2">Cédula del
+                            Estudiante</label>
                         <input type="text" id="cedula" name="cedula" th:value="${param.cedula}"
                                placeholder="Ej: 1234567890"
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm"/>
                     </div>
 
                     <div>
-                        <label for="nombreTrimestre" class="block text-sm font-semibold text-gray-800 mb-2">Semestre</label>
+                        <label for="nombreTrimestre"
+                               class="block text-sm font-semibold text-gray-800 mb-2">Semestre</label>
                         <select id="nombreTrimestre" name="nombreTrimestre"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
                             <option value="">-- Seleccione el semestre --</option>
@@ -103,6 +114,8 @@
                                     th:selected="${tri == param.nombreTrimestre}"></option>
                         </select>
                     </div>
+
+
                 </div>
 
                 <div class="flex justify-center pt-4 gap-4">
@@ -127,6 +140,13 @@
         <!-- Cuadro para generar PDF -->
         <div class="mt-8 p-6 bg-orange-100 border-2 border-orange-500 rounded-xl shadow text-center">
             <h3 class="text-lg font-semibold text-gray-700 mb-4">Crear PDF</h3>
+
+
+            <!-- Mensaje de error para generación de PDF -->
+            <div id="pdfAlertContainer" class="mt-4 hidden ali bg-gray-300 text-center">
+                <!-- Se llena dinámicamente -->
+            </div>
+
             <div class="flex flex-wrap justify-center gap-3">
                 <a th:href="@{/pages/Admin/admin/reporte-notas(
             cedula=${param.cedula},
@@ -135,7 +155,7 @@
             materia=${param.nombreMateria},
             trimestre='Primer Trimestre'
         )}" target="_blank"
-                   class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                   class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition pdf-link">
                     PDF - 1er Semestre
                 </a>
 
@@ -146,7 +166,7 @@
             materia=${param.nombreMateria},
             trimestre='Segundo Trimestre'
         )}" target="_blank"
-                   class="px-4 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition">
+                   class="px-4 py-2 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 transition pdf-link">
                     PDF - 2do Semestre
                 </a>
 
@@ -157,7 +177,7 @@
             materia=${param.nombreMateria},
             trimestre='Tercer Trimestre'
         )}" target="_blank"
-                   class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition">
+                   class="px-4 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 transition pdf-link">
                     PDF - 3er Semestre
                 </a>
 
@@ -168,245 +188,292 @@
             materia=${param.nombreMateria},
             trimestre=${param.nombreTrimestre} ?: 'todos'
         )}" target="_blank"
-                   class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
+                   class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition pdf-link">
                     PDF - Reporte General
                 </a>
             </div>
         </div>
 
 
+        <div class="mt-8 bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-blue-700 text-white">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Cédula
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            Estudiante
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Curso
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Área</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                            Periodo Académico
+                        </th>
+
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Nota 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Cualitativa 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Asistencia 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Faltas Just. 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Faltas Injust. 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Atrasos 1er Trimestre
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Total Asistencias 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
+                            Comportamiento 1er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Nota 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Cualitativa 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Asistencia 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Faltas Just. 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Faltas Injust. 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Atrasos 2do Trimestre
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Total Asistencias 2do Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
+                            Comportamiento 2do Trimestre
+                        </th>
+
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Nota 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Cualitativa 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Asistencia 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Faltas Just. 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Faltas Injust. 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Atrasos 3er Trimestre
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Total Asistencias 3er Trimestre
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
+                            Comportamiento 3er Trimestre
+                        </th>
+
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                            Estado
+                        </th>
+
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tr th:each="nota : ${notas}" class="hover:bg-gray-50 transition duration-150 ease-in-out">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                            th:text="${nota.cedulaEstudiante != null ? nota.cedulaEstudiante : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                            th:text="${nota.nombreCompletoEstudiante != null ? nota.nombreCompletoEstudiante : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                            th:text="${nota.nombreCurso != null ? nota.nombreCurso : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                            th:text="${nota.areaMateria != null ? nota.areaMateria : '---'}"></td>
+                        <td th:text="${nota.nombrePeriodo != null ? nota.nombrePeriodo : '---'}"></td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.notaNumericaPrimerTrim != null ? nota.notaNumericaPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.notaCualitativaPrimerTrim != null ? nota.notaCualitativaPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.asistenciaPrimerTrim != null ? nota.asistenciaPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.faltasJustificadasPrimerTrim != null ? nota.faltasJustificadasPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.faltasInjustificadasPrimerTrim != null ? nota.faltasInjustificadasPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.atrasosPrimerTrim != null ? nota.atrasosPrimerTrim : '---'}"></td>
+                        <!-- Total 1er -->
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.totalAsistenciaPrimerTrim != null ? nota.totalAsistenciaPrimerTrim : '---'}"></td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
+                            th:text="${nota.comportamientoPrimerTrim != null ? nota.comportamientoPrimerTrim : '---'}"></td>
 
 
-    <div class="mt-8 bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-700 text-white">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Cédula</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Estudiante
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Curso</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">Área</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider">
-                        Periodo Académico
-                    </th>
-
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Nota 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Cualitativa 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Asistencia 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Faltas Just. 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Faltas Injust. 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Atrasos 1er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">
-                        Comportamiento 1er Trimestre
-                    </th>
-
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Nota 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Cualitativa 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Asistencia 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Faltas Just. 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Faltas Injust. 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Atrasos 2do Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">
-                        Comportamiento 2do Trimestre
-                    </th>
-
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Nota 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Cualitativa 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Asistencia 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Faltas Just. 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Faltas Injust. 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Atrasos 3er Trimestre
-                    </th>
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">
-                        Comportamiento 3er Trimestre
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Acciones
-                    </th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                <tr th:each="nota : ${notas}" class="hover:bg-gray-50 transition duration-150 ease-in-out">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        th:text="${nota.cedulaEstudiante != null ? nota.cedulaEstudiante : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                        th:text="${nota.nombreCompletoEstudiante != null ? nota.nombreCompletoEstudiante : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        th:text="${nota.nombreCurso != null ? nota.nombreCurso : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
-                        th:text="${nota.areaMateria != null ? nota.areaMateria : '---'}"></td>
-                    <td th:text="${nota.nombrePeriodo != null ? nota.nombrePeriodo : '---'}"></td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.notaNumericaPrimerTrim != null ? nota.notaNumericaPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.notaCualitativaPrimerTrim != null ? nota.notaCualitativaPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.asistenciaPrimerTrim != null ? nota.asistenciaPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.faltasJustificadasPrimerTrim != null ? nota.faltasJustificadasPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.faltasInjustificadasPrimerTrim != null ? nota.faltasInjustificadasPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.atrasosPrimerTrim != null ? nota.atrasosPrimerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell"
-                        th:text="${nota.comportamientoPrimerTrim != null ? nota.comportamientoPrimerTrim : '---'}"></td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.notaNumericaSegundoTrim != null ? nota.notaNumericaSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.notaCualitativaSegundoTrim != null ? nota.notaCualitativaSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.asistenciaSegundoTrim != null ? nota.asistenciaSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.faltasJustificadasSegundoTrim != null ? nota.faltasJustificadasSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.faltasInjustificadasSegundoTrim != null ? nota.faltasInjustificadasSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.atrasosSegundoTrim != null ? nota.atrasosSegundoTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
-                        th:text="${nota.comportamientoSegundoTrim != null ? nota.comportamientoSegundoTrim : '---'}"></td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.notaNumericaTercerTrim != null ? nota.notaNumericaTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.notaCualitativaTercerTrim != null ? nota.notaCualitativaTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.asistenciaTercerTrim != null ? nota.asistenciaTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.faltasJustificadasTercerTrim != null ? nota.faltasJustificadasTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.faltasInjustificadasTercerTrim != null ? nota.faltasInjustificadasTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.atrasosTercerTrim != null ? nota.atrasosTercerTrim : '---'}"></td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
-                        th:text="${nota.comportamientoTercerTrim != null ? nota.comportamientoTercerTrim : '---'}"></td>
-
-                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                        <div class="flex items-center justify-center space-x-3">
-                            <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}"
-                               class="text-blue-600 hover:text-blue-800">Editar</a>
 
 
-                            <!-- Eliminar -->
-                            <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post"
-                                  onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
-                                <button type="submit"
-                                        class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
-                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                </button>
-                            </form>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.notaNumericaSegundoTrim != null ? nota.notaNumericaSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.notaCualitativaSegundoTrim != null ? nota.notaCualitativaSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.asistenciaSegundoTrim != null ? nota.asistenciaSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.faltasJustificadasSegundoTrim != null ? nota.faltasJustificadasSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.faltasInjustificadasSegundoTrim != null ? nota.faltasInjustificadasSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.atrasosSegundoTrim != null ? nota.atrasosSegundoTrim : '---'}"></td>
 
-                            <!-- PDF botones -->
-                            <div class="flex flex-col space-y-1">
-                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Primer Trimestre')}"
-                                   target="_blank"
-                                   class="inline-flex items-center px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700">
-                                    1er Trim
-                                </a>
-                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Segundo Trimestre')}"
-                                   target="_blank"
-                                   class="inline-flex items-center px-2 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-700">
-                                    2do Trim
-                                </a>
-                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Tercer Trimestre')}"
-                                   target="_blank"
-                                   class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white text-xs font-bold rounded hover:bg-yellow-700">
-                                    3er Trim
-                                </a>
-                                <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='todos')}"
-                                   target="_blank"
-                                   class="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
-                                    Todos
-                                </a>
+                        <!-- Total 2do -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.totalAsistenciaSegundoTrim != null ? nota.totalAsistenciaSegundoTrim : '---'}"></td>
+
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell"
+                            th:text="${nota.comportamientoSegundoTrim != null ? nota.comportamientoSegundoTrim : '---'}"></td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.notaNumericaTercerTrim != null ? nota.notaNumericaTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.notaCualitativaTercerTrim != null ? nota.notaCualitativaTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.asistenciaTercerTrim != null ? nota.asistenciaTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.faltasJustificadasTercerTrim != null ? nota.faltasJustificadasTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.faltasInjustificadasTercerTrim != null ? nota.faltasInjustificadasTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.atrasosTercerTrim != null ? nota.atrasosTercerTrim : '---'}"></td>
+
+                        <!-- Total 3er -->
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.totalAsistenciaTercerTrim != null ? nota.totalAsistenciaTercerTrim : '---'}"></td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell"
+                            th:text="${nota.comportamientoTercerTrim != null ? nota.comportamientoTercerTrim : '---'}"></td>
+
+                        <td class="px-4 py-2 text-center text-sm">
+                            <span th:text="${nota.promedioFinal != null ? nota.promedioFinal : '---'}"></span>
+                            <span th:text="${nota.estado}"
+                                  class="ml-1 px-2 py-0.5 text-xs font-bold rounded"
+                                  th:classappend="${nota.estado} == 'APROBADO' ? ' bg-green-200 text-green-800' :
+                          (${nota.estado} == 'REPROBADO' ? ' bg-red-200 text-red-800' : ' bg-gray-100 text-gray-600')">
+    </span>
+                        </td>
+
+
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <div class="flex items-center justify-center space-x-3">
+                                <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}"
+                                   class="text-blue-600 hover:text-blue-800">Editar</a>
+
+
+                                <!-- Eliminar -->
+                                <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
+                                    <button type="submit"
+                                            class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </form>
+
+                                <!-- PDF botones -->
+                                <div class="flex flex-col space-y-1">
+                                    <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Primer Trimestre')}"
+                                       target="_blank"
+                                       class="inline-flex items-center px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700">
+                                        1er Trim
+                                    </a>
+                                    <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Segundo Trimestre')}"
+                                       target="_blank"
+                                       class="inline-flex items-center px-2 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-700">
+                                        2do Trim
+                                    </a>
+                                    <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Tercer Trimestre')}"
+                                       target="_blank"
+                                       class="inline-flex items-center px-2 py-1 bg-yellow-600 text-white text-xs font-bold rounded hover:bg-yellow-700">
+                                        3er Trim
+                                    </a>
+                                    <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='todos')}"
+                                       target="_blank"
+                                       class="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700">
+                                        Todos
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div th:if="${#lists.isEmpty(notas)}" class="text-center py-8 text-gray-500 text-lg">
-                <p>No se encontraron notas con los filtros aplicados.</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div th:if="${#lists.isEmpty(notas)}" class="text-center py-8 text-gray-500 text-lg">
+                    <p>No se encontraron notas con los filtros aplicados.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="flex justify-center mt-8 mb-12">
-
-        <a th:href="@{/pages/Admin/notas/nuevo}"
+        <a th:href="@{/pages/Admin/notas/nuevo(
+        cedula=${param.cedula},
+        nombreCurso=${param.nombreCurso},
+        nombreMateria=${param.nombreMateria},
+        nombrePeriodo=${param.nombrePeriodo}
+    )}"
            class="inline-flex items-center px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-
             <i class="fas fa-plus-circle mr-2"></i> Crear Nuevo Registro
         </a>
-    </div>
 
+    </div>
 </div>
+
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <script th:inline="javascript">
+    /* <![CDATA[ */
     const mapaTrim = {
       "Primer Trimestre": "trim1",
       "Segundo Trimestre": "trim2",
       "Tercer Trimestre": "trim3",
-      "": ""  // mostrar todo
+      "": ""
     };
 
     function mostrarColumnasPorTrimestre(nombreTrimestre) {
@@ -421,7 +488,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const selectTrimestre = document.getElementById('nombreTrimestre');
-      const initialTrimestre = /*[['${param.nombreTrimestre}']]*/ '';  // Thymeleaf inyecta aquí
+      const initialTrimestre = /*[[${param.nombreTrimestre}]]*/ '';
       if (initialTrimestre) {
         selectTrimestre.value = initialTrimestre;
       }
@@ -429,6 +496,145 @@
       selectTrimestre.addEventListener('change', (e) => {
         mostrarColumnasPorTrimestre(e.target.value);
       });
+    });
+    /* ]]> */
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script th:inline="javascript">
+    /* --- VALIDACIÓN PDF BLOQUE CREAR PDF --- */
+
+    // Construye y muestra un mensaje debajo del bloque Crear PDF.
+    function mostrarPdfError(camposFaltantes) {
+        const cont = document.getElementById('pdfAlertContainer');
+        if (!cont) return;
+
+        const lista = camposFaltantes.map(txt => `<li class="ml-4 list-disc">${txt}</li>`).join('');
+        cont.innerHTML = `
+          <div class="mb-5 p-4 rounded-lg border-l-4 border-red-500 bg-red-200 text-red-700 text-sm text-center">
+            <p class="font-bold mb-1">No se puede generar el PDF.</p>
+            <p>Completa los siguientes campos:</p>
+            <ul class="mt-1">${lista}</ul>
+          </div>
+        `;
+        cont.classList.remove('hidden');
+    }
+
+    // Borra el mensaje (por si luego sí cumple).
+    function limpiarPdfError() {
+        const cont = document.getElementById('pdfAlertContainer');
+        if (!cont) return;
+        cont.classList.add('hidden');
+        cont.innerHTML = '';
+    }
+
+    // Valida antes de generar PDF (sólo bloque Crear PDF).
+    function validarCamposPdfPrincipal(event) {
+        const periodo = document.getElementById('nombrePeriodo')?.value?.trim();
+        const curso   = document.getElementById('nombreCurso')?.value?.trim();
+        const cedula  = document.getElementById('cedula')?.value?.trim();
+
+        const faltantes = [];
+        if (!periodo) faltantes.push('Periodo Académico');
+        if (!curso)   faltantes.push('Curso');
+        if (!cedula)  faltantes.push('Cédula del Estudiante');
+
+        if (faltantes.length > 0) {
+            event.preventDefault();
+            mostrarPdfError(faltantes);
+            return false;
+        }
+
+        // Si todo bien, limpiar mensaje (por si quedó uno anterior)
+        limpiarPdfError();
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Adjuntar a los botones PDF del bloque Crear PDF
+        document.querySelectorAll('.pdf-link').forEach(a => {
+            a.addEventListener('click', validarCamposPdfPrincipal);
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const cursoSelect   = document.getElementById('nombreCurso');
+        const materiaSelect = document.getElementById('nombreMateria');
+
+        function resetMaterias() {
+            materiaSelect.innerHTML = '<option value="">-- Seleccione la materia --</option>';
+        }
+
+        async function cargarMateriasPorCurso(cursoId, materiaSeleccionada) {
+            if (!cursoId) {
+                resetMaterias();
+                return;
+            }
+            materiaSelect.innerHTML = '<option value="">Cargando...</option>';
+            try {
+                // Reutiliza el endpoint existente
+                const fetchUrl = `/pages/Admin/${cursoId}/materias`;
+                const resp = await fetch(fetchUrl);
+                if (!resp.ok) throw new Error('Error HTTP ' + resp.status);
+                const data = await resp.json();
+
+                resetMaterias();
+                data.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.nombre;
+                    opt.textContent = m.nombre;
+                    if (materiaSeleccionada && m.nombre === materiaSeleccionada) {
+                        opt.selected = true;
+                    }
+                    materiaSelect.appendChild(opt);
+                });
+            } catch (err) {
+                console.error(err);
+                materiaSelect.innerHTML = '<option value="">(Error al cargar materias)</option>';
+            }
+        }
+
+        cursoSelect?.addEventListener('change', () => {
+            const opt = cursoSelect.options[cursoSelect.selectedIndex];
+            const cursoId = opt?.dataset?.id;
+            cargarMateriasPorCurso(cursoId, null);
+        });
+
+        // Inicializar si ya había un curso seleccionado al volver de Filtrar
+        const cursoSelOpt = cursoSelect?.options[cursoSelect.selectedIndex];
+        const cursoIdInicial = cursoSelOpt?.dataset?.id;
+        const materiaInicial = /*[[${param.nombreMateria}]]*/ null;
+        if (cursoIdInicial) {
+            cargarMateriasPorCurso(cursoIdInicial, materiaInicial);
+        }
     });
 </script>
 

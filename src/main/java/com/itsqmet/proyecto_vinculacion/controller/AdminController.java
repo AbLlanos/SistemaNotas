@@ -3,14 +3,18 @@ package com.itsqmet.proyecto_vinculacion.controller;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
+import com.itsqmet.proyecto_vinculacion.dto.EstudianteOptionDTO;
+import com.itsqmet.proyecto_vinculacion.dto.MateriaOptionDTO;
 import com.itsqmet.proyecto_vinculacion.dto.NotaCompletaDTO;
 import com.itsqmet.proyecto_vinculacion.entity.*;
 import com.itsqmet.proyecto_vinculacion.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -151,22 +155,24 @@ public class AdminController {
             @RequestParam(required = false) String nombreTrimestre,
             Model model) {
 
-        // Selects
+        // Combos base
         List<PeriodoAcademico> aniosLectivos = periodoAcademicoService.listarTodosPeriodosAcademicos();
         List<Curso> cursos = cursoService.listarTodosCursos();
-        List<Materia> materias = materiaService.listarTodasMaterias();
+
+        // Materias: si el usuario ya filtró por curso, trae solo esas; si no, trae todas
+        List<Materia> materias = (nombreCurso != null && !nombreCurso.isBlank())
+                ? materiaService.findByCursoNombre(nombreCurso)
+                : materiaService.listarTodasMaterias();
+
+        // Trimestres fijos
         List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
 
-        // 🔁 AQUÍ el cambio: usamos obtenerNotasCompletas (agrupado por materia y trimestre)
+        // Notas (agrupadas)
         List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
-                nombrePeriodo,
-                nombreCurso,
-                nombreMateria,
-                cedula,
-                nombreTrimestre
+                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
         );
 
-        // Parámetros para mantener filtros en la vista
+        // Mantener filtros
         Map<String, Object> param = new HashMap<>();
         param.put("nombrePeriodo", nombrePeriodo);
         param.put("nombreCurso", nombreCurso);
@@ -178,7 +184,6 @@ public class AdminController {
         model.addAttribute("cursos", cursos);
         model.addAttribute("materias", materias);
         model.addAttribute("trimestres", trimestres);
-
         model.addAttribute("notas", notas);
         model.addAttribute("param", param);
 
@@ -188,14 +193,61 @@ public class AdminController {
 
 
     @GetMapping("/notas/nuevo")
-    public String mostrarFormularioNota(Model model) {
-        model.addAttribute("nota", new NotaCompletaDTO());
-        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
-        model.addAttribute("materias", materiaService.listarTodasMaterias());
+    public String mostrarFormularioNota(
+            @RequestParam(required = false) String cedula,
+            @RequestParam(required = false) String nombreCurso,
+            @RequestParam(required = false) String nombreMateria,
+            @RequestParam(required = false) String nombrePeriodo,
+            Model model) {
+
+        NotaCompletaDTO dto = new NotaCompletaDTO();
+        dto.setCedulaEstudiante(cedula);
+        dto.setNombreCurso(nombreCurso);
+        dto.setAreaMateria(nombreMateria);
+        dto.setNombrePeriodo(nombrePeriodo);
+
+        // cursos
+        List<Curso> cursos;
+        try {
+            cursos = cursoService.listarCursosBachillerato();
+            if (cursos == null || cursos.isEmpty()) {
+                cursos = cursoService.listarTodosCursos();
+            }
+        } catch (Exception ex) {
+            cursos = cursoService.listarTodosCursos();
+        }
+        model.addAttribute("cursos", cursos);
+
+        // materias (si curso)
+        List<Materia> materias;
+        try {
+            materias = (nombreCurso != null && !nombreCurso.isBlank())
+                    ? materiaService.findByCursoNombre(nombreCurso)
+                    : List.of();
+        } catch (Exception ex) {
+            materias = List.of();
+        }
+        model.addAttribute("materias", materias);
+
+        // estudiantes (si curso)
+        List<Estudiante> estudiantes;
+        try {
+            estudiantes = (nombreCurso != null && !nombreCurso.isBlank())
+                    ? estudianteService.listarPorNombreCurso(nombreCurso)
+                    : estudianteService.listarTodosEstudiantes();
+        } catch (Exception ex) {
+            estudiantes = estudianteService.listarTodosEstudiantes();
+        }
+        model.addAttribute("estudiantes", estudiantes);
+
+        // periodos (por si necesitas mostrar algo)
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+
+        model.addAttribute("nota", dto);
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
+
 
 
 
@@ -205,12 +257,17 @@ public class AdminController {
         return "redirect:/Bachillerato/bachilleratoVista";
     }
 
+
+
+
+
     @GetMapping("/notas/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
         NotaCompletaDTO notaCompletaDTO = notasService.obtenerNotaCompletaPorId(id);
         model.addAttribute("nota", notaCompletaDTO);
 
         model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
+        model.addAttribute("cursos", cursoService.listarTodosCursos()); // <-- nuevo
         model.addAttribute("materias", materiaService.listarTodasMaterias());
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
@@ -306,6 +363,38 @@ public class AdminController {
 
         pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
     }
+
+
+    //Rutas generales
+
+    @GetMapping("/{cursoId}/materias")
+    @ResponseBody
+    public List<MateriaOptionDTO> getMateriasPorCurso(@PathVariable Long cursoId) {
+        Curso curso = cursoService.buscarCursoPorId(cursoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso no encontrado"));
+        return curso.getMaterias().stream()
+                .map(m -> new MateriaOptionDTO(m.getId(), m.getNombre()))
+                .toList();
+    }
+
+    // --- AJAX: estudiantes por curso ---
+    @GetMapping("/cursos/{cursoId}/estudiantes")
+    @ResponseBody
+    public List<EstudianteOptionDTO> getEstudiantesPorCurso(@PathVariable Long cursoId) {
+        // Si prefieres obtenerlos desde el curso:
+        // Curso curso = cursoService.getCursoOrThrow(cursoId);
+        // List<Estudiante> ests = curso.getEstudiantes();  // solo si tienes la relación mapeada en Curso
+        // Como vimos, usamos EstudianteService:
+        List<Estudiante> ests = estudianteService.listarPorCurso(cursoId);
+        return ests.stream()
+                .map(e -> new EstudianteOptionDTO(
+                        e.getCedula(),
+                        (e.getNombre() + " " + e.getApellido()).trim()
+                ))
+                .toList();
+    }
+
+
 
 
 

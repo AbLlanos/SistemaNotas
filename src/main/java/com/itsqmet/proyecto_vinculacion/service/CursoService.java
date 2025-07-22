@@ -104,4 +104,18 @@ public class CursoService {
             return cursoRepository.findAll();
         }
     }
+
+    public List<Curso> listarCursosBachillerato() {
+        return cursoRepository.findByNivelEducativo_NombreIgnoreCase("Bachillerato General");
+    }
+
+    public Curso getCursoOrThrow(Long id) {
+        return cursoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado id=" + id));
+    }
+
+    public Curso getCursoByNombreOrThrow(String nombreCurso) {
+        return cursoRepository.findByNombreIgnoreCase(nombreCurso)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado nombre=" + nombreCurso));
+    }
 }
