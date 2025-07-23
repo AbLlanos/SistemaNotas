@@ -4,232 +4,11 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/stylesAdmin.css">
+
     <title>Vista de administrador</title>
 </head>
-<style>
-    .card {
-  --card-bg: #ffffff;
-  --card-accent: #7c3aed;
-  --card-text: #1e293b;
-  --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
 
-  width: 420px;
-  height: 275px;
-  background: var(--card-bg);
-  border-radius: 20px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
-}
-
-.card__shine {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0.8) 50%,
-    rgba(255, 255, 255, 0) 60%
-  );
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.card__glow {
-  position: absolute;
-  inset: -10px;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(124, 58, 237, 0.3) 0%,
-    rgba(124, 58, 237, 0) 70%
-  );
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.card__content {
-  padding: 1.25em;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75em;
-  position: relative;
-  z-index: 2;
-}
-
-.card__badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #10b981;
-  color: white;
-  padding: 0.25em 0.5em;
-  border-radius: 999px;
-  font-size: 0.7em;
-  font-weight: 600;
-  transform: scale(0.8);
-  opacity: 0;
-  transition: all 0.4s ease 0.1s;
-}
-
-.card__image {
-  width: 100%;
-  height: 200px;
-
-  border-radius: 12px;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.card__image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Esto recorta la imagen manteniendo el aspecto */
-  display: block;
-}
-
-
-.card__text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25em;
- justify-content: center; /* Centrado horizontal */
-  align-items: center;
-}
-
-.card__title {
-  color: var(--card-text);
-  font-size: 1.1em;
-  margin: 0;
-  font-weight: 700;
-  transition: all 0.3s ease;
-}
-
-.card__description {
-  color: var(--card-text);
-  font-size: 0.75em;
-  margin: 0;
-  opacity: 0.7;
-  transition: all 0.3s ease;
-}
-
-.card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-    justify-content: center;
-
-}
-
-.card__price {
-  color: var(--card-text);
-  font-weight: 700;
-  font-size: 1em;
-  transition: all 0.3s ease;
-}
-
-.card__button {
-  width: 28px;
-  height: 28px;
-  background: var(--card-accent);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  transform: scale(0.9);
-   justify-content: center;
-  align-items: center;
-}
-
-/* Hover Effects */
-.card:hover {
-  transform: translateY(-10px);
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: rgba(124, 58, 237, 0.2);
-}
-
-.card:hover .card__shine {
-  opacity: 1;
-  animation: shine 3s infinite;
-}
-
-.card:hover .card__glow {
-  opacity: 1;
-}
-
-.card:hover .card__badge {
-  transform: scale(1);
-  opacity: 1;
-  z-index: 1;
-}
-
-.card:hover .card__image {
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.card:hover .card__title {
-  color: var(--card-accent);
-  transform: translateX(2px);
-}
-
-.card:hover .card__description {
-  opacity: 1;
-  transform: translateX(2px);
-}
-
-.card:hover .card__price {
-  color: var(--card-accent);
-  transform: translateX(2px);
-}
-
-.card:hover .card__button {
-  transform: scale(1);
-  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
-}
-
-.card:hover .card__button svg {
-  animation: pulse 1.5s infinite;
-}
-
-/* Active State */
-.card:active {
-  transform: translateY(-5px) scale(0.98);
-}
-
-/* Animations */
-@keyframes shine {
-  0% {
-    background-position: -100% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-</style>
 <body class="bg-gray-100">
 
 
@@ -335,100 +114,272 @@
 
         <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
-            <!-- CARD GENÉRICA -->
+            <!-- Estudiante -->
             <div class="card">
                 <div class="card__shine"></div>
                 <div class="card__glow"></div>
                 <div class="card__content">
                     <div class="card__badge">Nuevo</div>
 
-                    <!-- Imagen -->
                     <div class="card__image">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAYpkR9ddQMfT3q0NbJOZeMdwD9QJZT2hvIA&s" />
+                        <img src="https://www.hacerfamilia.com/wp-content/uploads/2024/07/20181230094939.jpg" />
                     </div>
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-blue-600 text-base font-bold text-blue-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#c5e5e4] hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_greenyellow] group"
+                    >
+                        <!-- Flecha izquierda -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-blue-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
 
-                    <!-- Texto centrado -->
-                    <div class="card__text" style="margin-top: 0.5rem;">
-                        <p class="card__title">Añadir Estudiante</p>
-                    </div>
+                        <!-- Texto -->
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Estudiante
+  </span>
 
-                    <!-- Botón centrado -->
-                        <div class="card__footer">
-                            <a th:href="@{/pages/Admin/estudianteVista}" class="card__button-link">
-                                <div class="card__button">
-                                    <svg height="16" width="16" viewBox="0 0 24 24">
-                                        <path stroke-width="2" stroke="currentColor" d="M4 12H20M12 4V20" fill="currentColor" />
-                                    </svg>
-                                </div>
-                            </a>
-                        </div>
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-[#c5e5e4] rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-blue-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+                    </button>
+
+
                 </div>
             </div>
 
 
 
-            <!-- Repite para docente -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBEjoCLHr_-pKvAoIEKfKND0YJKkB7G_IVHw&s"
-                     alt="Añadir Docente" class="w-full h-52 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/docenteVista}">
-                        <button class="w-full bg-green-700 hover:bg-green-900 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Añadir Docente
-                        </button>
-                    </a>
+            <!-- Docente -->
+            <div class="card">
+                <div class="card__shine"></div>
+                <div class="card__glow"></div>
+                <div class="card__content">
+                    <div class="card__badge">Nuevo</div>
+
+                    <div class="card__image">
+                        <img src="https://www.educaciontrespuntocero.com/wp-content/uploads/2021/01/Profesor-de-matematicas.jpg" />
+                    </div>
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-green-600 text-base font-bold text-green-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-green-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_limegreen] group"
+                    >
+                        <!-- Flecha izquierda -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-green-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+
+                        <!-- Texto -->
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Docente
+  </span>
+
+                        <!-- Círculo animado -->
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-green-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <!-- Flecha derecha -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-green-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+                    </button>
+
+
                 </div>
             </div>
 
             <!-- Materia -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                <img src="https://img.freepik.com/vector-gratis/asignaturas-colegio_23-2147511892.jpg"
-                     alt="Añadir Materia" class="w-full h-52 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/materiaVista}">
-                        <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Añadir Materia
-                        </button>
-                    </a>
+            <div class="card">
+                <div class="card__shine"></div>
+                <div class="card__glow"></div>
+                <div class="card__content">
+                    <div class="card__badge">Nuevo</div>
+
+                    <div class="card__image">
+                        <img src="https://definicion.de/wp-content/uploads/2008/06/asignatura.png" />
+                    </div>
+
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-yellow-500 text-base font-bold text-yellow-800 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-yellow-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_gold] group"
+                    >
+                        <!-- Flecha izquierda -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-yellow-800 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+
+                        <!-- Texto -->
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Materia
+  </span>
+
+                        <!-- Círculo animado -->
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-yellow-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <!-- Flecha derecha -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-yellow-800 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+                    </button>
+
+
+
                 </div>
             </div>
 
+
+
+
             <!-- Curso -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                <img src="https://blog.adecco.com.mx/wp-content/uploads/2019/05/cursos-adecco-capacitacion-personal-1-1.png"
-                     alt="Añadir Curso" class="w-full h-52 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/cursoVista}">
-                        <button class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Añadir Curso
-                        </button>
-                    </a>
+            <div class="card">
+                <div class="card__shine"></div>
+                <div class="card__glow"></div>
+                <div class="card__content">
+                    <div class="card__badge">Nuevo</div>
+
+                    <div class="card__image">
+                        <img src="https://d11cuk1a0j5b57.cloudfront.net/blog/wp-content/uploads/2022/08/18125803/Mejores-plataformas-de-cursos.jpg" />
+                    </div>
+                    <button class="animated-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            ></path>
+                        </svg>
+                        <span class="text">Añadir Curso</span>
+                        <span class="circle"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            ></path>
+                        </svg>
+                    </button>
+
                 </div>
             </div>
 
             <!-- Periodo académico -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                <img src="https://static.vecteezy.com/system/resources/previews/023/860/496/non_2x/education-path-finding-passion-to-study-decision-to-take-academic-course-concept-teens-finding-direction-to-go-at-signpost-locating-on-graduation-cap-vector.jpg"
-                     alt="Añadir Periodo Académico" class="w-full h-52 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/periodoAcademicoVista}">
-                        <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Añadir Periodo Académico
-                        </button>
-                    </a>
+            <div class="card">
+                <div class="card__shine"></div>
+                <div class="card__glow"></div>
+                <div class="card__content">
+                    <div class="card__badge">Nuevo</div>
+
+                    <div class="card__image">
+                        <img src="https://www.educaciontrespuntocero.com/wp-content/uploads/2019/07/Calendario-escolar.jpg" />
+                    </div>
+                    <button class="animated-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            ></path>
+                        </svg>
+                        <span class="text">Añadir Periodo Academico</span>
+                        <span class="circle"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            ></path>
+                        </svg>
+                    </button>
+
                 </div>
             </div>
 
             <!-- Trimestre -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn">
-                <img src="https://i0.wp.com/www3.gobiernodecanarias.org/medusa/edublog/ceippintornestor/wp-content/uploads/sites/886/2024/04/tercer-trimestre.jpg?ssl=1"
-                     alt="Añadir Trimestre" class="w-full h-52 object-cover rounded-t-3xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/trimestreVista}">
-                        <button class="w-full bg-amber-800 hover:bg-orange-900 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Añadir Trimestre
-                        </button>
-                    </a>
+            <div class="card">
+                <div class="card__shine"></div>
+                <div class="card__glow"></div>
+                <div class="card__content">
+                    <div class="card__badge">Nuevo</div>
+
+                    <div class="card__image">
+                        <img src="https://i0.wp.com/www3.gobiernodecanarias.org/medusa/edublog/ceippintornestor/wp-content/uploads/sites/886/2024/04/tercer-trimestre.jpg?ssl=1" />
+                    </div>
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-amber-800 text-base font-bold text-amber-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-amber-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_saddlebrown] group"
+                    >
+                        <!-- Flecha izquierda -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-amber-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+
+                        <!-- Texto -->
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Trimestre
+  </span>
+
+                        <!-- Círculo animado -->
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-amber-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <!-- Flecha derecha -->
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-amber-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
+                            <path
+                                    d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+                            />
+                        </svg>
+                    </button>
+
+
                 </div>
             </div>
 
