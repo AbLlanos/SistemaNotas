@@ -119,40 +119,22 @@ public class NotasService {
                 // Datos del estudiante
                 if (n.getEstudiante() != null) {
                     nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
-                    nuevoDto.setNombreCompletoEstudiante(
-                            n.getEstudiante().getNombre());
+                    nuevoDto.setNombreCompletoEstudiante(n.getEstudiante().getNombre());
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
                     nuevoDto.setNombreCompletoEstudiante("---");
                 }
 
-                nuevoDto.setNombreEstudiante(
-                        n.getEstudiante() != null
-                                ? n.getEstudiante().getNombre()
-                                : "---"
-                );
-                nuevoDto.setNombrePeriodo(
-                        n.getPeriodoAcademico() != null
-                                ? n.getPeriodoAcademico().getNombre()
-                                : "---"
-                );
-
-                // Materia y curso
                 nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
-
-                // Aquí asignamos el curso directo desde la entidad Notas (campo curso)
                 nuevoDto.setNombreCurso(n.getCurso() != null ? n.getCurso().getNombre() : "---");
-
-                // **Asignar nombrePeriodo para evitar el error en Thymeleaf**
                 nuevoDto.setNombrePeriodo(n.getPeriodoAcademico() != null ? n.getPeriodoAcademico().getNombre() : "---");
 
                 return nuevoDto;
             });
 
-            // --- Asignar notas, asistencia y comportamiento por trimestre ---
+            // Notas por trimestre
             if (n.getTrimestre() != null) {
                 String trimestre = n.getTrimestre().getNombre().toLowerCase();
-
                 if (trimestre.contains("primer")) {
                     dto.setNotaNumericaPrimerTrim(n.getNotaNumerica());
                     dto.setNotaCualitativaPrimerTrim(n.getNotaCualitativa());
@@ -167,7 +149,23 @@ public class NotasService {
                     asignarAsistenciaYComportamiento(dto, n, "tercero");
                 }
             }
+
+            // **Obtener comportamiento final**
+            ComportamientoFinal comportamiento = comportamientoFinalRepository
+                    .findByEstudianteAndCursoAndPeriodo(n.getEstudiante(), n.getCurso(), n.getPeriodoAcademico())
+                    .orElse(null);
+
+            if (comportamiento != null) {
+                dto.setComportamientoFinalVariable1(comportamiento.getComportamientoPrimerTrim());
+                dto.setComportamientoFinalVariable2(comportamiento.getComportamientoSegundoTrim());
+                dto.setComportamientoFinalVariable3(comportamiento.getComportamientoTercerTrim());
+            } else {
+                dto.setComportamientoFinalVariable1("---");
+                dto.setComportamientoFinalVariable2("---");
+                dto.setComportamientoFinalVariable3("---");
+            }
         }
+
 
         List<NotaCompletaDTO> lista = new ArrayList<>(mapaNotas.values());
 
@@ -285,21 +283,15 @@ public class NotasService {
 
 
 
-
-
-
-
-
     @Transactional
     public void guardarNotasDesdeFormulario(NotaCompletaDTO form) {
-
         // ----- Resolver estudiante -----
         Estudiante estudiante = null;
         if (form.getCedulaEstudiante() != null && !form.getCedulaEstudiante().isBlank()) {
             estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
         }
 
-        // ----- Resolver curso -----  // *** NEW ***
+        // ----- Resolver curso -----
         Curso curso = null;
         if (form.getCursoId() != null) {
             curso = cursoService.buscarCursoPorId(form.getCursoId()).orElse(null);
@@ -319,7 +311,7 @@ public class NotasService {
 
         // ----- Resolver periodo -----
         PeriodoAcademico periodo = null;
-        if (curso != null) { // usa curso ya resuelto
+        if (curso != null) {
             periodo = curso.getPeriodoAcademico();
             if (form.getNombreCurso() == null || form.getNombreCurso().isBlank()) {
                 form.setNombreCurso(curso.getNombre());
@@ -336,9 +328,9 @@ public class NotasService {
                 throw new IllegalArgumentException("No se encontró la nota base con id=" + form.getIdNota());
             }
             if (estudiante == null) estudiante = base.getEstudiante();
-            if (materia == null)    materia    = base.getMateria();
-            if (periodo == null)    periodo    = base.getPeriodoAcademico();
-            if (curso == null)      curso      = base.getCurso();  // <-- Aquí obtienes el curso de la nota base
+            if (materia == null) materia = base.getMateria();
+            if (periodo == null) periodo = base.getPeriodoAcademico();
+            if (curso == null) curso = base.getCurso();
         }
 
         // ----- Validación final mínima para notas -----
@@ -359,7 +351,9 @@ public class NotasService {
         Trimestre t2 = trimestreService.buscarPorNombre("Segundo Trimestre");
         Trimestre t3 = trimestreService.buscarPorNombre("Tercer Trimestre");
 
-        // ----- Guardar/actualizar (upsert) por trimestre -----
+        // Guardar para cada trimestre nota, comportamiento y asistencia
+
+        // Primer trimestre
         upsertNotaYRelacionados(
                 estudiante, materia, periodo, t1,
                 form.getNotaNumericaPrimerTrim(), form.getNotaCualitativaPrimerTrim(),
@@ -367,9 +361,18 @@ public class NotasService {
                 form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
                 form.getComportamientoPrimerTrim(),
                 form.getTotalAsistenciaPrimerTrim(),
-                curso  // PASAMOS EL CURSO AQUÍ
+                curso
+        );
+        upsertComportamiento(estudiante, materia, periodo, t1, form.getComportamientoPrimerTrim());
+        upsertAsistencia(estudiante, materia, periodo, t1,
+                form.getAsistenciaPrimerTrim(),
+                form.getFaltasJustificadasPrimerTrim(),
+                form.getFaltasInjustificadasPrimerTrim(),
+                form.getAtrasosPrimerTrim(),
+                form.getTotalAsistenciaPrimerTrim()
         );
 
+        // Segundo trimestre
         upsertNotaYRelacionados(
                 estudiante, materia, periodo, t2,
                 form.getNotaNumericaSegundoTrim(), form.getNotaCualitativaSegundoTrim(),
@@ -377,10 +380,18 @@ public class NotasService {
                 form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
                 form.getComportamientoSegundoTrim(),
                 form.getTotalAsistenciaSegundoTrim(),
-                curso  // PASAMOS EL CURSO AQUÍ
+                curso
+        );
+        upsertComportamiento(estudiante, materia, periodo, t2, form.getComportamientoSegundoTrim());
+        upsertAsistencia(estudiante, materia, periodo, t2,
+                form.getAsistenciaSegundoTrim(),
+                form.getFaltasJustificadasSegundoTrim(),
+                form.getFaltasInjustificadasSegundoTrim(),
+                form.getAtrasosSegundoTrim(),
+                form.getTotalAsistenciaSegundoTrim()
         );
 
-
+        // Tercer trimestre
         upsertNotaYRelacionados(
                 estudiante, materia, periodo, t3,
                 form.getNotaNumericaTercerTrim(), form.getNotaCualitativaTercerTrim(),
@@ -388,14 +399,22 @@ public class NotasService {
                 form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
                 form.getComportamientoTercerTrim(),
                 form.getTotalAsistenciaTercerTrim(),
-                curso  // PASAMOS EL CURSO AQUÍ
+                curso
+        );
+        upsertComportamiento(estudiante, materia, periodo, t3, form.getComportamientoTercerTrim());
+        upsertAsistencia(estudiante, materia, periodo, t3,
+                form.getAsistenciaTercerTrim(),
+                form.getFaltasJustificadasTercerTrim(),
+                form.getFaltasInjustificadasTercerTrim(),
+                form.getAtrasosTercerTrim(),
+                form.getTotalAsistenciaTercerTrim()
         );
 
-        // ----- Guardar Comportamiento Final por Curso (si hay curso y algún campo lleno) -----
+        // Guardar Comportamiento Final por Curso si hay algún dato
         if (curso != null &&
-                (notBlank(form.getComportamientoFinalVariable1())
-                        || notBlank(form.getComportamientoFinalVariable2())
-                        || notBlank(form.getComportamientoFinalVariable3()))) {
+                (notBlank(form.getComportamientoFinalVariable1()) ||
+                        notBlank(form.getComportamientoFinalVariable2()) ||
+                        notBlank(form.getComportamientoFinalVariable3()))) {
 
             upsertComportamientoCursoFinal(
                     estudiante,
@@ -405,29 +424,37 @@ public class NotasService {
                     form.getComportamientoFinalVariable2(),
                     form.getComportamientoFinalVariable3()
             );
-
-            upsertAsistencia(
-                    estudiante, materia, periodo, t1,
-                    form.getAsistenciaPrimerTrim(),
-                    form.getFaltasJustificadasPrimerTrim(),
-                    form.getFaltasInjustificadasPrimerTrim(),
-                    form.getAtrasosPrimerTrim(),
-                    form.getTotalAsistenciaPrimerTrim()
-            );
         }
     }
 
-    /**
-     * Método para insertar o actualizar la nota por trimestre, incluyendo el curso.
-     */
+// Métodos auxiliares (ya tienes estos, pero para referencia):
+
+    private void upsertComportamiento(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
+                                      Trimestre trimestre, String comportamiento) {
+        if (comportamiento == null) return;
+
+        Optional<Comportamiento> optComp = comportamientoRepository
+                .findByEstudianteAndMateriaAndPeriodoAndTrimestre(estudiante, materia, periodo, trimestre);
+
+        Comportamiento comp = optComp.orElse(new Comportamiento());
+
+        comp.setEstudiante(estudiante);
+        comp.setMateria(materia);
+        comp.setPeriodo(periodo);
+        comp.setTrimestre(trimestre);
+        comp.setComportamiento(comportamiento);
+
+        comportamientoRepository.save(comp);
+    }
+
     private void upsertNotaYRelacionados(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
                                          Trimestre trimestre, Double notaNumerica, String notaCualitativa,
                                          Integer asistencia, Integer faltasJustificadas, Integer faltasInjustificadas,
                                          Integer atrasos, String comportamiento, Integer totalAsistencia,
                                          Curso curso) {
 
-        // Buscar nota existente por clave compuesta
-        Optional<Notas> optionalNota = notasRepository.findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre);
+        Optional<Notas> optionalNota = notasRepository
+                .findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre);
 
         Notas nota = optionalNota.orElse(new Notas());
 
@@ -438,13 +465,11 @@ public class NotasService {
         nota.setNotaNumerica(notaNumerica);
         nota.setNotaCualitativa(notaCualitativa);
 
-        // ** Asignamos el curso aquí **
+        // ** Asignamos el curso **
         nota.setCurso(curso);
 
-        // Guarda o actualiza la nota
         notasRepository.save(nota);
     }
-
 
     private void upsertAsistencia(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
                                   Trimestre trimestre, Integer asistencias,
@@ -468,7 +493,6 @@ public class NotasService {
 
         asistenciaRepository.save(asistencia);
     }
-
 
 
     @Autowired
@@ -502,62 +526,6 @@ public class NotasService {
 
 
 
-
-    private void upsertNotaYRelacionados(
-            Estudiante estudiante,
-            Materia materia,
-            PeriodoAcademico periodo,
-            Trimestre trimestre,
-            Double notaNum,
-            String notaCual,
-            Integer asistencias,
-            Integer faltasJustificadas,
-            Integer faltasInjustificadas,
-            Integer atrasos,
-            String comportamientoTexto,
-            Integer totalAsistencias
-    ) {
-        // --- Nota ---
-        Notas nota = notasRepository
-                .findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre)
-                .orElseGet(Notas::new);
-
-        nota.setEstudiante(estudiante);
-        nota.setMateria(materia);
-        nota.setPeriodoAcademico(periodo);
-        nota.setTrimestre(trimestre);
-        nota.setNotaNumerica(notaNum);
-        nota.setNotaCualitativa(notaCual);
-        nota = notasRepository.save(nota);
-
-        // --- Asistencia ---
-        Asistencia asistenciaEnt = asistenciaRepository
-                .findByEstudianteAndMateriaAndTrimestreAndPeriodo(estudiante, materia, trimestre, periodo)
-                .orElseGet(Asistencia::new);
-
-        asistenciaEnt.setEstudiante(estudiante);
-        asistenciaEnt.setMateria(materia);
-        asistenciaEnt.setTrimestre(trimestre);
-        asistenciaEnt.setPeriodo(periodo);
-        asistenciaEnt.setAsistencias(asistencias);
-        asistenciaEnt.setFaltasJustificadas(faltasJustificadas);
-        asistenciaEnt.setFaltasInjustificadas(faltasInjustificadas);
-        asistenciaEnt.setAtrasos(atrasos);
-        asistenciaEnt.setTotalAsistencias(totalAsistencias);
-        asistenciaRepository.save(asistenciaEnt);
-
-        // --- Comportamiento ---
-        Comportamiento comportamiento = comportamientoRepository
-                .findByEstudianteAndMateriaAndTrimestreAndPeriodo(estudiante, materia, trimestre, periodo)
-                .orElseGet(Comportamiento::new);
-
-        comportamiento.setEstudiante(estudiante);
-        comportamiento.setMateria(materia);
-        comportamiento.setTrimestre(trimestre);
-        comportamiento.setPeriodo(periodo);
-        comportamiento.setComportamiento(comportamientoTexto);
-        comportamientoRepository.save(comportamiento);
-    }
 
 
 

@@ -26,4 +26,11 @@ public interface ComportamientoRepository extends JpaRepository<Comportamiento, 
             @Param("trimestre") Trimestre trimestre,
             @Param("periodo") PeriodoAcademico periodo);
 
+    Optional<Comportamiento> findByEstudianteAndMateriaAndPeriodoAndTrimestre(
+            Estudiante estudiante,
+            Materia materia,
+            PeriodoAcademico periodo,
+            Trimestre trimestre
+    );
+
 }
