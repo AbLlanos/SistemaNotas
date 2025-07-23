@@ -100,7 +100,7 @@
                 <td class="px-4 py-2" th:text="${mat.id}"></td>
                 <td class="px-4 py-2" th:text="${mat.nombre}"></td>
                 <td class="px-4 py-2"
-                    th:text="${mat.docente != null ? mat.docente.nombre + ' ' + mat.docente.apellido : '---'}"></td>
+                    th:text="${mat.docente != null ? mat.docente.nombre : '---'}"></td>
                 <td class="px-4 py-2"
                     th:text="${mat.nivelEducativo != null ? mat.nivelEducativo.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.tipoMateria != null ? mat.tipoMateria : 'NORMAL'}"></td>

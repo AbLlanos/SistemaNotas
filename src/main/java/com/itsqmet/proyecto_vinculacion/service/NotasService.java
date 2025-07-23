@@ -120,7 +120,7 @@ public class NotasService {
                 if (n.getEstudiante() != null) {
                     nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
                     nuevoDto.setNombreCompletoEstudiante(
-                            n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido());
+                            n.getEstudiante().getNombre());
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
                     nuevoDto.setNombreCompletoEstudiante("---");
@@ -128,7 +128,7 @@ public class NotasService {
 
                 nuevoDto.setNombreEstudiante(
                         n.getEstudiante() != null
-                                ? n.getEstudiante().getNombre() + " " + n.getEstudiante().getApellido()
+                                ? n.getEstudiante().getNombre()
                                 : "---"
                 );
                 nuevoDto.setNombrePeriodo(
