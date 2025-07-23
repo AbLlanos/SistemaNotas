@@ -93,22 +93,24 @@ public class MateriaController {
        ======================== */
     @PostMapping("/pages/Admin/materiaGuardar")
     public String guardarMateria(@ModelAttribute Materia materia,
-                                 @RequestParam(required = false) Long docenteId,
-                                 @RequestParam(required = false) Long nivelId,
                                  RedirectAttributes redirect) {
         try {
-            // Asociar el docente si se envió un docenteId
-            if (docenteId != null) {
-                Docente docente = docenteService.buscarDocenteId(docenteId)
+            // Asociar docente si tiene ID
+            if (materia.getDocente() != null && materia.getDocente().getId() != null) {
+                Docente docente = docenteService.buscarDocenteId(materia.getDocente().getId())
                         .orElse(null);
                 materia.setDocente(docente);
+            } else {
+                materia.setDocente(null);
             }
 
-            // Asociar el nivel educativo si se envió nivelId
-            if (nivelId != null) {
-                NivelEducativo nivel = new NivelEducativo();
-                nivel.setId(nivelId);
+            // Asociar nivel educativo si tiene ID
+            if (materia.getNivelEducativo() != null && materia.getNivelEducativo().getId() != null) {
+                NivelEducativo nivel = nivelEducativoService.buscarPorId(materia.getNivelEducativo().getId())
+                        .orElse(null);
                 materia.setNivelEducativo(nivel);
+            } else {
+                materia.setNivelEducativo(null);
             }
 
             // Guardar materia
@@ -118,9 +120,9 @@ public class MateriaController {
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Error al guardar la materia: " + e.getMessage());
         }
-
         return "redirect:/pages/Admin/materiaVista";
     }
+
 
 
     /* ========================

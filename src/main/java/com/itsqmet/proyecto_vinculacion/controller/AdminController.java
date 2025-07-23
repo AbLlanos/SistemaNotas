@@ -3,6 +3,7 @@ package com.itsqmet.proyecto_vinculacion.controller;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
+import com.itsqmet.proyecto_vinculacion.dto.CursoDTO;
 import com.itsqmet.proyecto_vinculacion.dto.EstudianteOptionDTO;
 import com.itsqmet.proyecto_vinculacion.dto.MateriaOptionDTO;
 import com.itsqmet.proyecto_vinculacion.dto.NotaCompletaDTO;
@@ -24,6 +25,7 @@ import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pages/Admin")
@@ -106,7 +108,7 @@ public class AdminController {
     //Ruta educaion basica
 
     @GetMapping("/EducacionBasica/educacionBasicaVista")
-    public String vistaAdminEscuela(
+    public String vistaAdminEducacionBasica(
             @RequestParam(required = false) String nombrePeriodo,
             @RequestParam(required = false) String nombreCurso,
             @RequestParam(required = false) String nombreMateria,
@@ -114,20 +116,55 @@ public class AdminController {
             @RequestParam(required = false) String nombreTrimestre,
             Model model) {
 
-        String nombreNivel = "EducacionBasica";
+        String nivel = "EducacionBasica";
 
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
+        // Filtrar cursos SOLO por Educación Básica
+        List<Curso> cursosFiltrados = cursoService.listarTodosCursos().stream()
+                .filter(c -> c.getNivelEducativo() != null
+                        && nivel.equalsIgnoreCase(c.getNivelEducativo().getNombre()))
+                .toList();
+
+        // Filtrar materias por curso si se filtró, si no, filtrar por nivel educativo
+        List<Materia> materiasFiltradas;
+
+        if (nombreCurso != null && !nombreCurso.isBlank()) {
+            materiasFiltradas = materiaService.listarTodasMaterias().stream()
+                    .filter(m -> m.getCursos() != null &&
+                            m.getCursos().stream()
+                                    .anyMatch(c -> nombreCurso.equalsIgnoreCase(c.getNombre())))
+                    .toList();
+        } else {
+            materiasFiltradas = materiaService.listarTodasMaterias().stream()
+                    .filter(m -> m.getNivelEducativo() != null
+                            && nivel.equalsIgnoreCase(m.getNivelEducativo().getNombre()))
+                    .toList();
+        }
+
+        // Listas para filtros base
+        List<PeriodoAcademico> aniosLectivos = periodoAcademicoService.listarTodosPeriodosAcademicos();
+        List<String> trimestres = trimestreService.listarTodosPeriodos().stream()
+                .map(tr -> tr.getNombre())
+                .collect(Collectors.toList());
+
+        // Notas filtradas
+        List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
                 nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
         );
 
-        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
-        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
+        // Mantener filtros para la vista
+        Map<String, Object> param = new HashMap<>();
+        param.put("nombrePeriodo", nombrePeriodo);
+        param.put("nombreCurso", nombreCurso);
+        param.put("nombreMateria", nombreMateria);
+        param.put("cedula", cedula);
+        param.put("nombreTrimestre", nombreTrimestre);
 
         model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+        model.addAttribute("aniosLectivos", aniosLectivos);
+        model.addAttribute("trimestres", trimestres);
         model.addAttribute("cursos", cursosFiltrados);
         model.addAttribute("materias", materiasFiltradas);
+        model.addAttribute("param", param);
 
         return "pages/Admin/EducacionBasica/educacionBasicaVista";
     }
@@ -146,7 +183,7 @@ public class AdminController {
 
 
     //Ruta bachillerato
-
+//Ruta bachillerato
     @GetMapping("/Bachillerato/bachilleratoVista")
     public String vistaBachillerato(
             @RequestParam(required = false) String nombrePeriodo,
@@ -156,19 +193,47 @@ public class AdminController {
             @RequestParam(required = false) String nombreTrimestre,
             Model model) {
 
-        // Combos base
-        List<PeriodoAcademico> aniosLectivos = periodoAcademicoService.listarTodosPeriodosAcademicos();
-        List<Curso> cursos = cursoService.listarTodosCursos();
+        // Nivel esperado (sin espacios y en minúsculas para comparar)
+        String nivelFiltro = "BachilleratoGeneral";
 
-        // Materias: si el usuario ya filtró por curso, trae solo esas; si no, trae todas
-        List<Materia> materias = (nombreCurso != null && !nombreCurso.isBlank())
-                ? materiaService.findByCursoNombre(nombreCurso)
-                : materiaService.listarTodasMaterias();
+        // Filtrar cursos SOLO por Bachillerato General
+        List<Curso> cursos = cursoService.listarTodosCursos().stream()
+                .filter(c -> {
+                    if (c.getNivelEducativo() == null || c.getNivelEducativo().getNombre() == null) {
+                        return false;
+                    }
+                    String nivelActual = c.getNivelEducativo().getNombre().toLowerCase().replace(" ", "");
+                    return nivelFiltro.equals(nivelActual);
+                })
+                .toList();
+
+        // Filtrar materias por curso si hay filtro, o por nivel educativo si no
+        List<Materia> materias;
+
+        if (nombreCurso != null && !nombreCurso.isBlank()) {
+            // Materias que pertenecen a algún curso con el nombre dado
+            materias = materiaService.listarTodasMaterias().stream()
+                    .filter(m -> m.getCursos() != null &&
+                            m.getCursos().stream()
+                                    .anyMatch(c -> nombreCurso.equalsIgnoreCase(c.getNombre())))
+                    .toList();
+        } else {
+            // Materias que pertenecen al nivel educativo "Bachillerato General"
+            materias = materiaService.listarTodasMaterias().stream()
+                    .filter(m -> {
+                        if (m.getNivelEducativo() == null || m.getNivelEducativo().getNombre() == null) {
+                            return false;
+                        }
+                        String nivelMat = m.getNivelEducativo().getNombre().toLowerCase().replace(" ", "");
+                        return nivelFiltro.equals(nivelMat);
+                    })
+                    .toList();
+        }
 
         // Trimestres fijos
         List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
 
-        // Notas (agrupadas)
+        // Notas filtradas
         List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
                 nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
         );
@@ -181,7 +246,7 @@ public class AdminController {
         param.put("cedula", cedula);
         param.put("nombreTrimestre", nombreTrimestre);
 
-        model.addAttribute("aniosLectivos", aniosLectivos);
+        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("cursos", cursos);
         model.addAttribute("materias", materias);
         model.addAttribute("trimestres", trimestres);
@@ -190,7 +255,6 @@ public class AdminController {
 
         return "pages/Admin/Bachillerato/bachilleratoVista";
     }
-
 
 
     @GetMapping("/notas/nuevo")
@@ -202,7 +266,20 @@ public class AdminController {
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("materias", materiaService.listarTodasMaterias());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        model.addAttribute("cursos", cursoService.listarTodosCursos()); // Inicialmente todos
+
+        // Filtrar cursos por Bachillerato General también aquí
+        String nivelFiltro = "bachilleratogeneral";
+        List<Curso> cursosBachillerato = cursoService.listarTodosCursos().stream()
+                .filter(c -> {
+                    if (c.getNivelEducativo() == null || c.getNivelEducativo().getNombre() == null) {
+                        return false;
+                    }
+                    String nivelActual = c.getNivelEducativo().getNombre().toLowerCase().replace(" ", "");
+                    return nivelFiltro.equals(nivelActual);
+                })
+                .toList();
+
+        model.addAttribute("cursos", cursosBachillerato);
 
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
@@ -220,7 +297,7 @@ public class AdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al guardar las notas: " + e.getMessage());
         }
-        return "redirect:/notas";
+        return "pages/Admin/Bachillerato/bachilleratoForm";
     }
 
     @GetMapping("/notas/editar/{id}")
@@ -297,7 +374,7 @@ public class AdminController {
         model.addAttribute("cursos", cursosFiltrados);
         model.addAttribute("materias", materiasFiltradas);
 
-        return "pages/Admin/Bachillerato/bachilleratoVista";
+        return "pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista";
     }
 
 
@@ -397,17 +474,28 @@ public class AdminController {
     }
 
 
-    @GetMapping("/periodo/{nombre}/cursos")
-    @ResponseBody
-    public List<Curso> listarCursosPorPeriodo(@PathVariable String nombre) {
-        return cursoService.obtenerCursosPorPeriodo(nombre);
-    }
 
     @GetMapping("/cursos/porPeriodo/{id}")
     @ResponseBody
     public List<Curso> obtenerCursosPorPeriodo(@PathVariable Long id) {
         return cursoService.obtenerCursosPorPeriodoID(id);
     }
+
+    @GetMapping("/periodo/{nombrePeriodo}/cursos")
+    @ResponseBody
+    public List<CursoDTO> listarCursosPorPeriodoFiltrados(@PathVariable String nombrePeriodo) {
+        String nivelFiltro = "BachilleratoGeneral";
+
+        List<Curso> cursosPorPeriodo = cursoService.obtenerCursosPorPeriodo(nombrePeriodo);
+
+        return cursosPorPeriodo.stream()
+                .filter(c -> c.getNivelEducativo() != null
+                        && c.getNivelEducativo().getNombre() != null
+                        && c.getNivelEducativo().getNombre().equalsIgnoreCase(nivelFiltro))
+                .map(c -> new CursoDTO(c.getId(), c.getNombre()))
+                .toList();
+    }
+
 
 
 

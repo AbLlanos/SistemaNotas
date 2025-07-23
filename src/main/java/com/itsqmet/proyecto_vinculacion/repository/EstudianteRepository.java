@@ -34,4 +34,6 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
 
     List<Estudiante> findDistinctByCursos_NombreIgnoreCase(String nombreCurso);
 
+    Optional<Estudiante> findByEmail(String email);
+
 }

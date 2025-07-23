@@ -1,5 +1,6 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,14 +20,17 @@ public class ComportamientoFinal {
 
     // --- Relaciones clave ---
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "estudiante_id")
     private Estudiante estudiante;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "curso_id")
     private Curso curso;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "periodo_id")
     private PeriodoAcademico periodo;
 

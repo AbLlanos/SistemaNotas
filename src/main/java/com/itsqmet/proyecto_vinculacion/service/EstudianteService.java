@@ -180,6 +180,14 @@ public class EstudianteService {
     }
 
 
+    public Optional<Estudiante> buscarPorEmail(String email) {
+        return estudianteRepository.findByEmail(email);
+    }
+
+    public Optional<Estudiante> buscarOptionalPorCedula(String cedula) {
+        return estudianteRepository.findByCedula(cedula);
+    }
+
 
 
 

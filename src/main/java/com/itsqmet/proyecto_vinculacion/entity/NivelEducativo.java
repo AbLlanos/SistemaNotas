@@ -1,5 +1,7 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,6 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class NivelEducativo {
 
     @Id
@@ -21,5 +24,6 @@ public class NivelEducativo {
 
     //Conexion con nivel Educativo
     @OneToMany(mappedBy = "nivelEducativo")
+    @JsonIgnore
     private List<Curso> cursos;
 }
