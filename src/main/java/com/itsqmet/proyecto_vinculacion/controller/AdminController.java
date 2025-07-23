@@ -497,6 +497,19 @@ public class AdminController {
     }
 
 
+    @GetMapping("/notas")
+    public String listarNotas(
+            @RequestParam(required = false) Long cursoId,
+            Model model) {
+
+        List<Notas> notas = (cursoId != null)
+                ? notasService.obtenerNotasPorCurso(cursoId)
+                : notasService.listarTodasLasNotas();
+
+        model.addAttribute("notas", notas);
+        return "pages/Admin/notas/listar";
+    }
+
 
 
 

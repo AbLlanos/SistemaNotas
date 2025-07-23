@@ -140,15 +140,13 @@ public class NotasService {
 
                 // Materia y curso
                 nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
-                String cursosTexto = "---";
-                if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
-                    cursosTexto = n.getMateria().getCursos()
-                            .stream()
-                            .map(Curso::getNombre)
-                            .reduce((a, b) -> a + ", " + b)
-                            .orElse("---");
+
+// Obtener el primer curso del estudiante, si existe
+                String nombreCursoEstudiante = "---";
+                if (n.getEstudiante() != null && n.getEstudiante().getCursos() != null && !n.getEstudiante().getCursos().isEmpty()) {
+                    nombreCursoEstudiante = n.getEstudiante().getCursos().get(0).getNombre();
                 }
-                nuevoDto.setNombreCurso(cursosTexto);
+                nuevoDto.setNombreCurso(nombreCursoEstudiante);
 
                 // **Asignar nombrePeriodo para evitar el error en Thymeleaf**
                 nuevoDto.setNombrePeriodo(n.getPeriodoAcademico() != null ? n.getPeriodoAcademico().getNombre() : "---");
@@ -729,6 +727,11 @@ public class NotasService {
         }
 
         return dtos;
+    }
+
+
+    public List<Notas> obtenerNotasPorCurso(Long cursoId) {
+        return notasRepository.obtenerNotasPorCursoYMaterias(cursoId);
     }
 
 
