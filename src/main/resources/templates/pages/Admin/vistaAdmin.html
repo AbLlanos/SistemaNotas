@@ -341,24 +341,27 @@
                 <div class="card__glow"></div>
                 <div class="card__content">
                     <div class="card__badge">Nuevo</div>
-                    <div  class="card__image">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAYpkR9ddQMfT3q0NbJOZeMdwD9QJZT2hvIA&s">
+
+                    <!-- Imagen -->
+                    <div class="card__image">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTAYpkR9ddQMfT3q0NbJOZeMdwD9QJZT2hvIA&s" />
                     </div>
-                    <div class="card__text">
+
+                    <!-- Texto centrado -->
+                    <div class="card__text" style="margin-top: 0.5rem;">
                         <p class="card__title">Añadir Estudiante</p>
                     </div>
-                    <div class="card__footer">
-                        <div class="card__button">
-                            <svg height="16" width="16" viewBox="0 0 24 24">
-                                <path
-                                        stroke-width="2"
-                                        stroke="currentColor"
-                                        d="M4 12H20M12 4V20"
-                                        fill="currentColor"
-                                ></path>
-                            </svg>
+
+                    <!-- Botón centrado -->
+                        <div class="card__footer">
+                            <a th:href="@{/pages/Admin/estudianteVista}" class="card__button-link">
+                                <div class="card__button">
+                                    <svg height="16" width="16" viewBox="0 0 24 24">
+                                        <path stroke-width="2" stroke="currentColor" d="M4 12H20M12 4V20" fill="currentColor" />
+                                    </svg>
+                                </div>
+                            </a>
                         </div>
-                    </div>
                 </div>
             </div>
 
