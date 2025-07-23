@@ -20,6 +20,9 @@ public class Notas {
     private String notaCualitativa;
 
     @ManyToOne
+    private Curso curso;
+
+    @ManyToOne
     private Estudiante estudiante;
 
     @ManyToOne

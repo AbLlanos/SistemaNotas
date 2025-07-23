@@ -93,7 +93,6 @@ public class NotasService {
 
 
 
-
     public List<NotaCompletaDTO> obtenerNotasCompletas(String nombrePeriodo,
                                                        String nombreCurso,
                                                        String nombreMateria,
@@ -141,13 +140,8 @@ public class NotasService {
                 // Materia y curso
                 nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
 
-// Obtener el primer curso del estudiante, si existe
-// Obtener el primer curso asociado a la materia
-                String nombreCursoEstudiante = "---";
-                if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
-                    nombreCursoEstudiante = n.getMateria().getCursos().iterator().next().getNombre();
-                }
-                nuevoDto.setNombreCurso(nombreCursoEstudiante);
+                // Aquí asignamos el curso directo desde la entidad Notas (campo curso)
+                nuevoDto.setNombreCurso(n.getCurso() != null ? n.getCurso().getNombre() : "---");
 
                 // **Asignar nombrePeriodo para evitar el error en Thymeleaf**
                 nuevoDto.setNombrePeriodo(n.getPeriodoAcademico() != null ? n.getPeriodoAcademico().getNombre() : "---");
@@ -175,7 +169,6 @@ public class NotasService {
             }
         }
 
-
         List<NotaCompletaDTO> lista = new ArrayList<>(mapaNotas.values());
 
         double NOTA_MINIMA_APROBACION = 7.0;
@@ -183,9 +176,9 @@ public class NotasService {
             calcularEstado(dto, NOTA_MINIMA_APROBACION);
         }
 
-
         return new ArrayList<>(mapaNotas.values());
     }
+
 
 
     private void calcularEstado(NotaCompletaDTO dto, double notaMinima) {
@@ -297,7 +290,6 @@ public class NotasService {
 
 
 
-
     @Transactional
     public void guardarNotasDesdeFormulario(NotaCompletaDTO form) {
 
@@ -313,7 +305,7 @@ public class NotasService {
             curso = cursoService.buscarCursoPorId(form.getCursoId()).orElse(null);
         }
         if (curso == null && form.getNombreCurso() != null && !form.getNombreCurso().isBlank()) {
-            curso = cursoService.buscarPorNombre(form.getNombreCurso()); // crea este método si no existe
+            curso = cursoService.buscarPorNombre(form.getNombreCurso());
         }
 
         // ----- Resolver materia -----
@@ -346,10 +338,10 @@ public class NotasService {
             if (estudiante == null) estudiante = base.getEstudiante();
             if (materia == null)    materia    = base.getMateria();
             if (periodo == null)    periodo    = base.getPeriodoAcademico();
-            if (curso == null)      curso      = cursoService.buscarCursoPorPeriodoAndNombre(periodo, base.getMateria().getNombre()); // <-- ajusta; o deja null si no aplica
+            if (curso == null)      curso      = base.getCurso();  // <-- Aquí obtienes el curso de la nota base
         }
 
-        // ----- Validación final mínima para notas (igual que antes) -----
+        // ----- Validación final mínima para notas -----
         if (estudiante == null || materia == null || periodo == null) {
             throw new IllegalArgumentException("Faltan datos necesarios (estudiante/materia/periodo).");
         }
@@ -374,7 +366,8 @@ public class NotasService {
                 form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
                 form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
                 form.getComportamientoPrimerTrim(),
-                form.getTotalAsistenciaPrimerTrim()
+                form.getTotalAsistenciaPrimerTrim(),
+                curso  // PASAMOS EL CURSO AQUÍ
         );
 
         upsertNotaYRelacionados(
@@ -383,7 +376,8 @@ public class NotasService {
                 form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
                 form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
                 form.getComportamientoSegundoTrim(),
-                form.getTotalAsistenciaSegundoTrim()
+                form.getTotalAsistenciaSegundoTrim(),
+                curso  // PASAMOS EL CURSO AQUÍ
         );
 
         upsertNotaYRelacionados(
@@ -392,10 +386,11 @@ public class NotasService {
                 form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
                 form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
                 form.getComportamientoTercerTrim(),
-                form.getTotalAsistenciaTercerTrim()
+                form.getTotalAsistenciaTercerTrim(),
+                curso  // PASAMOS EL CURSO AQUÍ
         );
 
-        // ----- Guardar Comportamiento Final por Curso (si hay curso y algún campo lleno) ----- // *** NEW ***
+        // ----- Guardar Comportamiento Final por Curso (si hay curso y algún campo lleno) -----
         if (curso != null &&
                 (notBlank(form.getComportamientoFinalVariable1())
                         || notBlank(form.getComportamientoFinalVariable2())
@@ -410,6 +405,40 @@ public class NotasService {
                     form.getComportamientoFinalVariable3()
             );
         }
+    }
+
+    /**
+     * Método para insertar o actualizar la nota por trimestre, incluyendo el curso.
+     */
+    private void upsertNotaYRelacionados(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
+                                         Trimestre trimestre, Double notaNumerica, String notaCualitativa,
+                                         Integer asistencia, Integer faltasJustificadas, Integer faltasInjustificadas,
+                                         Integer atrasos, String comportamiento, Integer totalAsistencia,
+                                         Curso curso) {
+
+        // Buscar nota existente por clave compuesta
+        Optional<Notas> optionalNota = notasRepository.findByEstudianteAndMateriaAndPeriodoAcademicoAndTrimestre(estudiante, materia, periodo, trimestre);
+
+        Notas nota = optionalNota.orElse(new Notas());
+
+        nota.setEstudiante(estudiante);
+        nota.setMateria(materia);
+        nota.setPeriodoAcademico(periodo);
+        nota.setTrimestre(trimestre);
+        nota.setNotaNumerica(notaNumerica);
+        nota.setNotaCualitativa(notaCualitativa);
+
+        // ** Asignamos el curso aquí **
+        nota.setCurso(curso);
+
+        // Aquí podrías setear otros campos como asistencia, faltas, comportamiento, total asistencia
+        // ejemplo:
+        // nota.setAsistencia(asistencia);
+        // nota.setFaltasJustificadas(faltasJustificadas);
+        // ...
+
+        // Guarda o actualiza la nota
+        notasRepository.save(nota);
     }
 
 
