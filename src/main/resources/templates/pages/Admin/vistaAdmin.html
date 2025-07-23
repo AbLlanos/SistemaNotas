@@ -44,72 +44,68 @@
 
 <div class="pt-20">
 
-    <div class="max-w-7xl mx-auto mt-14 mb-20 px-4">
-        <h2 class="text-3xl font-bold text-black mb-8 text-center">🎓 NIVELES EDUCATIVOS</h2>
+    <div class="max-w-7xl mx-auto mt-8 mb-15 ">
+        <h2 class="text-3xl font-bold text-black text-center">🎓 NIVELES EDUCATIVOS</h2>
 
-        <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="flex min-h-screen items-center justify-center">
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
 
-            <!-- Inicial -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-                <img src="https://www.usat.edu.pe/web/wp-content/uploads/2022/06/educacion_inicial-importancia.jpg"
-                     alt="Educación Inicial" class="w-full h-52 object-cover rounded-t-2xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/Inicial/educacionInicialVista}">
-                        <button class="w-full bg-pink-300 hover:bg-pink-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Educación Inicial
-                        </button>
-                    </a>
+                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-xl border border-gray-300">
+                    <div class="h-96 w-72 rounded-xl overflow-hidden">
+                        <img class="h-full w-full object-cover transition-transform duration-500 group-hover:rotate-3 group-hover:scale-125" src="https://educacion.gob.ec/wp-content/uploads/2016/03/53336565365_4b33041c0a_c.png" alt="Educación Inicial" />
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-xl"></div>
+                    <div class="absolute inset-0 flex translate-y-[60%] flex-col items-center justify-center px-9 text-center transition-all duration-500 group-hover:translate-y-0">
+                        <h1 class="text-3xl font-bold text-white">Educación Inicial</h1>
+                        <p class="mb-3 text-lg italic text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis dolore adipisci placeat.</p>
+                        <button class="rounded-full bg-neutral-900 py-2 px-3.5 text-sm capitalize text-white shadow shadow-black/60">Ver más</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Educación Básica -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfTZh31gNDbTk69d2tos21-byhEbi3xBjh-g&s"
-                     alt="Educación Básica" class="w-full h-52 object-cover rounded-t-2xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/EducacionBasica/educacionBasicaVista}">
-                        <button class="w-full bg-green-300 hover:bg-green-400 text-black font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Educación Básica
-                        </button>
-                    </a>
+                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-xl border border-gray-300">
+                    <div class="h-96 w-72 rounded-xl overflow-hidden">
+                        <img class="h-full w-full object-cover transition-transform duration-500 group-hover:rotate-3 group-hover:scale-125" src="https://queretaro.quadratin.com.mx/www/wp-content/uploads/2025/01/71_273_46611_1589555028_08_01_REGRESO_CLASES_USEBEQ_2-scaled-1160x700.jpg" alt="Educación Básica" />
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-xl"></div>
+                    <div class="absolute inset-0 flex translate-y-[60%] flex-col items-center justify-center px-9 text-center transition-all duration-500 group-hover:translate-y-0">
+                        <h1 class="text-3xl font-bold text-white">Educación Básica</h1>
+                        <p class="mb-3 text-lg italic text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis dolore adipisci placeat.</p>
+                        <button class="rounded-full bg-neutral-900 py-2 px-3.5 text-sm capitalize text-white shadow shadow-black/60">Ver más</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Bachillerato General -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf0jtrLp-TzcQVGoqhhqvk-WPbVhDq9llAVQ&s"
-                     alt="Bachillerato General" class="w-full h-52 object-cover rounded-t-2xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/Bachillerato/bachilleratoVista}">
-                        <button class="w-full bg-red-400 hover:bg-red-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Bachillerato General
-                        </button>
-                    </a>
+                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-xl border border-gray-300">
+                    <div class="h-96 w-72 rounded-xl overflow-hidden">
+                        <img class="h-full w-full object-cover transition-transform duration-500 group-hover:rotate-3 group-hover:scale-125" src="https://educacion.gob.ec/wp-content/uploads/2012/10/JC_4210-1.png" alt="Bachillerato General" />
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-xl"></div>
+                    <div class="absolute inset-0 flex translate-y-[60%] flex-col items-center justify-center px-9 text-center transition-all duration-500 group-hover:translate-y-0">
+                        <h1 class="text-3xl font-bold text-white">Bachillerato General</h1>
+                        <p class="mb-3 text-lg italic text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">Lorem ipsum dolor sit amet consectetur adipisicing elit. Facilis dolore adipisci placeat.</p>
+                        <button class="rounded-full bg-neutral-900 py-2 px-3.5 text-sm capitalize text-white shadow shadow-black/60">Ir</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Bachillerato Técnico -->
-            <div class="bg-white/90 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
-                <img src="https://educacion.gob.ec/wp-content/uploads/2020/11/Boletin-docentes-BT.jpg"
-                     alt="Bachillerato Técnico" class="w-full h-52 object-cover rounded-t-2xl">
-                <div class="p-5">
-                    <a th:href="@{/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista}">
-                        <button class="w-full bg-blue-400 hover:bg-blue-500 text-white font-semibold rounded-xl text-base px-4 py-3 transition shadow-md hover:shadow-lg">
-                            Bachillerato Técnico
-                        </button>
-                    </a>
+                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-xl border border-gray-300">
+                    <div class="h-96 w-72 rounded-xl overflow-hidden">
+                        <img class="h-full w-full object-cover transition-transform duration-500 group-hover:rotate-3 group-hover:scale-125" src="https://educacion.gob.ec/wp-content/uploads/2020/01/productivo.png" alt="Bachillerato Técnico" />
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-xl"></div>
+                    <div class="absolute inset-0 flex translate-y-[60%] flex-col items-center justify-center px-9 text-center transition-all duration-500 group-hover:translate-y-0">
+                        <h1 class="text-3xl font-bold text-white">Bachillerato Técnico</h1>
+                        <p class="mb-3 text-lg italic text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">Formación técnica para el futuro profesional.</p>
+                        <button class="rounded-full bg-neutral-900 py-2 px-3.5 text-sm capitalize text-white shadow shadow-black/60">Explorar</button>
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
 
-</div>
 
+    <div class="bg-indigo-50  ">
 
-<div class="bg-gray-300 py-5 ">
-
-    <div class="max-w-7xl mx-auto mt-14 mb-20">
+    <div class="max-w-7xl mx-auto mb-10">
         <h2 class="text-3xl font-bold text-black mb-8 text-center">📚 PANEL DE GESTION ACADÉMICA</h2>
 
         <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -127,7 +123,6 @@
                     <button
                             class="relative flex items-center gap-2 px-9 py-4 border-2 border-blue-600 text-base font-bold text-blue-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-[#c5e5e4] hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_greenyellow] group"
                     >
-                        <!-- Flecha izquierda -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-blue-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
@@ -138,7 +133,6 @@
                             />
                         </svg>
 
-                        <!-- Texto -->
                         <span
                                 class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
                         >
@@ -165,7 +159,6 @@
             </div>
 
 
-
             <!-- Docente -->
             <div class="card">
                 <div class="card__shine"></div>
@@ -179,7 +172,6 @@
                     <button
                             class="relative flex items-center gap-2 px-9 py-4 border-2 border-green-600 text-base font-bold text-green-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-green-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_limegreen] group"
                     >
-                        <!-- Flecha izquierda -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-green-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
@@ -190,19 +182,16 @@
                             />
                         </svg>
 
-                        <!-- Texto -->
                         <span
                                 class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
                         >
     Añadir Docente
   </span>
 
-                        <!-- Círculo animado -->
                         <span
                                 class="absolute top-1/2 left-1/2 w-5 h-5 bg-green-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
                         ></span>
 
-                        <!-- Flecha derecha -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-green-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
@@ -232,7 +221,6 @@
                     <button
                             class="relative flex items-center gap-2 px-9 py-4 border-2 border-yellow-500 text-base font-bold text-yellow-800 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-yellow-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_gold] group"
                     >
-                        <!-- Flecha izquierda -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-yellow-800 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
@@ -243,19 +231,16 @@
                             />
                         </svg>
 
-                        <!-- Texto -->
                         <span
                                 class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
                         >
     Añadir Materia
   </span>
 
-                        <!-- Círculo animado -->
                         <span
                                 class="absolute top-1/2 left-1/2 w-5 h-5 bg-yellow-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
                         ></span>
 
-                        <!-- Flecha derecha -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-yellow-800 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
@@ -285,20 +270,40 @@
                     <div class="card__image">
                         <img src="https://d11cuk1a0j5b57.cloudfront.net/blog/wp-content/uploads/2022/08/18125803/Mejores-plataformas-de-cursos.jpg" />
                     </div>
-                    <button class="animated-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-purple-600 text-base font-bold text-purple-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-purple-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_purple] group"
+                    >
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-purple-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
                             <path
                                     d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                            ></path>
+                            />
                         </svg>
-                        <span class="text">Añadir Curso</span>
-                        <span class="circle"></span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
+
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Curso
+  </span>
+
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-purple-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-purple-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
                             <path
                                     d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                            ></path>
+                            />
                         </svg>
                     </button>
+
 
                 </div>
             </div>
@@ -313,20 +318,40 @@
                     <div class="card__image">
                         <img src="https://www.educaciontrespuntocero.com/wp-content/uploads/2019/07/Calendario-escolar.jpg" />
                     </div>
-                    <button class="animated-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-2" viewBox="0 0 24 24">
+                    <button
+                            class="relative flex items-center gap-2 px-9 py-4 border-2 border-rose-600 text-base font-bold text-rose-800 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-rose-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_tomato] group"
+                    >
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-rose-800 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
+                                viewBox="0 0 24 24"
+                        >
                             <path
                                     d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                            ></path>
+                            />
                         </svg>
-                        <span class="text">Añadir Periodo Academico</span>
-                        <span class="circle"></span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="arr-1" viewBox="0 0 24 24">
+
+                        <span
+                                class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
+                        >
+    Añadir Período Académico
+  </span>
+
+                        <span
+                                class="absolute top-1/2 left-1/2 w-5 h-5 bg-rose-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
+                        ></span>
+
+                        <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="absolute w-6 fill-rose-800 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
+                                viewBox="0 0 24 24"
+                        >
                             <path
                                     d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
-                            ></path>
+                            />
                         </svg>
                     </button>
+
 
                 </div>
             </div>
@@ -344,7 +369,6 @@
                     <button
                             class="relative flex items-center gap-2 px-9 py-4 border-2 border-amber-800 text-base font-bold text-amber-900 bg-white rounded-full cursor-pointer overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-amber-100 hover:rounded-[12px] active:scale-95 active:shadow-[0_0_0_4px_saddlebrown] group"
                     >
-                        <!-- Flecha izquierda -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-amber-900 z-10 left-[-25%] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:left-4"
@@ -355,19 +379,16 @@
                             />
                         </svg>
 
-                        <!-- Texto -->
                         <span
                                 class="relative z-10 -translate-x-3 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:translate-x-3"
                         >
     Añadir Trimestre
   </span>
 
-                        <!-- Círculo animado -->
                         <span
                                 class="absolute top-1/2 left-1/2 w-5 h-5 bg-amber-100 rounded-full opacity-0 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:w-[220px] group-hover:h-[220px] group-hover:opacity-100"
                         ></span>
 
-                        <!-- Flecha derecha -->
                         <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 class="absolute w-6 fill-amber-900 z-10 right-4 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:right-[-25%]"
