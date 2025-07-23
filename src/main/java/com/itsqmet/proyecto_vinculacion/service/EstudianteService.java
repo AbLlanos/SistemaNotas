@@ -167,4 +167,30 @@ public class EstudianteService {
 
 
 
+    /** Estudiantes inscritos en un curso (por ID). */
+    public List<Estudiante> listarPorCurso(Long cursoId) {
+        if (cursoId == null) return List.of();
+        return estudianteRepository.findByCursos_Id(cursoId);
+    }
+
+    /** Estudiantes inscritos en un curso (por nombre). */
+    public List<Estudiante> listarPorNombreCurso(String nombreCurso) {
+        if (nombreCurso == null || nombreCurso.isBlank()) return List.of();
+        return estudianteRepository.findDistinctByCursos_NombreIgnoreCase(nombreCurso);
+    }
+
+
+    public Optional<Estudiante> buscarPorEmail(String email) {
+        return estudianteRepository.findByEmail(email);
+    }
+
+    public Optional<Estudiante> buscarOptionalPorCedula(String cedula) {
+        return estudianteRepository.findByCedula(cedula);
+    }
+
+
+
+
+
+
 }

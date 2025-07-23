@@ -1,6 +1,7 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
+import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
 import com.itsqmet.proyecto_vinculacion.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,4 +105,40 @@ public class CursoService {
             return cursoRepository.findAll();
         }
     }
+
+    public List<Curso> listarCursosBachillerato() {
+        return cursoRepository.findByNivelEducativo_NombreIgnoreCase("Bachillerato General");
+    }
+
+    public Curso getCursoOrThrow(Long id) {
+        return cursoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado id=" + id));
+    }
+
+    public Curso getCursoByNombreOrThrow(String nombreCurso) {
+        return cursoRepository.findByNombreIgnoreCase(nombreCurso)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado nombre=" + nombreCurso));
+    }
+
+    // CursoService.java
+    public List<Curso> obtenerCursosPorPeriodo(String nombrePeriodo) {
+        return cursoRepository.findByPeriodoAcademicoNombre(nombrePeriodo);
+    }
+
+    public List<Curso> obtenerCursosPorPeriodoID(Long periodoAcademicoId) {
+        return cursoRepository.findByPeriodoAcademico_Id(periodoAcademicoId);
+    }
+
+
+    public Curso buscarPorNombre(String nombre) {
+        return cursoRepository.findByNombre(nombre)
+                .orElse(null);
+    }
+
+    public Curso buscarCursoPorPeriodoAndNombre(PeriodoAcademico periodo, String nombre) {
+        return cursoRepository.findByPeriodoAcademicoAndNombre(periodo, nombre)
+                .orElse(null);
+    }
+
+
 }

@@ -2,16 +2,27 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Registro de Estudiante'">Registro de Estudiante</title>
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet" />
+    <title th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Registro de Estudiante'">Registro de
+        Estudiante</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet"/>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<style>
+    .error-message {
+        color: #dc2626; /* rojo Tailwind */
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+</style>
 <body class="bg-gradient-to-br from-purple-50 to-purple-100 min-h-screen">
 
 <nav class="bg-blue-700 p-6">
     <div class="container mx-auto flex justify-between items-center">
-        <span class="text-white font-bold text-3xl" th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Estudiante'">Estudiante</span>
-        <a th:href="@{/pages/Admin/estudianteVista}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
+        <span class="text-white font-bold text-3xl"
+              th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Estudiante'">Estudiante</span>
+        <a th:href="@{/pages/Admin/estudianteVista}"
+           class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
             Regresar
         </a>
     </div>
@@ -21,7 +32,8 @@
     <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10">
         <div class="mb-8 text-center">
             <h2 class="text-4xl font-extrabold text-blue-800 mb-2"
-                th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Registro de Estudiante'">Registro de Estudiante</h2>
+                th:text="${estudiante.id != null} ? 'Editar Estudiante' : 'Registro de Estudiante'">Registro de
+                Estudiante</h2>
             <p class="text-gray-500">Completa los datos del estudiante.</p>
         </div>
 
@@ -31,38 +43,53 @@
               class="space-y-6">
 
             <!-- ID oculto -->
-            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{id}"/>
 
             <!-- Nombre -->
             <div>
                 <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
-                <input type="text" id="nombre" th:field="*{nombre}" required
+                <input type="text" id="nombre" th:field="*{nombre}"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                       placeholder="Ej: Gabriel" />
+                       placeholder="Ej: Gabriel"/>
+                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="error-message"></span>
             </div>
 
-            <!-- Apellido -->
+
+            <!-- Apellido
             <div>
                 <label for="apellido" class="block text-sm font-semibold text-gray-700 mb-1">Apellido</label>
                 <input type="text" id="apellido" th:field="*{apellido}" required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                        placeholder="Ej: Perez" />
+                <span th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}" class="error-message"></span>
+            </div>
+                 -->
+
+            <!-- Telefono -->
+            <div>
+                <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
+                <input type="text" id="telefono" th:field="*{telefono}" maxlength="10"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                       placeholder="Ej: 1234567890"/>
+                <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="error-message"></span>
             </div>
 
             <!-- Cédula -->
             <div>
                 <label for="cedula" class="block text-sm font-semibold text-gray-700 mb-1">Cédula</label>
-                <input type="text" id="cedula" th:field="*{cedula}" required
+                <input type="text" id="cedula" th:field="*{cedula}" maxlength="10"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                       placeholder="Ej: 1234567890" />
+                       placeholder="Ej: 1234567890"/>
+                <span th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}" class="error-message"></span>
             </div>
 
             <!-- Email -->
             <div>
                 <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-                <input type="email" id="email" th:field="*{email}" required
+                <input type="email" id="email" th:field="*{email}"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                       placeholder="Ej: gabriel@correo.com" />
+                       placeholder="Ej: gabriel@correo.com"/>
+                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></span>
             </div>
 
             <!-- Dirección -->
@@ -70,7 +97,8 @@
                 <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-1">Dirección</label>
                 <input type="text" id="direccion" th:field="*{direccion}"
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                       placeholder="Ej: Av. Los Shyris" />
+                       placeholder="Ej: Av. Los Shyris"/>
+                <span th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" class="error-message"></span>
             </div>
 
             <!-- Nivel Educativo (filtra cursos) -->
@@ -88,6 +116,7 @@
                                             (estudiante.nivelEducativo != null ? estudiante.nivelEducativo.id : null)) == niv.id}">
                     </option>
                 </select>
+                <span th:if="${#fields.hasErrors('nivelEducativo')}" th:errors="*{nivelEducativo}" class="error-message"></span>
             </div>
 
             <!-- Visible -->
@@ -95,12 +124,13 @@
                 <input type="checkbox"
                        id="visible"
                        th:field="*{visible}"
-                       class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-400" />
+                       class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-400"/>
                 <label for="visible" class="text-sm font-medium text-gray-700">Visible en listados</label>
             </div>
 
             <div class="pt-6">
-                <button type="submit" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+                <button type="submit"
+                        class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                     Guardar Estudiante
                 </button>
             </div>

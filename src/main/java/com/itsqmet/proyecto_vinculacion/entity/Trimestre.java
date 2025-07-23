@@ -1,5 +1,6 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,5 +22,6 @@ public class Trimestre {
 
     //Conexion con notas
     @OneToMany(mappedBy = "trimestre", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Notas> notas;
 }

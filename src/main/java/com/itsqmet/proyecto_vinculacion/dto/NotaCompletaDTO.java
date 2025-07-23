@@ -1,117 +1,69 @@
 package com.itsqmet.proyecto_vinculacion.dto;
 
 import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
+import lombok.Data;
 
+@Data
 public class NotaCompletaDTO {
 
     private Long idNota;
+
+    // Identificadores de selección desde el formulario
+    private Long cursoId;
+    private Long materiaId;
+
     private String nombreEstudiante;
     private String cedulaEstudiante;
     private String nombreCompletoEstudiante;
+
+    // nombre de la materia (texto); se llena desde hidden
     private String areaMateria;
+
     private String nombreCurso;
     private String cedula;
 
-    private PeriodoAcademico periodoAcademico;
+    private PeriodoAcademico periodoAcademico; // no se bindea directamente, sólo informativo
+    private String nombrePeriodo;              // se llena desde Curso (data-periodo)
+    private Long periodoAcademicoId;
 
-    public PeriodoAcademico getPeriodoAcademico() {
-        return periodoAcademico;
-    }
-
-    public void setPeriodoAcademico(PeriodoAcademico periodoAcademico) {
-        this.periodoAcademico = periodoAcademico;
-    }
-
-    public String getCedula() {
-        return cedula;
-    }
-
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
-    }
-
-    private String nombrePeriodo;
-
-    public String getNombreEstudiante() {
-        return nombreEstudiante;
-    }
-
-    public void setNombreEstudiante(String nombreEstudiante) {
-        this.nombreEstudiante = nombreEstudiante;
-    }
-
-    public String getNombrePeriodo() {
-        return nombrePeriodo;
-    }
-
-    public void setNombrePeriodo(String nombrePeriodo) {
-        this.nombrePeriodo = nombrePeriodo;
-    }
-
-
-    public String getNombreCurso() {
-        return nombreCurso;
-    }
-
-    public void setNombreCurso(String nombreCurso) {
-        this.nombreCurso = nombreCurso;
-    }
-
-    // Primer trimestre
-
-    private Double notaNumericaPrimerTrim;
-    private String notaCualitativaPrimerTrim;
-
+    // ---------- Primer Trimestre ----------
+    private Double  notaNumericaPrimerTrim;
+    private String  notaCualitativaPrimerTrim;
     private Integer asistenciaPrimerTrim;
     private Integer faltasJustificadasPrimerTrim;
     private Integer faltasInjustificadasPrimerTrim;
     private Integer atrasosPrimerTrim;
-    private String comportamientoPrimerTrim;
+    private String  comportamientoPrimerTrim;
     private Integer totalAsistenciaPrimerTrim;
 
-
-
-
-    // Segundo trimestre
-
-    private Double notaNumericaSegundoTrim;
-    private String notaCualitativaSegundoTrim;
-
+    // ---------- Segundo Trimestre ----------
+    private Double  notaNumericaSegundoTrim;
+    private String  notaCualitativaSegundoTrim;
     private Integer asistenciaSegundoTrim;
     private Integer faltasJustificadasSegundoTrim;
     private Integer faltasInjustificadasSegundoTrim;
     private Integer atrasosSegundoTrim;
-    private String comportamientoSegundoTrim;
+    private String  comportamientoSegundoTrim;
+    private Integer totalAsistenciaSegundoTrim;
 
-    private Integer TotalAsistenciaSegundoTrim;
-
-    // Tercer trimestre
-
-    private Double notaNumericaTercerTrim;
-    private String notaCualitativaTercerTrim;
-
+    // ---------- Tercer Trimestre ----------
+    private Double  notaNumericaTercerTrim;
+    private String  notaCualitativaTercerTrim;
     private Integer asistenciaTercerTrim;
     private Integer faltasJustificadasTercerTrim;
     private Integer faltasInjustificadasTercerTrim;
     private Integer atrasosTercerTrim;
-    private String comportamientoTercerTrim;
-    private Integer TotalAsistenciaTercerTrim;
+    private String  comportamientoTercerTrim;
+    private Integer totalAsistenciaTercerTrim;
 
-    public Integer getTotalAsistenciaSegundoTrim() {
-        return TotalAsistenciaSegundoTrim;
-    }
 
-    public void setTotalAsistenciaSegundoTrim(Integer totalAsistenciaSegundoTrim) {
-        TotalAsistenciaSegundoTrim = totalAsistenciaSegundoTrim;
-    }
+    private String estado;
+    private Double promedioFinal;
 
-    public Integer getTotalAsistenciaTercerTrim() {
-        return TotalAsistenciaTercerTrim;
-    }
+    private String comportamientoFinalVariable1;
+    private String comportamientoFinalVariable2;
+    private String comportamientoFinalVariable3;
 
-    public void setTotalAsistenciaTercerTrim(Integer totalAsistenciaTercerTrim) {
-        TotalAsistenciaTercerTrim = totalAsistenciaTercerTrim;
-    }
 
     public Long getIdNota() {
         return idNota;
@@ -119,6 +71,30 @@ public class NotaCompletaDTO {
 
     public void setIdNota(Long idNota) {
         this.idNota = idNota;
+    }
+
+    public Long getCursoId() {
+        return cursoId;
+    }
+
+    public void setCursoId(Long cursoId) {
+        this.cursoId = cursoId;
+    }
+
+    public Long getMateriaId() {
+        return materiaId;
+    }
+
+    public void setMateriaId(Long materiaId) {
+        this.materiaId = materiaId;
+    }
+
+    public String getNombreEstudiante() {
+        return nombreEstudiante;
+    }
+
+    public void setNombreEstudiante(String nombreEstudiante) {
+        this.nombreEstudiante = nombreEstudiante;
     }
 
     public String getCedulaEstudiante() {
@@ -143,6 +119,46 @@ public class NotaCompletaDTO {
 
     public void setAreaMateria(String areaMateria) {
         this.areaMateria = areaMateria;
+    }
+
+    public String getNombreCurso() {
+        return nombreCurso;
+    }
+
+    public void setNombreCurso(String nombreCurso) {
+        this.nombreCurso = nombreCurso;
+    }
+
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
+
+    public PeriodoAcademico getPeriodoAcademico() {
+        return periodoAcademico;
+    }
+
+    public void setPeriodoAcademico(PeriodoAcademico periodoAcademico) {
+        this.periodoAcademico = periodoAcademico;
+    }
+
+    public String getNombrePeriodo() {
+        return nombrePeriodo;
+    }
+
+    public void setNombrePeriodo(String nombrePeriodo) {
+        this.nombrePeriodo = nombrePeriodo;
+    }
+
+    public Long getPeriodoAcademicoId() {
+        return periodoAcademicoId;
+    }
+
+    public void setPeriodoAcademicoId(Long periodoAcademicoId) {
+        this.periodoAcademicoId = periodoAcademicoId;
     }
 
     public Double getNotaNumericaPrimerTrim() {
@@ -265,6 +281,13 @@ public class NotaCompletaDTO {
         this.comportamientoSegundoTrim = comportamientoSegundoTrim;
     }
 
+    public Integer getTotalAsistenciaSegundoTrim() {
+        return totalAsistenciaSegundoTrim;
+    }
+
+    public void setTotalAsistenciaSegundoTrim(Integer totalAsistenciaSegundoTrim) {
+        this.totalAsistenciaSegundoTrim = totalAsistenciaSegundoTrim;
+    }
 
     public Double getNotaNumericaTercerTrim() {
         return notaNumericaTercerTrim;
@@ -322,5 +345,51 @@ public class NotaCompletaDTO {
         this.comportamientoTercerTrim = comportamientoTercerTrim;
     }
 
+    public Integer getTotalAsistenciaTercerTrim() {
+        return totalAsistenciaTercerTrim;
+    }
 
+    public void setTotalAsistenciaTercerTrim(Integer totalAsistenciaTercerTrim) {
+        this.totalAsistenciaTercerTrim = totalAsistenciaTercerTrim;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public Double getPromedioFinal() {
+        return promedioFinal;
+    }
+
+    public void setPromedioFinal(Double promedioFinal) {
+        this.promedioFinal = promedioFinal;
+    }
+
+    public String getComportamientoFinalVariable1() {
+        return comportamientoFinalVariable1;
+    }
+
+    public void setComportamientoFinalVariable1(String comportamientoFinalVariable1) {
+        this.comportamientoFinalVariable1 = comportamientoFinalVariable1;
+    }
+
+    public String getComportamientoFinalVariable2() {
+        return comportamientoFinalVariable2;
+    }
+
+    public void setComportamientoFinalVariable2(String comportamientoFinalVariable2) {
+        this.comportamientoFinalVariable2 = comportamientoFinalVariable2;
+    }
+
+    public String getComportamientoFinalVariable3() {
+        return comportamientoFinalVariable3;
+    }
+
+    public void setComportamientoFinalVariable3(String comportamientoFinalVariable3) {
+        this.comportamientoFinalVariable3 = comportamientoFinalVariable3;
+    }
 }

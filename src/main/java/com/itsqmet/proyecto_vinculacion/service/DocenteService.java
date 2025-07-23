@@ -1,6 +1,7 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Docente;
+import com.itsqmet.proyecto_vinculacion.entity.Estudiante;
 import com.itsqmet.proyecto_vinculacion.repository.DocenteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,5 +58,12 @@ public class DocenteService {
         return docenteRepository.findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(nombre, cedula);
     }
 
+    public Optional<Docente> buscarPorEmail(String email) {
+        return docenteRepository.findByEmail(email);
+    }
+
+    public Optional<Docente> buscarOptionalCedula(String cedula) {
+        return docenteRepository.findByCedula(cedula);
+    }
 
 }

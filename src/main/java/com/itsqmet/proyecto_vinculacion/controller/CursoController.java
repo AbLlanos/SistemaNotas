@@ -10,6 +10,7 @@ import com.itsqmet.proyecto_vinculacion.service.EstudianteService;
 import com.itsqmet.proyecto_vinculacion.service.MateriaService;
 import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
 import com.itsqmet.proyecto_vinculacion.service.PeriodoAcademicoService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -142,6 +143,7 @@ public class CursoController {
 // 4. Guardar curso (nuevo o editado)
 // ------------------------------------------------------------
     @PostMapping("/pages/Admin/cursoGuardar")
+    @Transactional
     public String guardarCurso(@ModelAttribute Curso curso,
                                @RequestParam(value = "materiasSeleccionadas", required = false) List<Long> materiasIds,
                                @RequestParam(value = "estudiantesSeleccionados", required = false) List<Long> estudiantesIds,
@@ -151,31 +153,44 @@ public class CursoController {
                     ? cursoService.buscarCursoPorId(curso.getId()).orElse(new Curso())
                     : new Curso();
 
-            // Lista original estudiantes antes de cambios
             List<Estudiante> estudiantesActuales = new ArrayList<>();
             if (cursoPersistido.getEstudiantes() != null) {
                 estudiantesActuales.addAll(cursoPersistido.getEstudiantes());
             }
 
             cursoPersistido.setNombre(curso.getNombre());
-            cursoPersistido.setPeriodoAcademico(curso.getPeriodoAcademico());
-            cursoPersistido.setNivelEducativo(curso.getNivelEducativo());
+
+            // Cargar PeriodoAcademico completo por id
+            if (curso.getPeriodoAcademico() != null && curso.getPeriodoAcademico().getId() != null) {
+                PeriodoAcademico pa = periodoAcademicoService.buscarPorId(curso.getPeriodoAcademico().getId());
+                cursoPersistido.setPeriodoAcademico(pa);
+            } else {
+                cursoPersistido.setPeriodoAcademico(null);
+            }
+
+            // Cargar NivelEducativo completo por id
+            Optional<NivelEducativo> optionalNe = nivelEducativoService.buscarPorId(curso.getNivelEducativo().getId());
+            if (optionalNe.isPresent()) {
+                cursoPersistido.setNivelEducativo(optionalNe.get());
+            } else {
+                cursoPersistido.setNivelEducativo(null);
+            }
 
             // Materias
             if (materiasIds != null && !materiasIds.isEmpty()) {
-                cursoPersistido.setMaterias(materiaService.obtenerMateriasPorIds(materiasIds));
+                List<Materia> materias = materiaService.obtenerMateriasPorIds(materiasIds);
+                cursoPersistido.setMaterias(materias);
             } else {
                 cursoPersistido.setMaterias(new ArrayList<>());
             }
 
-            // Guardar sin estudiantes para tener ID
-            cursoPersistido.setEstudiantes(new ArrayList<>());
+            // Guardar primero para obtener ID si es nuevo
             cursoService.guardarCurso(cursoPersistido);
 
             if (estudiantesIds != null && !estudiantesIds.isEmpty()) {
                 List<Estudiante> estudiantesSeleccionados = estudianteService.obtenerPorIds(estudiantesIds);
 
-                // Detectar estudiantes que se removieron
+                // Detectar estudiantes removidos
                 List<Estudiante> estudiantesARemover = new ArrayList<>();
                 for (Estudiante actual : estudiantesActuales) {
                     if (!estudiantesIds.contains(actual.getId())) {
@@ -183,8 +198,7 @@ public class CursoController {
                     }
                 }
 
-                // Remover estudiantes del curso y relación inversa
-                estudiantesActuales.removeAll(estudiantesARemover);
+                // Remover estudiantes y actualizar relación inversa
                 for (Estudiante remover : estudiantesARemover) {
                     if (remover.getCursos() != null) {
                         remover.getCursos().remove(cursoPersistido);
@@ -192,7 +206,7 @@ public class CursoController {
                 }
                 estudianteService.guardarTodos(estudiantesARemover);
 
-                // Agregar nuevos estudiantes sin duplicar y actualizar relación inversa
+                // Agregar nuevos estudiantes y actualizar relación inversa
                 for (Estudiante nuevo : estudiantesSeleccionados) {
                     if (!estudiantesActuales.contains(nuevo)) {
                         estudiantesActuales.add(nuevo);
@@ -209,7 +223,7 @@ public class CursoController {
                 cursoPersistido.setEstudiantes(estudiantesActuales);
 
             } else {
-                // Si no se seleccionó ninguno, eliminar todos
+                // Si no seleccionó estudiantes, remover todos
                 for (Estudiante e : estudiantesActuales) {
                     if (e.getCursos() != null) {
                         e.getCursos().remove(cursoPersistido);
@@ -219,17 +233,17 @@ public class CursoController {
                 cursoPersistido.setEstudiantes(new ArrayList<>());
             }
 
+            // Guardar actualización final de curso con estudiantes
             cursoService.guardarCurso(cursoPersistido);
 
             redirectAttributes.addFlashAttribute("success", "Curso guardado correctamente.");
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Error al guardar el curso: " + e.getMessage());
         }
 
         return "redirect:/pages/Admin/cursoVista";
     }
-
-
 
 
 

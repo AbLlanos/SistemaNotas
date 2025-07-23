@@ -86,6 +86,10 @@ public class MateriaService {
         return materiaRepository.findByNivelEducativo_Nombre(nombreNivel);
     }
 
+    public List<Materia> findByCursoId(Long cursoId) {
+        return materiaRepository.findMateriasByCursoId(cursoId);
+    }
+
     // ==================== NUEVO ====================
     /** Materias por nivel educativo (para filtrar en formulario de Curso). */
     public List<Materia> listarPorNivelId(Long nivelId) {
@@ -95,4 +99,15 @@ public class MateriaService {
         return materiaRepository.findByNivelEducativo_Id(nivelId);
     }
 
+    public List<Materia> findByCursoNombre(String nombreCurso) {
+        if (nombreCurso == null || nombreCurso.isBlank()) {
+            return List.of();  // Devuelve lista vacía si no hay nombre de curso
+        }
+        return materiaRepository.findDistinctByCursos_NombreIgnoreCase(nombreCurso);
+    }
+
+    public Materia buscarPorId(Long id) {
+        return materiaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la materia con id=" + id));
+    }
 }

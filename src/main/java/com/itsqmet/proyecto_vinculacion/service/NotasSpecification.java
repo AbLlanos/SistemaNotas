@@ -1,55 +1,49 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
-import com.itsqmet.proyecto_vinculacion.entity.Curso;
-import com.itsqmet.proyecto_vinculacion.entity.Materia;
-import com.itsqmet.proyecto_vinculacion.entity.Notas;
+import com.itsqmet.proyecto_vinculacion.entity.*;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NotasSpecification {
 
-    public static Specification<Notas> filtrarPorCampos(
-            String nombrePeriodo,
-            String nombreCurso,
-            String nombreMateria,
-            String cedula,
-            String nombreTrimestre) {
+    public static Specification<Notas> filtrarPorCampos(String nombrePeriodo,
+                                                        String nombreCurso,
+                                                        String nombreMateria,
+                                                        String cedula,
+                                                        String nombreTrimestre) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        return (Root<Notas> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
-
-            query.distinct(true);
-
-            Predicate predicate = cb.conjunction();
-
-            Join<Notas, Materia> joinMateria = root.join("materia");
-            Join<Materia, Curso> joinCurso = joinMateria.join("cursos", JoinType.LEFT);
-
-            if (nombreCurso != null && !nombreCurso.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(cb.lower(joinCurso.get("nombre")), nombreCurso.trim().toLowerCase()));
+            if (nombrePeriodo != null && !nombrePeriodo.isEmpty()) {
+                Join<Notas, PeriodoAcademico> periodoJoin = root.join("periodoAcademico", JoinType.LEFT);
+                predicates.add(cb.equal(cb.lower(periodoJoin.get("nombre")), nombrePeriodo.toLowerCase()));
             }
 
-            if (nombreMateria != null && !nombreMateria.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(cb.lower(joinMateria.get("nombre")), nombreMateria.trim().toLowerCase()));
+            if (nombreCurso != null && !nombreCurso.isEmpty()) {
+                Join<Notas, Materia> materiaJoin = root.join("materia", JoinType.LEFT);
+                Join<Materia, Curso> cursoJoin = materiaJoin.join("cursos", JoinType.LEFT);
+                predicates.add(cb.equal(cb.lower(cursoJoin.get("nombre")), nombreCurso.toLowerCase()));
             }
 
-            if (cedula != null && !cedula.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("estudiante").get("cedula"), cedula.trim()));
+            if (nombreMateria != null && !nombreMateria.isEmpty()) {
+                Join<Notas, Materia> materiaJoin = root.join("materia", JoinType.LEFT);
+                predicates.add(cb.equal(cb.lower(materiaJoin.get("nombre")), nombreMateria.toLowerCase()));
             }
 
-            if (nombreTrimestre != null && !nombreTrimestre.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("trimestre").get("nombre"), nombreTrimestre.trim()));
+            if (cedula != null && !cedula.isEmpty()) {
+                Join<Notas, Estudiante> estudianteJoin = root.join("estudiante", JoinType.LEFT);
+                predicates.add(cb.equal(cb.lower(estudianteJoin.get("cedula")), cedula.toLowerCase()));
             }
 
-            if (nombrePeriodo != null && !nombrePeriodo.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("periodoAcademico").get("nombre"), nombrePeriodo.trim()));
+            if (nombreTrimestre != null && !nombreTrimestre.isEmpty()) {
+                Join<Notas, Trimestre> trimestreJoin = root.join("trimestre", JoinType.LEFT);
+                predicates.add(cb.equal(cb.lower(trimestreJoin.get("nombre")), nombreTrimestre.toLowerCase()));
             }
 
-            return predicate;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 

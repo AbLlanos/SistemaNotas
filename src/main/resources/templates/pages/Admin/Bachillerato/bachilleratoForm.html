@@ -3,170 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${nota.idNota} != null ? 'Editar Nota' : 'Crear Nota'">Nota</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="p-6">
 
-<h1 th:text="${nota.idNota} != null ? 'Editar Nota' : 'Crear Nota'"></h1>
+<h1 class="text-2xl font-bold mb-4" th:text="${nota.idNota} != null ? 'Editar Nota' : 'Crear Nota'"></h1>
 
-<form th:action="@{/pages/Admin/notas/guardar}"
-      method="post">
-
+<form th:object="${nota}" th:action="@{/pages/Admin/notas/guardar}" method="post" class="space-y-6 max-w-3xl">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-    <!-- ID principal (solo edición) -->
-    <input type="hidden" name="idNota" th:if="${nota.idNota != null}" th:value="${nota.idNota}"/>
+    <!-- Campo oculto para idNota (en editar) -->
+    <input type="hidden" th:if="*{idNota != null}" th:field="*{idNota}" />
 
-    <!-- Claves originales (solo edición) -->
-    <input type="hidden" name="originalCedula" th:if="${nota.idNota != null}" th:value="${nota.cedulaEstudiante}"/>
-    <input type="hidden" name="originalMateria" th:if="${nota.idNota != null}" th:value="${nota.areaMateria}"/>
-    <input type="hidden" name="originalPeriodo" th:if="${nota.idNota != null}" th:value="${nota.nombrePeriodo}"/>
+    <!-- ======== Periodo Académico ======== -->
+    <div>
+        <label for="periodoSelect" class="block mb-1 text-sm font-semibold">Periodo Académico</label>
+        <select id="periodoSelect" th:field="*{periodoAcademicoId}" class="w-full border rounded px-3 py-2 text-sm">
+            <option value="">-- Seleccione un periodo --</option>
+            <option th:each="periodo : ${periodos}" th:value="${periodo.id}" th:text="${periodo.nombre}"></option>
+        </select>
+    </div>
 
-    <!-- Estudiante -->
-    <label for="cedulaEstudiante">Estudiante:</label>
-    <select id="cedulaEstudiante" name="cedulaEstudiante"
-            th:disabled="${nota.idNota != null}" required>
-        <option value="" disabled th:selected="${nota.idNota == null}">Seleccione un estudiante</option>
-        <th:block th:each="est : ${estudiantes}">
-            <option th:value="${est.cedula}"
-                    th:text="${est.cedula + ' - ' + est.nombre + ' ' + est.apellido}"
-                    th:selected="${nota.idNota != null} ? (est.cedula == nota.cedulaEstudiante) : false">
+    <!-- ======== Curso (Filtrado por Periodo) ======== -->
+    <div>
+        <label for="cursoSelect" class="block mb-1 text-sm font-semibold">Curso</label>
+        <select id="cursoSelect" th:field="*{cursoId}" class="w-full border rounded px-3 py-2 text-sm" th:disabled="${nota.idNota != null}">
+            <option value="">-- Seleccione un curso --</option>
+            <option th:each="cur : ${cursos}"
+                    th:value="${cur.id}"
+                    th:attr="data-periodo-id=${cur.periodoAcademico != null ? cur.periodoAcademico.id : ''}"
+                    th:text="${cur.nombre}">
             </option>
-        </th:block>
-    </select>
-    <!-- cuando está disabled no envía valor, así que duplicamos hidden -->
-    <input type="hidden" name="cedulaEstudiante" th:if="${nota.idNota != null}" th:value="${nota.cedulaEstudiante}"/>
+        </select>
+        <!-- Campo oculto para curso en modo edición -->
+        <input type="hidden" th:if="*{idNota != null}" th:field="*{cursoId}" />
+    </div>
 
-
-    <!-- Materia -->
-    <!-- Materia -->
-    <label for="areaMateria">Materia:</label>
-    <select id="areaMateria" name="areaMateria"
-            th:disabled="${nota.idNota != null}" required>
-        <option value="" disabled th:selected="${nota.idNota == null}">Seleccione una materia</option>
-        <th:block th:each="mat : ${materias}">
-            <option th:value="${mat.nombre}"
-                    th:selected="${nota.idNota != null} ? (mat.nombre == nota.areaMateria) : false"
-                    th:text="${mat.nombre + ' - (' + #strings.listJoin(mat.cursos.![nombre], ', ') + ')'}">
+    <!-- ======== Materia dependiente de Curso ======== -->
+    <div>
+        <label for="areaMateria" class="block mb-1 text-sm font-semibold">Materia</label>
+        <select id="areaMateria" th:field="*{materiaId}" class="w-full border rounded px-3 py-2 text-sm" th:disabled="${nota.idNota != null}" required>
+            <option value="">Seleccionar materia</option>
+            <option th:each="mat : ${listaMaterias}"
+                    th:value="${mat.id}"
+                    th:text="${mat.nombre}"
+                    th:selected="${mat.id == nota.materiaId}">
             </option>
-        </th:block>
-    </select>
-    <input type="hidden" name="areaMateria" th:if="${nota.idNota != null}" th:value="${nota.areaMateria}"/>
+        </select>
+        <input type="hidden" id="materiaNombreHidden" th:field="*{areaMateria}" />
+    </div>
 
+    <!-- ======== Estudiante ======== -->
+    <div>
+        <label for="cedulaEstudiante" class="block mb-1 text-sm font-semibold">Estudiante</label>
 
-    <!-- Periodo -->
-    <label for="periodo">Periodo Académico:</label>
-    <select id="periodo" name="nombrePeriodo"
-            th:disabled="${nota.idNota != null}" required>
-        <option value="" disabled th:selected="${nota.idNota == null}">Seleccione un periodo</option>
-        <th:block th:each="per : ${periodos}">
-            <option th:value="${per.nombre}"
-                    th:text="${per.nombre}"
-                    th:selected="${nota.idNota != null} ? (per.nombre == nota.nombrePeriodo) : false">
+        <!-- SELECT visible sólo en CREAR -->
+        <select id="cedulaEstudiante"
+                th:field="*{cedulaEstudiante}"
+                class="w-full border rounded px-3 py-2 text-sm"
+                th:if="${nota.idNota == null}"
+                required>
+            <option value="">-- Seleccione un estudiante --</option>
+            <option th:each="est : ${estudiantes}"
+                    th:value="${est.cedula}"
+                    th:text="|${est.cedula} - "
+                    th:selected="${est.cedula == nota.cedulaEstudiante}">
             </option>
-        </th:block>
-    </select>
-    <input type="hidden" name="nombrePeriodo" th:if="${nota.idNota != null}" th:value="${nota.nombrePeriodo}"/>
+        </select>
 
+        <!-- MODO EDITAR: sólo lectura + hidden -->
+        <div th:if="${nota.idNota != null}">
+            <input type="hidden" th:field="*{cedulaEstudiante}" />
+            <p class="font-semibold text-gray-700"
+               th:text="|${nota.cedulaEstudiante} - ${nota.nombreCompletoEstudiante}|"></p>
+        </div>
+    </div>
+
+    <hr class="my-4"/>
 
     <!-- ======= Primer Trimestre ======= -->
-    <h3>Primer Trimestre</h3>
-    <label for="notaNumerica1">Nota Numérica:</label>
-    <input type="number" step="0.01" id="notaNumerica1" name="notaNumericaPrimerTrim"
-           th:value="${nota.notaNumericaPrimerTrim}" />
-
-    <label for="notaCualitativa1">Nota Cualitativa:</label>
-    <input type="text" id="notaCualitativa1" name="notaCualitativaPrimerTrim"
-           th:value="${nota.notaCualitativaPrimerTrim}" />
-
-    <label for="asistencia1">Asistencias:</label>
-    <input type="number" id="asistencia1" name="asistenciaPrimerTrim"
-           th:value="${nota.asistenciaPrimerTrim}" />
-
-    <label for="faltasJustificadas1">Faltas Justificadas:</label>
-    <input type="number" id="faltasJustificadas1" name="faltasJustificadasPrimerTrim"
-           th:value="${nota.faltasJustificadasPrimerTrim}" />
-
-    <label for="faltasInjustificadas1">Faltas Injustificadas:</label>
-    <input type="number" id="faltasInjustificadas1" name="faltasInjustificadasPrimerTrim"
-           th:value="${nota.faltasInjustificadasPrimerTrim}" />
-
-    <label for="atrasos1">Atrasos:</label>
-    <input type="number" id="atrasos1" name="atrasosPrimerTrim"
-           th:value="${nota.atrasosPrimerTrim}" />
-
-    <label for="comportamiento1">Comportamiento:</label>
-    <input type="text" id="comportamiento1" name="comportamientoPrimerTrim"
-           th:value="${nota.comportamientoPrimerTrim}" />
-
+    <h3 class="text-lg font-semibold">Primer Trimestre</h3>
+    <div class="grid grid-cols-2 gap-4">
+        <!-- Nota num -->
+        <div>
+            <label for="notaNumerica1" class="block text-xs font-semibold">Nota Numérica</label>
+            <input type="number" step="0.01" id="notaNumerica1" name="notaNumericaPrimerTrim"
+                   th:value="${nota.notaNumericaPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Nota cual -->
+        <div>
+            <label for="notaCualitativa1" class="block text-xs font-semibold">Nota Cualitativa</label>
+            <input type="text" id="notaCualitativa1" name="notaCualitativaPrimerTrim"
+                   th:value="${nota.notaCualitativaPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Asist -->
+        <div>
+            <label for="asistencia1" class="block text-xs font-semibold">Asistencias</label>
+            <input type="number" id="asistencia1" name="asistenciaPrimerTrim"
+                   th:value="${nota.asistenciaPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Faltas J -->
+        <div>
+            <label for="faltasJustificadas1" class="block text-xs font-semibold">Faltas Just.</label>
+            <input type="number" id="faltasJustificadas1" name="faltasJustificadasPrimerTrim"
+                   th:value="${nota.faltasJustificadasPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Faltas I -->
+        <div>
+            <label for="faltasInjustificadas1" class="block text-xs font-semibold">Faltas Injust.</label>
+            <input type="number" id="faltasInjustificadas1" name="faltasInjustificadasPrimerTrim"
+                   th:value="${nota.faltasInjustificadasPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Atrasos -->
+        <div>
+            <label for="atrasos1" class="block text-xs font-semibold">Atrasos</label>
+            <input type="number" id="atrasos1" name="atrasosPrimerTrim"
+                   th:value="${nota.atrasosPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Comportamiento -->
+        <div class="col-span-2">
+            <label for="comportamiento1" class="block text-xs font-semibold">Comportamiento</label>
+            <input type="text" id="comportamiento1" name="comportamientoPrimerTrim"
+                   th:value="${nota.comportamientoPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <!-- Total -->
+        <div>
+            <label for="totalAsistencias1" class="block text-xs font-semibold">Total Asistencias</label>
+            <input type="number" id="totalAsistencias1" name="totalAsistenciaPrimerTrim"
+                   th:value="${nota.totalAsistenciaPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
 
     <!-- ======= Segundo Trimestre ======= -->
-    <h3>Segundo Trimestre</h3>
-    <label for="notaNumerica2">Nota Numérica:</label>
-    <input type="number" step="0.01" id="notaNumerica2" name="notaNumericaSegundoTrim"
-           th:value="${nota.notaNumericaSegundoTrim}" />
-
-    <label for="notaCualitativa2">Nota Cualitativa:</label>
-    <input type="text" id="notaCualitativa2" name="notaCualitativaSegundoTrim"
-           th:value="${nota.notaCualitativaSegundoTrim}" />
-
-    <label for="asistencia2">Asistencias:</label>
-    <input type="number" id="asistencia2" name="asistenciaSegundoTrim"
-           th:value="${nota.asistenciaSegundoTrim}" />
-
-    <label for="faltasJustificadas2">Faltas Justificadas:</label>
-    <input type="number" id="faltasJustificadas2" name="faltasJustificadasSegundoTrim"
-           th:value="${nota.faltasJustificadasSegundoTrim}" />
-
-    <label for="faltasInjustificadas2">Faltas Injustificadas:</label>
-    <input type="number" id="faltasInjustificadas2" name="faltasInjustificadasSegundoTrim"
-           th:value="${nota.faltasInjustificadasSegundoTrim}" />
-
-    <label for="atrasos2">Atrasos:</label>
-    <input type="number" id="atrasos2" name="atrasosSegundoTrim"
-           th:value="${nota.atrasosSegundoTrim}" />
-
-    <label for="comportamiento2">Comportamiento:</label>
-    <input type="text" id="comportamiento2" name="comportamientoSegundoTrim"
-           th:value="${nota.comportamientoSegundoTrim}" />
-
+    <h3 class="text-lg font-semibold mt-6">Segundo Trimestre</h3>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label for="notaNumerica2" class="block text-xs font-semibold">Nota Numérica</label>
+            <input type="number" step="0.01" id="notaNumerica2" name="notaNumericaSegundoTrim"
+                   th:value="${nota.notaNumericaSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="notaCualitativa2" class="block text-xs font-semibold">Nota Cualitativa</label>
+            <input type="text" id="notaCualitativa2" name="notaCualitativaSegundoTrim"
+                   th:value="${nota.notaCualitativaSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="asistencia2" class="block text-xs font-semibold">Asistencias</label>
+            <input type="number" id="asistencia2" name="asistenciaSegundoTrim"
+                   th:value="${nota.asistenciaSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="faltasJustificadas2" class="block text-xs font-semibold">Faltas Just.</label>
+            <input type="number" id="faltasJustificadas2" name="faltasJustificadasSegundoTrim"
+                   th:value="${nota.faltasJustificadasSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="faltasInjustificadas2" class="block text-xs font-semibold">Faltas Injust.</label>
+            <input type="number" id="faltasInjustificadas2" name="faltasInjustificadasSegundoTrim"
+                   th:value="${nota.faltasInjustificadasSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="atrasos2" class="block text-xs font-semibold">Atrasos</label>
+            <input type="number" id="atrasos2" name="atrasosSegundoTrim"
+                   th:value="${nota.atrasosSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div class="col-span-2">
+            <label for="comportamiento2" class="block text-xs font-semibold">Comportamiento</label>
+            <input type="text" id="comportamiento2" name="comportamientoSegundoTrim"
+                   th:value="${nota.comportamientoSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="totalAsistencias2" class="block text-xs font-semibold">Total Asistencias</label>
+            <input type="number" id="totalAsistencias2" name="totalAsistenciaSegundoTrim"
+                   th:value="${nota.totalAsistenciaSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
 
     <!-- ======= Tercer Trimestre ======= -->
-    <h3>Tercer Trimestre</h3>
-    <label for="notaNumerica3">Nota Numérica:</label>
-    <input type="number" step="0.01" id="notaNumerica3" name="notaNumericaTercerTrim"
-           th:value="${nota.notaNumericaTercerTrim}" />
+    <h3 class="text-lg font-semibold mt-6">Tercer Trimestre</h3>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label for="notaNumerica3" class="block text-xs font-semibold">Nota Numérica</label>
+            <input type="number" step="0.01" id="notaNumerica3" name="notaNumericaTercerTrim"
+                   th:value="${nota.notaNumericaTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="notaCualitativa3" class="block text-xs font-semibold">Nota Cualitativa</label>
+            <input type="text" id="notaCualitativa3" name="notaCualitativaTercerTrim"
+                   th:value="${nota.notaCualitativaTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="asistencia3" class="block text-xs font-semibold">Asistencias</label>
+            <input type="number" id="asistencia3" name="asistenciaTercerTrim"
+                   th:value="${nota.asistenciaTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="faltasJustificadas3" class="block text-xs font-semibold">Faltas Just.</label>
+            <input type="number" id="faltasJustificadas3" name="faltasJustificadasTercerTrim"
+                   th:value="${nota.faltasJustificadasTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="faltasInjustificadas3" class="block text-xs font-semibold">Faltas Injust.</label>
+            <input type="number" id="faltasInjustificadas3" name="faltasInjustificadasTercerTrim"
+                   th:value="${nota.faltasInjustificadasTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="atrasos3" class="block text-xs font-semibold">Atrasos</label>
+            <input type="number" id="atrasos3" name="atrasosTercerTrim"
+                   th:value="${nota.atrasosTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div class="col-span-2">
+            <label for="comportamiento3" class="block text-xs font-semibold">Comportamiento</label>
+            <input type="text" id="comportamiento3" name="comportamientoTercerTrim"
+                   th:value="${nota.comportamientoTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="totalAsistencias3" class="block text-xs font-semibold">Total Asistencias</label>
+            <input type="number" id="totalAsistencias3" name="totalAsistenciaTercerTrim"
+                   th:value="${nota.totalAsistenciaTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
 
-    <label for="notaCualitativa3">Nota Cualitativa:</label>
-    <input type="text" id="notaCualitativa3" name="notaCualitativaTercerTrim"
-           th:value="${nota.notaCualitativaTercerTrim}" />
-
-    <label for="asistencia3">Asistencias:</label>
-    <input type="number" id="asistencia3" name="asistenciaTercerTrim"
-           th:value="${nota.asistenciaTercerTrim}" />
-
-    <label for="faltasJustificadas3">Faltas Justificadas:</label>
-    <input type="number" id="faltasJustificadas3" name="faltasJustificadasTercerTrim"
-           th:value="${nota.faltasJustificadasTercerTrim}" />
-
-    <label for="faltasInjustificadas3">Faltas Injustificadas:</label>
-    <input type="number" id="faltasInjustificadas3" name="faltasInjustificadasTercerTrim"
-           th:value="${nota.faltasInjustificadasTercerTrim}" />
-
-    <label for="atrasos3">Atrasos:</label>
-    <input type="number" id="atrasos3" name="atrasosTercerTrim"
-           th:value="${nota.atrasosTercerTrim}" />
-
-    <label for="comportamiento3">Comportamiento:</label>
-    <input type="text" id="comportamiento3" name="comportamientoTercerTrim"
-           th:value="${nota.comportamientoTercerTrim}" />
+    <!-- ======= Comportamiento Final por Curso ======= -->
+    <h3 class="text-lg font-semibold mt-6">Comportamiento Final (por Curso)</h3>
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label for="comportamientoFinal1" class="block text-xs font-semibold">Comportamiento Final 1</label>
+            <input type="text" id="comportamientoFinal1" name="comportamientoFinalVariable1"
+                   th:value="${nota.comportamientoFinalVariable1}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="comportamientoFinal2" class="block text-xs font-semibold">Comportamiento Final 2</label>
+            <input type="text" id="comportamientoFinal2" name="comportamientoFinalVariable2"
+                   th:value="${nota.comportamientoFinalVariable2}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="comportamientoFinal3" class="block text-xs font-semibold">Comportamiento Final 3</label>
+            <input type="text" id="comportamientoFinal3" name="comportamientoFinalVariable3"
+                   th:value="${nota.comportamientoFinalVariable3}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
 
 
-    <br><br>
-    <button type="submit"
-            th:text="${nota.idNota != null ? 'Actualizar' : 'Guardar'}">
-        Guardar
-    </button>
+    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="pt-6">
+        <button type="submit"
+                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded">
+            <span th:text="${nota.idNota != null ? 'Actualizar' : 'Guardar'}">Guardar</span>
+        </button>
+    </div>
+
+
 </form>
+
+<!-- Aquí los scripts quedan igual -->
+
+<script th:inline="javascript">
+    const isEdit = /*[[${nota.idNota != null}]]*/ false;
+      document.addEventListener('DOMContentLoaded', function() {
+        const periodoSelect = document.getElementById('periodoSelect');
+        const cursoSelect = document.getElementById('cursoSelect');
+        const materiaSelect = document.getElementById('areaMateria');
+        const estudianteSelect = document.getElementById('cedulaEstudiante');
+        const materiaNombreHidden = document.getElementById('materiaNombreHidden');
+
+        // Guardamos todas las opciones de curso (excepto la primera vacía)
+        const allCursoOptions = Array.from(cursoSelect.querySelectorAll('option[data-periodo-id]'));
+
+        // Inicialmente limpiamos cursos, materias y estudiantes para que no muestren nada (solo opción vacía)
+        cursoSelect.innerHTML = '<option value="">-- Seleccione un curso --</option>';
+        materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
+        estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+
+        // Cuando cambie Periodo Académico
+        periodoSelect.addEventListener('change', function () {
+          const periodoId = this.value;
+
+          // Limpiar cursos, materias y estudiantes
+if (!isEdit) {
+    cursoSelect.innerHTML = '<option value="">-- Seleccione un curso --</option>';
+    materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
+    estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+}
+
+          if (!periodoId) return; // Si no hay periodo seleccionado no mostrar cursos
+
+          // Mostrar solo cursos que coinciden con el periodo seleccionado
+          allCursoOptions.forEach(option => {
+            if (option.getAttribute('data-periodo-id') === periodoId) {
+              cursoSelect.appendChild(option);
+            }
+          });
+        });
+
+        // Cuando cambie Curso
+        cursoSelect.addEventListener('change', function() {
+          const cursoId = this.value;
+
+          materiaSelect.innerHTML = '<option value="" data-nombre="">-- Seleccione una materia --</option>';
+          estudianteSelect.innerHTML = '<option value="">-- Seleccione un estudiante --</option>';
+          materiaNombreHidden.value = '';
+
+          if (!cursoId) return; // Si no hay curso seleccionado, no cargamos materias ni estudiantes
+
+          // Cargar materias vía fetch
+          fetch(`/pages/Admin/${cursoId}/materias`)
+            .then(res => {
+              if (!res.ok) throw new Error('Error al consultar materias');
+              return res.json();
+            })
+            .then(data => {
+              data.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.dataset.nombre = m.nombre;
+                opt.textContent = m.nombre;
+                materiaSelect.appendChild(opt);
+              });
+            })
+            .catch(err => {
+              console.error(err);
+              materiaSelect.innerHTML = '<option value="" data-nombre="">(Error cargando materias)</option>';
+            });
+
+          // Cargar estudiantes vía fetch
+          fetch(`/pages/Admin/cursos/${cursoId}/estudiantes`)
+            .then(res => {
+              if (!res.ok) throw new Error('Error al consultar estudiantes');
+              return res.json();
+            })
+            .then(data => {
+              data.forEach(e => {
+                const opt = document.createElement('option');
+                opt.value = e.cedula;
+                opt.textContent = e.cedula + ' - ' + (e.nombreCompleto || '');
+                estudianteSelect.appendChild(opt);
+              });
+            })
+            .catch(err => {
+              console.error(err);
+              estudianteSelect.innerHTML = '<option value="">(Error cargando estudiantes)</option>';
+            });
+        });
+
+        // Cuando cambia la materia, actualizar campo oculto con nombre
+        materiaSelect.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          if (selectedOption) {
+            materiaNombreHidden.value = selectedOption.dataset.nombre || '';
+          } else {
+            materiaNombreHidden.value = '';
+          }
+        });
+
+        // Si estás editando y ya tienes valores, dispara los eventos para cargar selects dependientes
+        if (periodoSelect.value) {
+          periodoSelect.dispatchEvent(new Event('change'));
+
+          // Esperar un poco para cargar cursos y luego setear curso seleccionado
+          setTimeout(() => {
+            if ('[[${nota.cursoId}]]' !== '') {
+              cursoSelect.value = '[[${nota.cursoId}]]';
+              cursoSelect.dispatchEvent(new Event('change'));
+
+              // Si tienes materiaId para setear
+              setTimeout(() => {
+                if ('[[${nota.materiaId}]]' !== '') {
+                  materiaSelect.value = '[[${nota.materiaId}]]';
+                  materiaNombreHidden.value = materiaSelect.options[materiaSelect.selectedIndex]?.dataset.nombre || '';
+                }
+              }, 500);
+            }
+          }, 500);
+        }
+      });
+</script>
+
+<script th:inline="javascript">
+    const exito = /*[[${exito}]]*/ null;
+    const error = /*[[${error}]]*/ null;
+    if (exito) { alert(exito); }
+    if (error) { alert(error); }
+</script>
 
 </body>
 </html>

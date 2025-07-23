@@ -30,5 +30,10 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
 
     List<Estudiante> findByVisibleTrueAndNivelEducativoNombre(String nombreNivel);
 
+    List<Estudiante> findByCursos_Id(Long cursoId);
+
+    List<Estudiante> findDistinctByCursos_NombreIgnoreCase(String nombreCurso);
+
+    Optional<Estudiante> findByEmail(String email);
 
 }

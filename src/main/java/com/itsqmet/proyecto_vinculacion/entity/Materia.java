@@ -1,6 +1,9 @@
 package com.itsqmet.proyecto_vinculacion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +14,8 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Materia {
 
     @Id
@@ -18,6 +23,9 @@ public class Materia {
     private Long id;
 
     private String nombre;
+
+    @Column(name = "tipo_materia")
+    private String tipoMateria;
 
     /* Docente responsable (opcional). */
     @ManyToOne(fetch = FetchType.LAZY)
