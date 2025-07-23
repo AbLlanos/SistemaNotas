@@ -83,6 +83,26 @@
                 </select>
             </div>
 
+
+            <!-- Periodo Académico -->
+            <div>
+                <label for="periodoSelect" class="block text-sm font-semibold text-gray-700 mb-1">Seleccione el Periodo Académico</label>
+                <select id="periodoSelect" th:field="*{periodoAcademico.id}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                    <option value="">-- Seleccione periodo --</option>
+                    <option th:each="per : ${periodos}"
+                            th:value="${per.id}"
+                            th:text="${per.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Visible -->
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="visible" th:field="*{visible}" class="h-4 w-4 border-gray-300 rounded">
+                <label for="visible" class="text-sm text-gray-700">¿Visible?</label>
+            </div>
+
             <div class="pt-6">
                 <button type="submit" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                     Guardar Materia

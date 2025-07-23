@@ -37,14 +37,28 @@ public class CursoController {
     @GetMapping("/pages/Admin/cursoVista")
     public String mostrarCursoVista(@RequestParam(value = "nombre", required = false) String nombre,
                                     @RequestParam(value = "nivelEducativo", required = false) Long nivelId,
-                                    @RequestParam(value = "periodoId", required = false) Long periodoId, // NUEVO
+                                    @RequestParam(value = "periodoId", required = false) Long periodoId,
+                                    @RequestParam(value = "mostrarOcultos", required = false, defaultValue = "false") boolean mostrarOcultos,
                                     Model model) {
 
-        // filtro avanzado que respeta lo que ya tenías
+        // Obtener cursos filtrados por nombre, periodo y nivel
         List<Curso> cursos = cursoService.filtrarCursosAvanzado(nombre, periodoId, nivelId);
 
+        // Filtrar cursos según visibilidad del periodo (solo mostrar cursos con periodo visible)
+        if (!mostrarOcultos) {
+            cursos = cursos.stream()
+                    .filter(c -> c.getPeriodoAcademico() != null && Boolean.TRUE.equals(c.getPeriodoAcademico().getVisible()))
+                    .toList();
+        }
+
+        // Listar todos los niveles educativos
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
-        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos();
+
+        // Listar solo periodos académicos visibles
+        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
+                .stream()
+                .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+                .toList();
 
         model.addAttribute("cursos", cursos);
         model.addAttribute("niveles", niveles);
@@ -54,13 +68,14 @@ public class CursoController {
         model.addAttribute("paramNombre", nombre);
         model.addAttribute("paramNivelId", nivelId);
         model.addAttribute("paramPeriodoId", periodoId);
+        model.addAttribute("mostrarOcultos", mostrarOcultos);
 
         return "pages/Admin/cursoVista";
     }
 
-    // ------------------------------------------------------------
-    // 2. Formulario nuevo curso (con filtrado opcional por nivel)
-    // ------------------------------------------------------------
+// ------------------------------------------------------------
+// 2. Formulario nuevo curso (con filtrado opcional por nivel)
+// ------------------------------------------------------------
 
     @GetMapping("/pages/Admin/cursoForm")
     public String mostrarCursoForm(
@@ -69,18 +84,33 @@ public class CursoController {
             Model model) {
 
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
-        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos();
+
+        // Solo periodos académicos visibles
+        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
+                .stream()
+                .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+                .toList();
 
         List<Materia> materias;
         List<Estudiante> estudiantes;
 
         if (nivelId != null) {
-            materias = materiaService.listarPorNivelId(nivelId);
-            // Cambiar a listar solo visibles en ese nivel
+            // Listar materias por nivel que sean visibles
+            materias = materiaService.listarPorNivelId(nivelId)
+                    .stream()
+                    .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                    .toList();
+
+            // Listar solo estudiantes visibles por nivel
             estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
         } else {
-            materias = materiaService.listarTodasMaterias();
-            // Cambiar a listar solo visibles (sin filtro de nivel)
+            // Listar todas las materias visibles (crea este método si no existe)
+            materias = materiaService.listarTodasMaterias()
+                    .stream()
+                    .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                    .toList();
+
+            // Listar solo estudiantes visibles sin filtro de nivel
             estudiantes = estudianteService.listarVisibles();
         }
 
@@ -90,13 +120,10 @@ public class CursoController {
         model.addAttribute("estudiantes", estudiantes);
         model.addAttribute("nivelSeleccionado", nivelId);
         model.addAttribute("periodoSeleccionado", periodoId);
-        model.addAttribute("curso", new Curso()); // curso vacío para crear nuevo
+        model.addAttribute("curso", new Curso());
 
         return "pages/Admin/cursoForm";
     }
-
-
-
 
     // ----------------------------------------
 // Mostrar formulario para editar curso
@@ -116,7 +143,12 @@ public class CursoController {
         Curso curso = cursoOptional.get();
 
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
-        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos();
+
+        // Solo periodos visibles
+        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
+                .stream()
+                .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+                .toList();
 
         Long nivelId = (overrideNivelId != null)
                 ? overrideNivelId
@@ -124,9 +156,13 @@ public class CursoController {
 
         model.addAttribute("nivelSeleccionado", nivelId);
 
-        List<Materia> materias = materiaService.listarPorNivelId(nivelId);
+        // Listar materias visibles por nivel
+        List<Materia> materias = materiaService.listarPorNivelId(nivelId)
+                .stream()
+                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                .toList();
 
-        // También cambiar a estudiantes visibles para ese nivel
+        // Listar estudiantes visibles por nivel
         List<Estudiante> estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
 
         model.addAttribute("niveles", niveles);

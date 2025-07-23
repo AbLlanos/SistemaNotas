@@ -45,6 +45,17 @@
         <!-- FILTROS -->
         <div class="px-6 pb-6 bg-gray-50 rounded-b-xl border-t border-gray-100 pt-6">
             <form method="get" action="/pages/Admin/Bachillerato/bachilleratoVista" id="formFiltros" class="space-y-6">
+
+                <div th:if="${exito}"
+                     class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded shadow">
+                    <span th:text="${exito}"></span>
+                </div>
+
+                <div th:if="${error}"
+                     class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded shadow">
+                    <span th:text="${error}"></span>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Periodo -->
                     <div>
@@ -101,6 +112,16 @@
                             <option th:each="tri : ${trimestres}" th:value="${tri}" th:text="${tri}" th:selected="${tri == param.nombreTrimestre}"></option>
                         </select>
                     </div>
+                </div>
+
+                <!-- NUEVO -->
+                <div class="flex items-center mt-4">
+                    <label class="inline-flex items-center space-x-2">
+                        <input type="checkbox" name="mostrarOcultos"
+                               class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               th:checked="${mostrarOcultos}" />
+                        <span class="text-sm text-gray-700">Mostrar estudiantes ocultos</span>
+                    </label>
                 </div>
 
                 <div class="flex justify-center pt-4 gap-4">
@@ -228,12 +249,13 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex items-center justify-center space-x-3">
                                 <a th:href="@{/pages/Admin/notas/editar/{id}(id=${nota.idNota})}" class="text-blue-600 hover:text-blue-800">Editar</a>
-                                <!-- Eliminar -->
-                                <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
+                                <!-- Eliminar
+                                                               <form th:action="@{'/notas/eliminar/' + ${nota.idNota}}" method="post" onsubmit="return confirm('¿Estás seguro de eliminar esta nota? Esta acción es irreversible.')">
                                     <button type="submit" class="text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
                                         <i class="fas fa-trash-alt"></i> Eliminar
                                     </button>
-                                </form>
+                                </form>-->
+
                                 <!-- PDF fila (usa params actuales en server; opción rápida) -->
                                 <div class="flex flex-col space-y-1">
                                     <a th:href="@{/pages/Admin/admin/generar-pdf(idNota=${nota.idNota}, periodo=${param.nombrePeriodo}, curso=${param.nombreCurso}, materia=${param.nombreMateria}, cedula=${param.cedula}, trimestre='Primer Trimestre')}" target="_blank" class="inline-flex items-center px-2 py-1 bg-red-600 text-white text-xs font-bold rounded hover:bg-red-700">1er Trim</a>

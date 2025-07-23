@@ -18,18 +18,42 @@ public class PeriodoController {
 
     // 1. Vista general con filtro opcional
     @GetMapping("/periodoAcademicoVista")
-    public String mostrarPeriodoAcademicoVista(@RequestParam(required = false) String nombre, Model model) {
-        List<PeriodoAcademico> periodos;
+    public String mostrarPeriodoAcademicoVista(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false, defaultValue = "false") boolean mostrarOcultos,
+            Model model) {
+
+        List<PeriodoAcademico> periodos = periodoService.listarTodosPeriodosAcademicos();
+
+        // Filtro por nombre
         if (nombre != null && !nombre.isEmpty()) {
-            periodos = periodoService.listarTodosPeriodosAcademicos().stream()
+            periodos = periodos.stream()
                     .filter(p -> p.getNombre().toLowerCase().contains(nombre.toLowerCase()))
                     .toList();
-        } else {
-            periodos = periodoService.listarTodosPeriodosAcademicos();
         }
+
+        // Filtrar solo visibles si mostrarOcultos = false
+        if (!mostrarOcultos) {
+            periodos = periodos.stream()
+                    .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+                    .toList();
+        }
+
         model.addAttribute("periodos", periodos);
-        model.addAttribute("param", nombre);
+        model.addAttribute("paramNombre", nombre);
+        model.addAttribute("mostrarOcultos", mostrarOcultos);
         return "pages/Admin/periodoAcademicoVista";
+    }
+
+    // Cambiar visibilidad
+    @GetMapping("/togglePeriodo/{id}")
+    public String toggleVisibilidad(@PathVariable Long id) {
+        PeriodoAcademico periodo = periodoService.buscarPorId(id);
+        if (periodo != null) {
+            periodo.setVisible(!Boolean.TRUE.equals(periodo.getVisible()));
+            periodoService.guardar(periodo);
+        }
+        return "redirect:/pages/Admin/periodoAcademicoVista";
     }
 
     // 2. Mostrar formulario para crear
