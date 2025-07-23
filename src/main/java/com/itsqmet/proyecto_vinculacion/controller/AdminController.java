@@ -315,30 +315,21 @@ public class AdminController {
 
         model.addAttribute("nota", notaCompletaDTO);
 
-        // Listas auxiliares
+        // Listas auxiliares para selects
         model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
-        System.out.println("DEBUG: Total estudiantes = " + estudianteService.listarTodosEstudiantes().size());
-
         model.addAttribute("materias", materiaService.listarTodasMaterias());
-        System.out.println("DEBUG: Total materias = " + materiaService.listarTodasMaterias().size());
-
         model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        System.out.println("DEBUG: Total periodos = " + periodoAcademicoService.listarTodosPeriodosAcademicos().size());
-
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        System.out.println("DEBUG: Total trimestres = " + trimestreService.listarTodosPeriodos().size());
 
+        // Cargar cursos filtrados por PeriodoAcademicoId si existe, o todos si no
         if (notaCompletaDTO.getPeriodoAcademicoId() != null) {
-            System.out.println("DEBUG: Cargando cursos para periodo ID = " + notaCompletaDTO.getPeriodoAcademicoId());
             model.addAttribute("cursos", cursoService.obtenerCursosPorPeriodoID(notaCompletaDTO.getPeriodoAcademicoId()));
         } else {
-            System.out.println("DEBUG: No hay PeriodoAcademicoId, listando todos los cursos.");
             model.addAttribute("cursos", cursoService.listarTodosCursos());
         }
 
         return "pages/Admin/Bachillerato/bachilleratoForm";
     }
-
 
 
 
