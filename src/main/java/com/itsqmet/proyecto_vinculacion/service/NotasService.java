@@ -142,9 +142,10 @@ public class NotasService {
                 nuevoDto.setAreaMateria(n.getMateria() != null ? n.getMateria().getNombre() : "---");
 
 // Obtener el primer curso del estudiante, si existe
+// Obtener el primer curso asociado a la materia
                 String nombreCursoEstudiante = "---";
-                if (n.getEstudiante() != null && n.getEstudiante().getCursos() != null && !n.getEstudiante().getCursos().isEmpty()) {
-                    nombreCursoEstudiante = n.getEstudiante().getCursos().get(0).getNombre();
+                if (n.getMateria() != null && n.getMateria().getCursos() != null && !n.getMateria().getCursos().isEmpty()) {
+                    nombreCursoEstudiante = n.getMateria().getCursos().iterator().next().getNombre();
                 }
                 nuevoDto.setNombreCurso(nombreCursoEstudiante);
 
