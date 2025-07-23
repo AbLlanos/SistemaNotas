@@ -194,7 +194,7 @@ public class AdminController {
             Model model) {
 
         // Nivel esperado (sin espacios y en minúsculas para comparar)
-        String nivelFiltro = "BachilleratoGeneral";
+        String nivelFiltro = "bachilleratogeneral";
 
         // Filtrar cursos SOLO por Bachillerato General
         List<Curso> cursos = cursoService.listarTodosCursos().stream()
@@ -297,7 +297,7 @@ public class AdminController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al guardar las notas: " + e.getMessage());
         }
-        return "pages/Admin/Bachillerato/bachilleratoForm";
+        return "redirect:/pages/Admin/Bachillerato/bachilleratoVista";
     }
 
     @GetMapping("/notas/editar/{id}")

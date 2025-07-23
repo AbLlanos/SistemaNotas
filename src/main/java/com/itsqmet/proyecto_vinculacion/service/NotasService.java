@@ -380,6 +380,7 @@ public class NotasService {
                 curso  // PASAMOS EL CURSO AQUÍ
         );
 
+
         upsertNotaYRelacionados(
                 estudiante, materia, periodo, t3,
                 form.getNotaNumericaTercerTrim(), form.getNotaCualitativaTercerTrim(),
@@ -403,6 +404,15 @@ public class NotasService {
                     form.getComportamientoFinalVariable1(),
                     form.getComportamientoFinalVariable2(),
                     form.getComportamientoFinalVariable3()
+            );
+
+            upsertAsistencia(
+                    estudiante, materia, periodo, t1,
+                    form.getAsistenciaPrimerTrim(),
+                    form.getFaltasJustificadasPrimerTrim(),
+                    form.getFaltasInjustificadasPrimerTrim(),
+                    form.getAtrasosPrimerTrim(),
+                    form.getTotalAsistenciaPrimerTrim()
             );
         }
     }
@@ -431,14 +441,32 @@ public class NotasService {
         // ** Asignamos el curso aquí **
         nota.setCurso(curso);
 
-        // Aquí podrías setear otros campos como asistencia, faltas, comportamiento, total asistencia
-        // ejemplo:
-        // nota.setAsistencia(asistencia);
-        // nota.setFaltasJustificadas(faltasJustificadas);
-        // ...
-
         // Guarda o actualiza la nota
         notasRepository.save(nota);
+    }
+
+
+    private void upsertAsistencia(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
+                                  Trimestre trimestre, Integer asistencias,
+                                  Integer faltasJustificadas, Integer faltasInjustificadas,
+                                  Integer atrasos, Integer totalAsistencias) {
+
+        Optional<Asistencia> optAsistencia = asistenciaRepository.findByEstudianteAndMateriaAndPeriodoAndTrimestre(
+                estudiante, materia, periodo, trimestre);
+
+        Asistencia asistencia = optAsistencia.orElse(new Asistencia());
+        asistencia.setEstudiante(estudiante);
+        asistencia.setMateria(materia);
+        asistencia.setPeriodo(periodo);
+        asistencia.setTrimestre(trimestre);
+
+        asistencia.setAsistencias(asistencias != null ? asistencias : 0);
+        asistencia.setFaltasJustificadas(faltasJustificadas != null ? faltasJustificadas : 0);
+        asistencia.setFaltasInjustificadas(faltasInjustificadas != null ? faltasInjustificadas : 0);
+        asistencia.setAtrasos(atrasos != null ? atrasos : 0);
+        asistencia.setTotalAsistencias(totalAsistencias != null ? totalAsistencias : 0);
+
+        asistenciaRepository.save(asistencia);
     }
 
 
