@@ -140,5 +140,8 @@ public class CursoService {
                 .orElse(null);
     }
 
+    public List<Curso> obtenerCursosPorPeriodoVisible(String nombrePeriodo) {
+        return cursoRepository.findByPeriodoAcademicoNombreAndPeriodoAcademicoVisibleTrue(nombrePeriodo);
+    }
 
 }

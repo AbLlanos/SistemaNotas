@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pages/Admin")
@@ -292,16 +293,11 @@ public class BachilleratoGeneralController {
     @GetMapping("/periodo/{nombrePeriodo}/cursos")
     @ResponseBody
     public List<CursoDTO> listarCursosPorPeriodoFiltrados(@PathVariable String nombrePeriodo) {
-        String nivelFiltro = "BachilleratoGeneral";
-
-        List<Curso> cursosPorPeriodo = cursoService.obtenerCursosPorPeriodo(nombrePeriodo);
-
-        return cursosPorPeriodo.stream()
-                .filter(c -> c.getNivelEducativo() != null
-                        && c.getNivelEducativo().getNombre() != null
-                        && c.getNivelEducativo().getNombre().equalsIgnoreCase(nivelFiltro))
-                .map(c -> new CursoDTO(c.getId(), c.getNombre()))
-                .toList();
+        System.out.println("📥 Entrando a listarCursosPorPeriodoFiltrados con periodo: " + nombrePeriodo);
+        return cursoService.obtenerCursosPorPeriodoVisible(nombrePeriodo)
+                .stream()
+                .map(curso -> new CursoDTO(curso.getId(), curso.getNombre()))
+                .collect(Collectors.toList());
     }
 
 

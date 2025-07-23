@@ -40,4 +40,5 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     Optional<Curso> findByPeriodoAcademicoAndNombre(PeriodoAcademico periodo, String nombre);
 
+    List<Curso> findByPeriodoAcademicoNombreAndPeriodoAcademicoVisibleTrue(String nombrePeriodo);
 }
