@@ -107,19 +107,9 @@ public class EstudianteController {
             RedirectAttributes redirectAttributes) {
 
         estudiante.setRol("ESTUDIANTE");
-
-        // Validación de campos
-        if (result.hasErrors()) {
-            model.addAttribute("niveles", nivelEducativoService.listarTodos());
-            model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
-            model.addAttribute("nivelSeleccionado", nivelId);
-            return "pages/Admin/estudianteForm";
-        }
-
-        // Verifica si es edición
         boolean esEdicion = estudiante.getId() != null;
 
-        // Validación de unicidad con control para edición
+        // Validación de email duplicado
         Optional<Estudiante> estudiantePorEmail = estudianteService.buscarPorEmail(estudiante.getEmail());
         if (estudiantePorEmail.isPresent()) {
             Estudiante otro = estudiantePorEmail.get();
@@ -128,6 +118,7 @@ public class EstudianteController {
             }
         }
 
+        // Validación de cédula duplicada
         Optional<Estudiante> estudiantePorCedula = estudianteService.buscarOptionalPorCedula(estudiante.getCedula());
         if (estudiantePorCedula.isPresent()) {
             Estudiante otro = estudiantePorCedula.get();
@@ -136,6 +127,7 @@ public class EstudianteController {
             }
         }
 
+        // Validación de otros errores
         if (result.hasErrors()) {
             model.addAttribute("niveles", nivelEducativoService.listarTodos());
             model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
@@ -144,12 +136,9 @@ public class EstudianteController {
         }
 
         // Asignar nivel
-        if (nivelId != null) {
-            NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null);
-            estudiante.setNivelEducativo(nivel);
-        } else {
-            estudiante.setNivelEducativo(null);
-        }
+        estudiante.setNivelEducativo(nivelId != null
+                ? nivelEducativoService.buscarNivelPorId(nivelId).orElse(null)
+                : null);
 
         // Asignar cursos
         if (cursosIds == null) cursosIds = Collections.emptyList();
@@ -157,9 +146,7 @@ public class EstudianteController {
         estudiante.setCursos(cursos);
 
         for (Curso curso : cursos) {
-            if (curso.getEstudiantes() == null) {
-                curso.setEstudiantes(new ArrayList<>());
-            }
+            if (curso.getEstudiantes() == null) curso.setEstudiantes(new ArrayList<>());
             if (!curso.getEstudiantes().contains(estudiante)) {
                 curso.getEstudiantes().add(estudiante);
             }

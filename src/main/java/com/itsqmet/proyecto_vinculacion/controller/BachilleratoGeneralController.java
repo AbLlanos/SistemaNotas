@@ -109,10 +109,12 @@ public class BachilleratoGeneralController {
                 nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
         );
 
-        // Filtrar notas para que solo aparezcan estudiantes visibles si mostrarOcultos == false
+        // 🔽 Filtrar estudiantes según visibilidad y nivel educativo
         if (!mostrarOcultos) {
-            List<String> cedulasVisibles = estudianteService.listarVisibles()
-                    .stream()
+            List<String> cedulasVisibles = estudianteService.listarVisibles().stream()
+                    .filter(e -> e.getNivelEducativo() != null &&
+                            e.getNivelEducativo().getNombre() != null &&
+                            e.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
                     .map(Estudiante::getCedula)
                     .toList();
 
@@ -150,7 +152,7 @@ public class BachilleratoGeneralController {
         model.addAttribute("materias", materiaService.listarTodasMaterias());
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
 
-        // Filtrar cursos por Bachillerato General también aquí
+        //MODIFICAR
         String nivelFiltro = "bachilleratogeneral";
         List<Curso> cursosBachillerato = cursoService.listarTodosCursos().stream()
                 .filter(c -> {
@@ -294,10 +296,19 @@ public class BachilleratoGeneralController {
     @ResponseBody
     public List<CursoDTO> listarCursosPorPeriodoFiltrados(@PathVariable String nombrePeriodo) {
         System.out.println("📥 Entrando a listarCursosPorPeriodoFiltrados con periodo: " + nombrePeriodo);
-        return cursoService.obtenerCursosPorPeriodoVisible(nombrePeriodo)
-                .stream()
+
+        List<Curso> cursos = cursoService.obtenerCursosPorPeriodoVisible(nombrePeriodo);
+        System.out.println("📦 Cursos totales encontrados: " + cursos.size());
+
+        List<CursoDTO> cursosFiltrados = cursos.stream()
+                .filter(curso -> curso.getNivelEducativo() != null &&
+                        //MODIFICAR
+                        "Bachillerato General".equals(curso.getNivelEducativo().getNombre()))
                 .map(curso -> new CursoDTO(curso.getId(), curso.getNombre()))
                 .collect(Collectors.toList());
+
+        System.out.println("🎯 Cursos filtrados: " + cursosFiltrados.size());
+        return cursosFiltrados;
     }
 
 
