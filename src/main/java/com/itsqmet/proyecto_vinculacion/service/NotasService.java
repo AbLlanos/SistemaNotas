@@ -119,7 +119,10 @@ public class NotasService {
                 // Datos del estudiante
                 if (n.getEstudiante() != null) {
                     nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
-                    nuevoDto.setNombreCompletoEstudiante(n.getEstudiante().getNombre());
+                    nuevoDto.setNombreCompletoEstudiante(
+                            (n.getEstudiante().getNombre() != null ? n.getEstudiante().getNombre() : "") + " " +
+                                    (n.getEstudiante().getApellido() != null ? n.getEstudiante().getApellido() : "")
+                                            .trim());
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
                     nuevoDto.setNombreCompletoEstudiante("---");

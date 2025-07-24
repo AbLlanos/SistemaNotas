@@ -220,7 +220,6 @@ public class BachilleratoGeneralController {
 
 
 
-
     @GetMapping("/admin/reporte-notas")
     public void generarReporteNotas(
             @RequestParam(value = "cedula", required = false) String cedula,
@@ -230,27 +229,21 @@ public class BachilleratoGeneralController {
             HttpServletResponse response
     ) throws IOException {
 
-        // Obtén la lista completa de notas con filtro periodo, curso y cédula
         List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
 
         if (notas.isEmpty()) {
-            // Manejar caso sin datos, tal vez lanzar excepción o enviar PDF vacío
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "No se encontraron notas para los filtros indicados.");
             return;
         }
 
-        // Extrae nombre del estudiante del primer registro (asumimos que es el mismo para todas las notas)
-        String nombreEstudiante = notas.get(0).getNombreEstudiante();
+        // Usar nombre completo, no solo nombre
+        String nombreEstudiante = notas.get(0).getNombreCompletoEstudiante();
 
-        // Configura respuesta HTTP para PDF en línea
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "inline; filename=reporte-notas.pdf");
 
-        // Llama al servicio que genera el PDF y escribe en el output stream de la respuesta HTTP
         pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
     }
-
-
     //Rutas generales
 
     @GetMapping("/{cursoId}/materias")
