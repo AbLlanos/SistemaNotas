@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PDFGeneratorService {
@@ -100,6 +101,17 @@ public class PDFGeneratorService {
 
 
 
+
+
+
+
+
+
+
+    private boolean esComplementaria(NotaCompletaDTO dto) {
+        return dto.getTipoMateria() != null && dto.getTipoMateria().equalsIgnoreCase("complementaria");
+    }
+
     public void generarReporteNotas(
             String nombreEstudiante,
             String periodo,
@@ -121,91 +133,122 @@ public class PDFGeneratorService {
         document.add(new Paragraph("Año Lectivo: " + (periodo != null ? periodo : "---")));
         document.add(new Paragraph("\n"));
 
-        /* =======================================================================
-         * TABLA PRINCIPAL: NOTAS / CUALITATIVAS
-         * ======================================================================= */
-        // Materia + 6 columnas (Nota/Cuali x 3 trimestres)
-        float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f}; // Suma ≈100
-        Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
+        // Separar notas regulares y complementarias
+        List<NotaCompletaDTO> notasRegular = notas.stream()
+                .filter(n -> !esComplementaria(n))
+                .collect(Collectors.toList());
 
-        // --- Cabecera ---
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
-        tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
+        List<NotaCompletaDTO> notasComplementarias = notas.stream()
+                .filter(this::esComplementaria)
+                .collect(Collectors.toList());
 
-        // Acumuladores para promedios numéricos
-        double sumaNota1T = 0; int countNota1T = 0;
-        double sumaNota2T = 0; int countNota2T = 0;
-        double sumaNota3T = 0; int countNota3T = 0;
+        // ======== Tabla Notas Regulares ========
+        if (!notasRegular.isEmpty()) {
+            float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f}; // Suma ≈100
+            Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
 
-        for (NotaCompletaDTO dto : notas) {
-            // Materia
-            tablaNotas.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
+            // --- Cabecera ---
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
 
-            // Notas y cualitativas
-            boolean show1T = mostrarColumna("Primer Trimestre", trimestreSeleccionado);
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+            // Acumuladores para promedios numéricos
+            double sumaNota1T = 0; int countNota1T = 0;
+            double sumaNota2T = 0; int countNota2T = 0;
+            double sumaNota3T = 0; int countNota3T = 0;
 
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+            for (NotaCompletaDTO dto : notasRegular) {
+                tablaNotas.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
 
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
 
-            // Acumular promedios
-            if (show1T && dto.getNotaNumericaPrimerTrim() != null) {
-                sumaNota1T += dto.getNotaNumericaPrimerTrim();
-                countNota1T++;
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+
+                // Acumular para promedio
+                if (mostrarColumna("Primer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaPrimerTrim() != null) {
+                    sumaNota1T += dto.getNotaNumericaPrimerTrim();
+                    countNota1T++;
+                }
+                if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado) && dto.getNotaNumericaSegundoTrim() != null) {
+                    sumaNota2T += dto.getNotaNumericaSegundoTrim();
+                    countNota2T++;
+                }
+                if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaTercerTrim() != null) {
+                    sumaNota3T += dto.getNotaNumericaTercerTrim();
+                    countNota3T++;
+                }
             }
-            boolean show2T = mostrarColumna("Segundo Trimestre", trimestreSeleccionado);
-            if (show2T && dto.getNotaNumericaSegundoTrim() != null) {
-                sumaNota2T += dto.getNotaNumericaSegundoTrim();
-                countNota2T++;
+
+            // Fila de Promedios
+            tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold()));
+
+            if (mostrarColumna("Primer Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
             }
-            boolean show3T = mostrarColumna("Tercer Trimestre", trimestreSeleccionado);
-            if (show3T && dto.getNotaNumericaTercerTrim() != null) {
-                sumaNota3T += dto.getNotaNumericaTercerTrim();
-                countNota3T++;
+
+            if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
             }
+
+            if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
+            }
+
+            document.add(tablaNotas);
+            document.add(new Paragraph("\n"));
         }
 
-        /* ---------------- Fila de Promedios ---------------- */
-        tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold()));
+        // ======== Tabla Notas Complementarias ========
+        if (!notasComplementarias.isEmpty()) {
+            document.add(new Paragraph("Materias Complementarias").setBold().setFontSize(14));
+            float[] columnWidthsComp = {28f, 12f, 12f, 12f, 12f, 12f, 12f};
+            Table tablaComp = new Table(UnitValue.createPercentArray(columnWidthsComp)).useAllAvailableWidth();
 
-        // Nota/Cuali 1T
-        if (mostrarColumna("Primer Trimestre", trimestreSeleccionado)) {
-            tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));
-            tablaNotas.addCell("--");
-        } else {
-            tablaNotas.addCell("--");
-            tablaNotas.addCell("--");
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
+            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
+
+            for (NotaCompletaDTO dto : notasComplementarias) {
+                tablaComp.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
+
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+            }
+
+            document.add(tablaComp);
+            document.add(new Paragraph("\n"));
         }
-
-        // Nota/Cuali 2T
-        if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado)) {
-            tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));
-            tablaNotas.addCell("--");
-        } else {
-            tablaNotas.addCell("--");
-            tablaNotas.addCell("--");
-        }
-
-        // Nota/Cuali 3T
-        if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado)) {
-            tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));
-            tablaNotas.addCell("--");
-        } else {
-            tablaNotas.addCell("--");
-            tablaNotas.addCell("--");
-        }
-
-        document.add(tablaNotas);
-        document.add(new Paragraph("\n"));
 
         /* =======================================================================
          * TABLA DETALLADA DE ASISTENCIAS + FILA TOTAL POR MATERIA

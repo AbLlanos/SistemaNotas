@@ -115,6 +115,7 @@ public class NotasService {
             NotaCompletaDTO dto = mapaNotas.computeIfAbsent(key, k -> {
                 NotaCompletaDTO nuevoDto = new NotaCompletaDTO();
                 nuevoDto.setIdNota(n.getId());
+                nuevoDto.setTipoMateria(n.getMateria() != null ? n.getMateria().getTipoMateria() : null);
 
                 // Datos del estudiante
                 if (n.getEstudiante() != null) {

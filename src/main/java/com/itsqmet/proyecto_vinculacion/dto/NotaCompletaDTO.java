@@ -11,6 +11,7 @@ public class NotaCompletaDTO {
     // Identificadores de selección desde el formulario
     private Long cursoId;
     private Long materiaId;
+    private String tipoMateria;
 
     private String nombreEstudiante;
     private String cedulaEstudiante;
