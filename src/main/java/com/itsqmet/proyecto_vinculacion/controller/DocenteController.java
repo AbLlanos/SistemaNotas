@@ -27,7 +27,8 @@ public class DocenteController {
     public String mostrarDocenteVista(
             Model model,
             @RequestParam(name = "nombre", required = false) String nombre,
-            @RequestParam(name = "cedula", required = false) String cedula) {
+            @RequestParam(name = "cedula", required = false) String cedula,
+            @RequestParam(name = "mostrarOcultos", required = false, defaultValue = "false") boolean mostrarOcultos) {
 
         List<Docente> docentes;
 
@@ -41,7 +42,16 @@ public class DocenteController {
             docentes = docenteService.buscarPorNombreYCedula(nombre, cedula);
         }
 
+        if (!mostrarOcultos) {
+            docentes = docentes.stream()
+                    .filter(d -> Boolean.TRUE.equals(d.getVisible()))
+                    .toList();
+        }
+
         model.addAttribute("docentes", docentes);
+        model.addAttribute("paramMostrarOcultos", mostrarOcultos);
+        model.addAttribute("paramNombre", nombre);
+        model.addAttribute("paramCedula", cedula);
         return "pages/Admin/docenteVista";
     }
 

@@ -3,6 +3,7 @@ package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itsqmet.proyecto_vinculacion.entity.Materia;
 import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
+import com.itsqmet.proyecto_vinculacion.repository.MateriaRepository;
 import com.itsqmet.proyecto_vinculacion.repository.PeriodoAcademicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,5 +57,29 @@ public class PeriodoAcademicoService {
     public void eliminarPorId(Long id) {
         periodoAcademicoRepository.deleteById(id);
     }
+
+
+    public List<PeriodoAcademico> listarPeriodosVisibles() {
+        return periodoAcademicoRepository.findByVisibleTrue();
+    }
+
+    @Autowired
+    private MateriaRepository materiaRepository;
+
+
+    public void ocultarPeriodo(Long periodoId) {
+        PeriodoAcademico periodo = periodoAcademicoRepository.findById(periodoId)
+                .orElseThrow(() -> new IllegalArgumentException("Periodo no encontrado"));
+
+        periodo.setVisible(false);
+        periodoAcademicoRepository.save(periodo);
+
+        // Ocultar todas las materias del periodo
+        List<Materia> materias = materiaRepository.findByPeriodoAcademicoId(periodoId);
+        materias.forEach(m -> m.setVisible(false));
+        materiaRepository.saveAll(materias);
+    }
+
+
 }
 

@@ -61,6 +61,30 @@
                         </select>
                     </div>
 
+                    <!-- Periodo Académico -->
+                    <div>
+                        <label for="filtroPeriodo" class="block text-sm font-medium text-gray-700 mb-1">Periodo Académico</label>
+                        <select
+                                id="filtroPeriodo"
+                                name="periodoId"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                            <option value="">Todos</option>
+                            <option th:each="per : ${periodos}"
+                                    th:value="${per.id}"
+                                    th:text="${per.nombre}"
+                                    th:selected="${paramPeriodoId != null} ? (per.id == paramPeriodoId) : false">
+                            </option>
+                        </select>
+                    </div>
+
+
+                    <!-- Mostrar no visibles -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="mostrarOcultos" name="mostrarOcultos"
+                               th:checked="${paramMostrarOcultos}" class="mr-2">
+                        <label for="mostrarOcultos" class="text-sm text-gray-700">Mostrar materias ocultas</label>
+                    </div>
+
                 </div>
 
                 <!-- Botón -->
@@ -84,6 +108,8 @@
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Docente</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Nivel Educativo</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Tipo</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible</th> <!-- Nuevo -->
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Periodo Académico</th> <!-- Nuevo -->
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
             </tr>
             </thead>
@@ -99,11 +125,16 @@
             <tr th:each="mat : ${materias}" class="hover:bg-blue-50" th:unless="${#lists.isEmpty(materias)}">
                 <td class="px-4 py-2" th:text="${mat.id}"></td>
                 <td class="px-4 py-2" th:text="${mat.nombre}"></td>
-                <td class="px-4 py-2"
-                    th:text="${mat.docente != null ? mat.docente.nombre : '---'}"></td>
-                <td class="px-4 py-2"
-                    th:text="${mat.nivelEducativo != null ? mat.nivelEducativo.nombre : '---'}"></td>
+                <td class="px-4 py-2" th:text="${mat.docente != null ? mat.docente.nombre : '---'}"></td>
+                <td class="px-4 py-2" th:text="${mat.nivelEducativo != null ? mat.nivelEducativo.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.tipoMateria != null ? mat.tipoMateria : 'NORMAL'}"></td>
+
+                <!-- Mostrar visible como Sí/No -->
+                <td class="px-4 py-2" th:text="${mat.visible} ? 'Sí' : 'No'"></td>
+
+                <!-- Mostrar Periodo Académico (nombre) -->
+                <td class="px-4 py-2" th:text="${mat.periodoAcademico != null ? mat.periodoAcademico.nombre : '---'}"></td>
+
                 <td class="px-4 py-2 flex space-x-2">
                     <a th:href="@{/pages/Admin/materiaForm/{id}(id=${mat.id})}"
                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
@@ -121,10 +152,6 @@
         <a th:href="@{/pages/Admin/materiaForm}"
            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
             Nueva Materia
-        </a>
-        <a th:href="@{/generar-pdf-materias}"
-           class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow">
-            Generar PDF
         </a>
     </div>
 

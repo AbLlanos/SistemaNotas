@@ -27,6 +27,9 @@ public class Materia {
     @Column(name = "tipo_materia")
     private String tipoMateria;
 
+    @Column(name = "visible")
+    private Boolean visible = true;
+
     /* Docente responsable (opcional). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "docente_id")
@@ -36,6 +39,10 @@ public class Materia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nivel_educativo_id")
     private NivelEducativo nivelEducativo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "periodo_academico_id")
+    private PeriodoAcademico periodoAcademico;
 
     /* Relación inversa: cursos que incluyen esta materia. */
     @ManyToMany(mappedBy = "materias", fetch = FetchType.LAZY)

@@ -115,11 +115,15 @@ public class NotasService {
             NotaCompletaDTO dto = mapaNotas.computeIfAbsent(key, k -> {
                 NotaCompletaDTO nuevoDto = new NotaCompletaDTO();
                 nuevoDto.setIdNota(n.getId());
+                nuevoDto.setTipoMateria(n.getMateria() != null ? n.getMateria().getTipoMateria() : null);
 
                 // Datos del estudiante
                 if (n.getEstudiante() != null) {
                     nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
-                    nuevoDto.setNombreCompletoEstudiante(n.getEstudiante().getNombre());
+                    nuevoDto.setNombreCompletoEstudiante(
+                            (n.getEstudiante().getNombre() != null ? n.getEstudiante().getNombre() : "") + " " +
+                                    (n.getEstudiante().getApellido() != null ? n.getEstudiante().getApellido() : "")
+                                            .trim());
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
                     nuevoDto.setNombreCompletoEstudiante("---");
