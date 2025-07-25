@@ -15,4 +15,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
     //Validar si existe un estudiante por correo
     Optional<Usuario> findByEmail(String email);
 
+    boolean existsByCedula(String cedula);
+    boolean existsByEmail(String email);
+
+
+
 }

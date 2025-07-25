@@ -6,15 +6,19 @@ import com.itsqmet.proyecto_vinculacion.entity.NivelEducativo;
 import com.itsqmet.proyecto_vinculacion.service.CursoService;
 import com.itsqmet.proyecto_vinculacion.service.EstudianteService;
 import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
+import com.itsqmet.proyecto_vinculacion.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class EstudianteController {
@@ -22,6 +26,10 @@ public class EstudianteController {
     @Autowired private EstudianteService estudianteService;
     @Autowired private NivelEducativoService nivelEducativoService;
     @Autowired private CursoService cursoService;
+    @Autowired
+    private UsuarioService usuarioService;
+
+
 
     /* ==========================================
        1. Vista principal con filtros + visibilidad
@@ -87,49 +95,65 @@ public class EstudianteController {
     }
 
     /* ==========================================
-       3. Guardar Estudiante (nuevo o editado)
-       ========================================== */
+   3. Guardar Estudiante (nuevo o editado)
+   ========================================== */
     @PostMapping("/pages/Admin/guardarEstudiante")
     public String guardarEstudiante(
-            @ModelAttribute Estudiante estudiante,
+            @Valid @ModelAttribute Estudiante estudiante,
+            BindingResult result,
             @RequestParam(name = "nivelId", required = false) Long nivelId,
             @RequestParam(name = "cursosSeleccionados", required = false) List<Long> cursosIds,
+            Model model,
             RedirectAttributes redirectAttributes) {
 
-        try {
-            estudiante.setRol("ESTUDIANTE");
+        estudiante.setRol("ESTUDIANTE");
+        boolean esEdicion = estudiante.getId() != null;
 
-            // Nivel
-            if (nivelId != null) {
-                NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null);
-                estudiante.setNivelEducativo(nivel);
-            } else {
-                estudiante.setNivelEducativo(null);
+        // Validación de email duplicado
+        Optional<Estudiante> estudiantePorEmail = estudianteService.buscarPorEmail(estudiante.getEmail());
+        if (estudiantePorEmail.isPresent()) {
+            Estudiante otro = estudiantePorEmail.get();
+            if (!esEdicion || !otro.getId().equals(estudiante.getId())) {
+                result.rejectValue("email", "error.estudiante", "Ya existe un registro con este correo");
             }
-
-            // Cursos
-            if (cursosIds == null) cursosIds = Collections.emptyList();
-
-            List<Curso> cursos = cursoService.obtenerCursosPorIds(cursosIds);
-            estudiante.setCursos(cursos);
-
-            // Agrega el estudiante a la lista de cada curso (relación inversa)
-            for (Curso curso : cursos) {
-                if (curso.getEstudiantes() == null) {
-                    curso.setEstudiantes(new ArrayList<>());
-                }
-                if (!curso.getEstudiantes().contains(estudiante)) {
-                    curso.getEstudiantes().add(estudiante);
-                }
-            }
-
-            // Guarda el estudiante
-            estudianteService.guardarEstudiante(estudiante);
-
-            redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al guardar el estudiante: " + e.getMessage());
         }
+
+        // Validación de cédula duplicada
+        Optional<Estudiante> estudiantePorCedula = estudianteService.buscarOptionalPorCedula(estudiante.getCedula());
+        if (estudiantePorCedula.isPresent()) {
+            Estudiante otro = estudiantePorCedula.get();
+            if (!esEdicion || !otro.getId().equals(estudiante.getId())) {
+                result.rejectValue("cedula", "error.estudiante", "Ya existe un registro con esta cédula");
+            }
+        }
+
+        // Validación de otros errores
+        if (result.hasErrors()) {
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
+            model.addAttribute("nivelSeleccionado", nivelId);
+            return "pages/Admin/estudianteForm";
+        }
+
+        // Asignar nivel
+        estudiante.setNivelEducativo(nivelId != null
+                ? nivelEducativoService.buscarNivelPorId(nivelId).orElse(null)
+                : null);
+
+        // Asignar cursos
+        if (cursosIds == null) cursosIds = Collections.emptyList();
+        List<Curso> cursos = cursoService.obtenerCursosPorIds(cursosIds);
+        estudiante.setCursos(cursos);
+
+        for (Curso curso : cursos) {
+            if (curso.getEstudiantes() == null) curso.setEstudiantes(new ArrayList<>());
+            if (!curso.getEstudiantes().contains(estudiante)) {
+                curso.getEstudiantes().add(estudiante);
+            }
+        }
+
+        estudianteService.guardarEstudiante(estudiante);
+        redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
 
         return "redirect:/pages/Admin/estudianteVista";
     }

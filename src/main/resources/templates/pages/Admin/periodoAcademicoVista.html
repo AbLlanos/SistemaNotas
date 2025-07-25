@@ -25,19 +25,28 @@
         <!-- Filtro -->
         <div class="px-6 pb-6">
             <form th:action="@{/pages/Admin/periodoAcademicoVista}" method="get" class="space-y-4">
-
-                <div class="flex-1">
-                    <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Nombre</label>
-                    <input
-                            type="text"
-                            id="filtroNombre"
-                            name="nombre"
-                            placeholder="Ingrese nombre"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
-                            th:value="${param.nombre}" />
+                <div class="flex flex-wrap gap-4 items-end">
+                    <div class="flex-1">
+                        <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Nombre</label>
+                        <input
+                                type="text"
+                                id="filtroNombre"
+                                name="nombre"
+                                placeholder="Ingrese nombre"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                                th:value="${paramNombre}" />
+                    </div>
+                    <!-- Mostrar ocultos -->
+                    <div class="flex items-center">
+                        <label class="inline-flex items-center space-x-2">
+                            <input type="checkbox" name="mostrarOcultos"
+                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                   th:checked="${mostrarOcultos}" />
+                            <span class="text-sm text-gray-700">Mostrar ocultos</span>
+                        </label>
+                    </div>
                 </div>
-
-                <div class="flex justify-center">
+                <div class="flex justify-center pt-2">
                     <button type="submit" class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                         Filtrar
                     </button>
@@ -51,21 +60,28 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-100 sticky top-0 z-10">
             <tr>
-                <th class="px-4 py-2 text-left font-medium text-gray-700">ID</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-700">Nombre</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
+                <th class="px-4 py-2 text-center font-medium text-gray-700">ID</th>
+                <th class="px-4 py-2 text-center font-medium text-gray-700">Nombre del Periodo Académico</th>
+                <th class="px-4 py-2 text-center font-medium text-gray-700">Visible</th>
+                <th class="px-4 py-2 text-center font-medium text-gray-700">Controles</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
             <tr th:if="${#lists.isEmpty(periodos)}">
-                <td colspan="3" class="px-4 py-4 text-center text-gray-500 italic">No se encontraron datos.</td>
+                <td colspan="4" class="px-4 py-4 text-center text-gray-500 italic">No se encontraron datos.</td>
             </tr>
-            <tr th:each="p : ${periodos}" class="hover:bg-blue-50">
+            <tr th:each="p : ${periodos}" class="hover:bg-blue-50 text-center">
                 <td class="px-4 py-2" th:text="${p.id}"></td>
                 <td class="px-4 py-2" th:text="${p.nombre}"></td>
-                <td class="px-4 py-2 flex space-x-2">
-                    <a th:href="@{'/pages/Admin/editarPeriodo/' + ${p.id}}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
-                    <a th:href="@{'/pages/Admin/eliminarPeriodo/' + ${p.id}}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Eliminar</a>
+                <td class="px-4 py-2 text-center">
+                    <span th:if="${p.visible}" class="text-green-700 text-center font-semibold">Sí</span>
+                    <span th:unless="${p.visible}" class="text-red-600 text-center  font-semibold">No</span>
+                </td>
+                <td class="px-4 py-2 text-center">
+                    <a th:href="@{'/pages/Admin/editarPeriodo/' + ${p.id}}"
+                       class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm inline-block">
+                        Editar
+                    </a>
                 </td>
             </tr>
             </tbody>

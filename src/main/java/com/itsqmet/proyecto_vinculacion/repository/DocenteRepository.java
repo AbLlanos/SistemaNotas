@@ -16,4 +16,6 @@ public interface DocenteRepository extends JpaRepository <Docente, Long> {
 
     List<Docente> findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(String nombre, String cedula);
 
+    Optional<Docente> findByEmail(String email);
+    Optional<Docente> findByCedula(String cedula);
 }

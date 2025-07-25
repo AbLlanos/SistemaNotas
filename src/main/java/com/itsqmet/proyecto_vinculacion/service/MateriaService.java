@@ -81,11 +81,6 @@ public class MateriaService {
                 .toList();
     }
 
-    // 10. Buscar materias por nivel educativo (nuevo)
-    public List<Materia> findByNivelEducativoNombre(String nombreNivel) {
-        return materiaRepository.findByNivelEducativo_Nombre(nombreNivel);
-    }
-
     // ==================== NUEVO ====================
     /** Materias por nivel educativo (para filtrar en formulario de Curso). */
     public List<Materia> listarPorNivelId(Long nivelId) {
@@ -94,5 +89,48 @@ public class MateriaService {
         }
         return materiaRepository.findByNivelEducativo_Id(nivelId);
     }
+
+
+    public Materia buscarPorId(Long id) {
+        return materiaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la materia con id=" + id));
+    }
+
+
+    public List<Materia> listarMateriasVisibles() {
+        return materiaRepository.findByVisibleTrue();
+    }
+
+    public List<Materia> listarMateriasVisiblesPorPeriodo() {
+        return materiaRepository.findByVisibleTrueAndPeriodoAcademico_VisibleTrue();
+    }
+
+
+
+    public List<Materia> filtrarPorNombreDocenteYPeriodo(String nombre, Long docenteId, Long periodoId) {
+        // Aquí puedes usar repositorio con consultas personalizadas, o filtrado manual.
+        List<Materia> materias = materiaRepository.findAll();
+
+        if (nombre != null && !nombre.isBlank()) {
+            materias = materias.stream()
+                    .filter(m -> m.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                    .toList();
+        }
+
+        if (docenteId != null) {
+            materias = materias.stream()
+                    .filter(m -> m.getDocente() != null && m.getDocente().getId().equals(docenteId))
+                    .toList();
+        }
+
+        if (periodoId != null) {
+            materias = materias.stream()
+                    .filter(m -> m.getPeriodoAcademico() != null && m.getPeriodoAcademico().getId().equals(periodoId))
+                    .toList();
+        }
+
+        return materias;
+    }
+
 
 }

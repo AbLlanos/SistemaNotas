@@ -19,6 +19,7 @@ public class Asistencia {
     private Integer faltasJustificadas;
     private Integer faltasInjustificadas;
     private Integer atrasos;
+    private Integer totalAsistencias;
 
     @ManyToOne
     private Estudiante estudiante;
