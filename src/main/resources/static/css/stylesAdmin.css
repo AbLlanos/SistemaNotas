@@ -191,127 +191,10 @@
   }
 }
 
-
-/* Boton Añadir Estudiante*/
-.animated-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 16px 36px;
-  border: 2px solid;
-  border-color: blue;
-  font-size: 16px;
-  border-radius: 100px;
-  font-weight: 700;
-  color: #1f387e;
-  box-shadow: 0 0 0 2px #ffffff;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button svg {
-  position: absolute;
-  width: 24px;
-  fill: #1f387e;
-  z-index: 9;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    right: 16px;
-}
-.animated-button .arr-1 {
-  right: 16px;
-}
-.animated-button .arr-2 {
-  left: -25%;
-}
-.animated-button .circle {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #c5e5e4;
-  border-radius: 50%;
-  opacity: 0;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button .text {
-  position: relative;
-  z-index: 1;
-  transform: translateX(-12px);
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button:hover {
-  box-shadow: 0 0 0 12px transparent;
-  color: blue;
-  border-radius: 12px;
-    background-color: #c5e5e4;
-}
-.animated-button:hover .arr-1 {
-  right: -25%;
-}
-.animated-button:hover .arr-2 {
-  left: 16px;
-}
-.animated-button:hover .text {
-  transform: translateX(12px);
-}
-.animated-button:hover svg {
-  fill: #1f387e;
-}
-.animated-button:active {
-  scale: 0.95;
-  box-shadow: 0 0 0 4px greenyellow;
-}
-.animated-button:hover .circle {
-  width: 220px;
-  height: 220px;
-  opacity: 1;
 }
 
 
-/* Boton Añadir Docente*/
-.animated-button1 {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 16px 36px;
-  border: 2px solid;
-  border-color: green;
-  font-size: 16px;
-  border-radius: 100px;
-  font-weight: 700;
-  color: green;
-  box-shadow: 0 0 0 2px #ffffff;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button1 svg {
-  position: absolute;
-  width: 24px;
-  fill: #1f387e;
-  z-index: 9;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    right: 16px;
-}
-.animated-button1 .arr-1 {
-  right: 16px;
-}
-.animated-button1 .arr-2 {
-  left: -25%;
-}
-.animated-button1 .circle {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #c5e5e4 ;
-  border-radius: 50%;
-  opacity: 0;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button1 .text {
+mated-button1 .text {
   position: relative;
   z-index: 1;
   transform: translateX(-12px);
@@ -346,82 +229,76 @@
 }
 
 
-/* Boton Añadir Mater*/
-.animated-button2 {
-  position: relative;
+
+
+
+/* From Uiverse.io by vinodjangid07 */
+.Btn {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 16px 36px;
-  border: 2px solid;
-  border-color: brown;
-  font-size: 16px;
-  border-radius: 100px;
-  font-weight: 700;
-  color: brown;
-  box-shadow: 0 0 0 2px #ffffff;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button2 svg {
-  position: absolute;
-  width: 24px;
-  fill: #1f387e;
-  z-index: 9;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-    right: 16px;
-}
-.animated-button2 .arr-1 {
-  right: 16px;
-}
-.animated-button2 .arr-2 {
-  left: -25%;
-}
-.animated-button2 .circle {
-  position: absolute;
-  top: 20%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #c5e5e8 ;
+  justify-content: flex-start;
+  width: 50px;
+  height: 50px;
+  border: none;
   border-radius: 50%;
-  opacity: 0;
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button2 .text {
+  cursor: pointer;
   position: relative;
-  z-index: 1;
-  transform: translateX(-12px);
-  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
-.animated-button2:hover {
-  box-shadow: 0 0 0 12px transparent;
-  color: brown;
-  border-radius: 12px;
-    background-color: #c5e5e4;
-}
-.animated-button2:hover .arr-1 {
-  right: -25%;
-}
-.animated-button2:hover .arr-2 {
-  left: 16px;
-}
-.animated-button2:hover .text {
-  transform: translateX(12px);
-}
-.animated-button2:hover svg {
-  fill: #1f387e;
-}
-.animated-button2:active {
-  scale: 0.95;
-  box-shadow: 0 0 0 4px brown;
-}
-.animated-button2:hover .circle {
-  width: 220px;
-  height: 220px;
-  opacity: 1;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+  background-color: rgb(255, 65, 65);
 }
 
+/* plus sign */
+.sign {
+  width: 100%;
+  transition-duration: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign svg {
+  width: 17px;
+}
+
+.sign svg path {
+  fill: white;
+}
+/* text */
+.textoboton {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  color: white;
+  font-size: 1;
+  font-weight: 600;
+  transition-duration: .3s;
+}
+/* hover effect on button width */
+.Btn:hover {
+  width: 125px;
+  border-radius: 40px;
+  transition-duration: .3s;
+}
+
+.Btn:hover .sign {
+  width: 30%;
+  transition-duration: .3s;
+  padding-left: 20px;
+}
+/* hover effect button's text */
+.Btn:hover .textoboton {
+  opacity: 1;
+  width: 70%;
+  transition-duration: .3s;
+  padding-right: 10px;
+}
+/* button click effect*/
+.Btn:active {
+  transform: translate(2px ,2px);
+}
 
 
 
