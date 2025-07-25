@@ -44,7 +44,7 @@ public class EstudianteController {
         List<Estudiante> estudiantes;
 
         if (mostrarOcultos) {
-            // incluir NO visibles
+
             if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
                 estudiantes = estudianteService.listarTodosEstudiantes();
             } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
@@ -55,7 +55,7 @@ public class EstudianteController {
                 estudiantes = estudianteService.buscarPorNombreYCedula(nombre, cedula);
             }
         } else {
-            // sólo visibles
+
             if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
                 estudiantes = estudianteService.listarVisibles();
             } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {

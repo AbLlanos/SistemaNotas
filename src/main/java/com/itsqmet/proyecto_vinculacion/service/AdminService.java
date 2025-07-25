@@ -1,5 +1,6 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
+import com.itsqmet.proyecto_vinculacion.entity.Admin;
 import com.itsqmet.proyecto_vinculacion.entity.Curso;
 import com.itsqmet.proyecto_vinculacion.entity.Estudiante;
 import com.itsqmet.proyecto_vinculacion.entity.Materia;
@@ -15,14 +16,14 @@ import java.util.List;
 @Service
 public class AdminService {
 
-    @Autowired
-    private CursoRepository cursoRepository;
 
     @Autowired
-    private EstudianteRepository estudianteRepository;
+    private AdminRepository adminRepository;
 
-    @Autowired
-    private MateriaRepository materiaRepository;
+
+    public List<Admin> buscarPorNombreYCedula(String nombre, String cedula) {
+        return adminRepository.findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(nombre, cedula);
+    }
 
 }
 

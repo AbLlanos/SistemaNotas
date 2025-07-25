@@ -55,6 +55,9 @@ public class AdminController {
     @Autowired
     private PDFGeneratorService pdfGeneratorService;
 
+    @Autowired
+    private  AdminService adminService;
+
 
     //1. Sistema de notas
 
@@ -62,6 +65,38 @@ public class AdminController {
     public String vistaAdmin(){
         return "pages/Admin/vistaAdmin";
     }
+
+    //1. Sistema de notas
+
+    @GetMapping("/adminPerfilVista")
+    public String mostrarAdminbVista(
+            Model model,
+            @RequestParam(name = "nombre", required = false) String nombre,
+            @RequestParam(name = "cedula", required = false) String cedula) {
+
+        List<Admin> admins = adminService.buscarPorNombreYCedula(nombre, cedula);
+
+        model.addAttribute("admins", admins);
+        model.addAttribute("paramNombre", nombre);
+        model.addAttribute("paramCedula", cedula);
+
+        return "pages/Admin/adminPerfilVista";
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @GetMapping("/admin/generar-pdf")
