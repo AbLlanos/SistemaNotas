@@ -124,7 +124,29 @@ public class PDFGeneratorService {
 
 
 
-
+    private String getNotaFinalCualitativaPorTrimestre(List<NotaCompletaDTO> notas, String trimestre) {
+        String nota = "--";
+        for (NotaCompletaDTO dto : notas) {
+            switch (trimestre) {
+                case "Primer Trimestre":
+                    if (dto.getNotaCualitativaPrimerTrim() != null) {
+                        nota = dto.getNotaCualitativaPrimerTrim();
+                    }
+                    break;
+                case "Segundo Trimestre":
+                    if (dto.getNotaCualitativaSegundoTrim() != null) {
+                        nota = dto.getNotaCualitativaSegundoTrim();
+                    }
+                    break;
+                case "Tercer Trimestre":
+                    if (dto.getNotaCualitativaTercerTrim() != null) {
+                        nota = dto.getNotaCualitativaTercerTrim();
+                    }
+                    break;
+            }
+        }
+        return nota;
+    }
 
 
 
@@ -258,8 +280,6 @@ public class PDFGeneratorService {
 
 
 
-
-        // ======== Tabla Notas Regulares ========
         if (!notasRegular.isEmpty()) {
             float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f}; // Suma ≈100
             Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
@@ -273,7 +293,6 @@ public class PDFGeneratorService {
             tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
             tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
 
-            // Acumuladores para promedios numéricos
             double sumaNota1T = 0; int countNota1T = 0;
             double sumaNota2T = 0; int countNota2T = 0;
             double sumaNota3T = 0; int countNota3T = 0;
@@ -305,28 +324,31 @@ public class PDFGeneratorService {
                 }
             }
 
-            // Fila de Promedios
+
+
+
+            // Fila de Promedios (intercalando cuantitativa y cualitativa)
             tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold()));
 
             if (mostrarColumna("Primer Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));
-                tablaNotas.addCell("--");
+                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));      // promedio cuantitativa 1T
+                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Primer Trimestre")); // cualitativa 1T
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");
             }
 
             if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));
-                tablaNotas.addCell("--");
+                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));      // promedio cuantitativa 2T
+                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Segundo Trimestre")); // cualitativa 2T
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");
             }
 
             if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));
-                tablaNotas.addCell("--");
+                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));      // promedio cuantitativa 3T
+                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Tercer Trimestre")); // cualitativa 3T
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");

@@ -167,7 +167,6 @@ public class EstudianteService {
         return estudianteRepository.findByCursos_Id(cursoId);
     }
 
-
     public Optional<Estudiante> buscarPorEmail(String email) {
         return estudianteRepository.findByEmail(email);
     }
@@ -175,4 +174,8 @@ public class EstudianteService {
     public Optional<Estudiante> buscarOptionalPorCedula(String cedula) {
         return estudianteRepository.findByCedula(cedula);
     }
+
+
 }
+
+

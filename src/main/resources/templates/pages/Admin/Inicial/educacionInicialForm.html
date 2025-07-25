@@ -244,6 +244,27 @@
         </div>
     </div>
 
+    <!-- ======= Nota Cualitativa Final (por Curso) ======= -->
+    <h3 class="text-lg font-semibold mt-6">Nota Cualitativa Final (por Curso)</h3>
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label for="notaCualitativaFinal1" class="block text-xs font-semibold">Nota Cualitativa Final 1</label>
+            <input type="text" id="notaCualitativaFinal1" name="notaCualitativaFinalPrimerTrim"
+                   th:value="${nota.notaCualitativaFinalPrimerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="notaCualitativaFinal2" class="block text-xs font-semibold">Nota Cualitativa Final 2</label>
+            <input type="text" id="notaCualitativaFinal2" name="notaCualitativaFinalSegundoTrim"
+                   th:value="${nota.notaCualitativaFinalSegundoTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+        <div>
+            <label for="notaCualitativaFinal3" class="block text-xs font-semibold">Nota Cualitativa Final 3</label>
+            <input type="text" id="notaCualitativaFinal3" name="notaCualitativaFinalTercerTrim"
+                   th:value="${nota.notaCualitativaFinalTercerTrim}" class="w-full border rounded px-2 py-1"/>
+        </div>
+    </div>
+
+
 
     <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>

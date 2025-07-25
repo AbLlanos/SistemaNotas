@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -57,15 +58,10 @@ public class BachilleratoGeneralController {
 
 
 
-
-
-
-
-    //Ruta bachillerato
     @GetMapping("/Bachillerato/bachilleratoVista")
     public String vistaBachillerato(
             @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
+            @RequestParam(required = false) String nombreCurso,  // <-- aquí nombreCurso en lugar de cursoId
             @RequestParam(required = false) String nombreMateria,
             @RequestParam(required = false) String cedula,
             @RequestParam(required = false) String nombreTrimestre,
@@ -74,47 +70,54 @@ public class BachilleratoGeneralController {
 
         String nivelFiltro = "bachilleratogeneral";
 
+        // Obtener cursos filtrados por nivel educativo
         List<Curso> cursos = cursoService.listarTodosCursos().stream()
-                .filter(c -> {
-                    if (c.getNivelEducativo() == null || c.getNivelEducativo().getNombre() == null) {
-                        return false;
-                    }
-                    String nivelActual = c.getNivelEducativo().getNombre().toLowerCase().replace(" ", "");
-                    return nivelFiltro.equals(nivelActual);
-                })
+                .filter(c -> c.getNivelEducativo() != null
+                        && c.getNivelEducativo().getNombre() != null
+                        && c.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
                 .toList();
 
+        // Obtener materias filtrando por curso nombre (si hay) o por nivel educativo
         List<Materia> materias;
         if (nombreCurso != null && !nombreCurso.isBlank()) {
             materias = materiaService.listarTodasMaterias().stream()
                     .filter(m -> m.getCursos() != null &&
                             m.getCursos().stream()
-                                    .anyMatch(c -> nombreCurso.equalsIgnoreCase(c.getNombre())))
+                                    .anyMatch(c -> c.getNombre().equalsIgnoreCase(nombreCurso)))
                     .toList();
         } else {
             materias = materiaService.listarTodasMaterias().stream()
-                    .filter(m -> {
-                        if (m.getNivelEducativo() == null || m.getNivelEducativo().getNombre() == null) {
-                            return false;
-                        }
-                        String nivelMat = m.getNivelEducativo().getNombre().toLowerCase().replace(" ", "");
-                        return nivelFiltro.equals(nivelMat);
-                    })
+                    .filter(m -> m.getNivelEducativo() != null
+                            && m.getNivelEducativo().getNombre() != null
+                            && m.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
                     .toList();
         }
 
         List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
 
+        // Obtener notas con filtro por nombreCurso (String) y nivel educativo
         List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
+                nombrePeriodo,
+                nombreCurso,
+                nombreMateria,
+                cedula,
+                nombreTrimestre,
+                nivelFiltro);
 
-        // 🔽 Filtrar estudiantes según visibilidad y nivel educativo
+        // Filtrar notas solo para cursos del nivel educativo actual
+        Set<String> nombresCursos = cursos.stream()
+                .map(Curso::getNombre)
+                .collect(Collectors.toSet());
+
+        notas = notas.stream()
+                .filter(n -> n.getNombreCurso() != null && nombresCursos.contains(n.getNombreCurso()))
+                .toList();
+
         if (!mostrarOcultos) {
             List<String> cedulasVisibles = estudianteService.listarVisibles().stream()
-                    .filter(e -> e.getNivelEducativo() != null &&
-                            e.getNivelEducativo().getNombre() != null &&
-                            e.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
+                    .filter(e -> e.getNivelEducativo() != null
+                            && e.getNivelEducativo().getNombre() != null
+                            && e.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
                     .map(Estudiante::getCedula)
                     .toList();
 
@@ -140,6 +143,7 @@ public class BachilleratoGeneralController {
 
         return "pages/Admin/Bachillerato/bachilleratoVista";
     }
+
 
 
     @GetMapping("/notas/nuevo")

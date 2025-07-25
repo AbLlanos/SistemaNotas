@@ -9,42 +9,44 @@ import java.util.List;
 
 public class NotasSpecification {
 
-    public static Specification<Notas> filtrarPorCampos(String nombrePeriodo,
-                                                        String nombreCurso,
-                                                        String nombreMateria,
-                                                        String cedula,
-                                                        String nombreTrimestre) {
-        return (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
 
-            if (nombrePeriodo != null && !nombrePeriodo.isEmpty()) {
-                Join<Notas, PeriodoAcademico> periodoJoin = root.join("periodoAcademico", JoinType.LEFT);
-                predicates.add(cb.equal(cb.lower(periodoJoin.get("nombre")), nombrePeriodo.toLowerCase()));
-            }
+        public static Specification<Notas> filtrarPorCampos(
+                String nombrePeriodo,
+                String nombreCurso,
+                String nombreMateria,
+                String cedula,
+                String nombreTrimestre,
+                String nivelFiltro) {
 
-            if (nombreCurso != null && !nombreCurso.isEmpty()) {
-                Join<Notas, Materia> materiaJoin = root.join("materia", JoinType.LEFT);
-                Join<Materia, Curso> cursoJoin = materiaJoin.join("cursos", JoinType.LEFT);
-                predicates.add(cb.equal(cb.lower(cursoJoin.get("nombre")), nombreCurso.toLowerCase()));
-            }
+            return (root, query, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
 
-            if (nombreMateria != null && !nombreMateria.isEmpty()) {
-                Join<Notas, Materia> materiaJoin = root.join("materia", JoinType.LEFT);
-                predicates.add(cb.equal(cb.lower(materiaJoin.get("nombre")), nombreMateria.toLowerCase()));
-            }
+                if (nombrePeriodo != null && !nombrePeriodo.isBlank()) {
+                    predicates.add(cb.equal(root.get("periodoAcademico").get("nombre"), nombrePeriodo));
+                }
+                if (nombreCurso != null && !nombreCurso.isBlank()) {
+                    predicates.add(cb.equal(root.get("curso").get("nombre"), nombreCurso));
+                }
+                if (nombreMateria != null && !nombreMateria.isBlank()) {
+                    predicates.add(cb.equal(root.get("materia").get("nombre"), nombreMateria));
+                }
+                if (cedula != null && !cedula.isBlank()) {
+                    predicates.add(cb.equal(root.get("estudiante").get("cedula"), cedula));
+                }
+                if (nombreTrimestre != null && !nombreTrimestre.isBlank()) {
+                    predicates.add(cb.equal(root.get("trimestre").get("nombre"), nombreTrimestre));
+                }
+                if (nivelFiltro != null && !nivelFiltro.isBlank()) {
+                    predicates.add(cb.equal(
+                            cb.lower(cb.function("REPLACE", String.class,
+                                    root.get("estudiante").get("nivelEducativo").get("nombre"),
+                                    cb.literal(" "), cb.literal(""))),
+                            nivelFiltro.toLowerCase()
+                    ));
+                }
 
-            if (cedula != null && !cedula.isEmpty()) {
-                Join<Notas, Estudiante> estudianteJoin = root.join("estudiante", JoinType.LEFT);
-                predicates.add(cb.equal(cb.lower(estudianteJoin.get("cedula")), cedula.toLowerCase()));
-            }
+                return cb.and(predicates.toArray(new Predicate[0]));
+            };
+        }
 
-            if (nombreTrimestre != null && !nombreTrimestre.isEmpty()) {
-                Join<Notas, Trimestre> trimestreJoin = root.join("trimestre", JoinType.LEFT);
-                predicates.add(cb.equal(cb.lower(trimestreJoin.get("nombre")), nombreTrimestre.toLowerCase()));
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
     }
-
-}

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -24,6 +25,27 @@ public class AdminService {
     public List<Admin> buscarPorNombreYCedula(String nombre, String cedula) {
         return adminRepository.findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(nombre, cedula);
     }
+
+    /** Listar todos. */
+    public List<Admin> listarTodosAdmin() {
+        return adminRepository.findAll();
+    }
+
+    /** Guardar/actualizar entidad completa ya armada (con cursos y nivel seteados). */
+    public Admin guardarAdmin(Admin admin) {
+        return adminRepository.save(admin);
+    }
+
+    /** Eliminar por ID. */
+    public void eliminarAdmin(Long id) {
+        adminRepository.deleteById(id);
+    }
+
+    /** Buscar por ID. */
+    public Optional<Admin> buscarAdminPorId(Long id) {
+        return adminRepository.findById(id);
+    }
+
 
 }
 

@@ -31,4 +31,8 @@ public class NivelEducativoService {
     public Optional<NivelEducativo> buscarNivelPorId(Long id) {
         return buscarPorId(id);
     }
+
+    public NivelEducativo buscarOptionalPorId(Long id) {
+        return nivelEducativoRepository.findById(id).orElse(null);
+    }
 }

@@ -98,7 +98,7 @@ public class EducacionInicialController {
         List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
 
         List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
+                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre, nivelFiltro
         );
 
         // Filtrar estudiantes por visibilidad y por nivel educativo

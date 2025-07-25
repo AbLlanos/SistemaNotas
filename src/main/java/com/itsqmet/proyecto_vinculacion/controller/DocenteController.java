@@ -5,6 +5,7 @@ import com.itsqmet.proyecto_vinculacion.service.DocenteService;
 import com.itsqmet.proyecto_vinculacion.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -63,7 +64,6 @@ public class DocenteController {
     }
 
     //3.Insertar un Nuevo Docente
-    // 3. Guardar Docente (nuevo o editado)
     @PostMapping("/guardarDocente")
     public String guardarDocente(
             @Valid @ModelAttribute Docente docente,
@@ -73,7 +73,7 @@ public class DocenteController {
 
         docente.setRol("DOCENTE");
 
-        // Validación de campos con @Valid
+        // Validación con anotaciones
         if (result.hasErrors()) {
             model.addAttribute("docente", docente);
             return "pages/Admin/docenteForm";
@@ -81,7 +81,7 @@ public class DocenteController {
 
         boolean esEdicion = docente.getId() != null;
 
-        // Validación manual de unicidad con control para edición
+        // Validación manual de unicidad (email)
         Optional<Docente> docentePorEmail = docenteService.buscarPorEmail(docente.getEmail());
         if (docentePorEmail.isPresent()) {
             Docente otro = docentePorEmail.get();
@@ -90,6 +90,7 @@ public class DocenteController {
             }
         }
 
+        // Validación manual de unicidad (cédula)
         Optional<Docente> docentePorCedula = docenteService.buscarOptionalCedula(docente.getCedula());
         if (docentePorCedula.isPresent()) {
             Docente otro = docentePorCedula.get();
@@ -98,15 +99,26 @@ public class DocenteController {
             }
         }
 
+        // Verificamos errores después de validaciones manuales
         if (result.hasErrors()) {
             model.addAttribute("docente", docente);
             return "pages/Admin/docenteForm";
         }
 
-        docenteService.guardarDocente(docente);
+        try {
+            docenteService.guardarDocente(docente);
+        } catch (DataIntegrityViolationException ex) {
+            result.reject("error.general", "Ya existe un docente con este correo o cédula.");
+            model.addAttribute("docente", docente);
+            return "pages/Admin/docenteForm";
+        }
+
         redirectAttrs.addFlashAttribute("success", "Docente guardado correctamente.");
         return "redirect:/pages/Admin/docenteVista";
     }
+
+
+
     //4. Actualizar Docente
     @GetMapping("/editarDocente/{id}")
     public String actualizarDocente(@PathVariable Long id, Model model){

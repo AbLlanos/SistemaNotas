@@ -100,7 +100,7 @@ public class BachilleratoTecnicoController {
         List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
 
         List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
+                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre, nivelFiltro
         );
 
         // Filtrar estudiantes visibles Y del nivel Bachillerato Técnico en Computación

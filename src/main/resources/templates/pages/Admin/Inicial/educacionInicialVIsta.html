@@ -44,7 +44,7 @@
 
         <!-- FILTROS -->
         <div class="px-6 pb-6 bg-gray-50 rounded-b-xl border-t border-gray-100 pt-6">
-            <form method="get" action="/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista" id="formFiltros" class="space-y-6">
+            <form method="get" action="/pages/Admin/Inicial/educacionInicialVista" id="formFiltros" class="space-y-6">
 
                 <div th:if="${exito}"
                      class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded shadow">
@@ -132,7 +132,7 @@
                     </button>
 
                     <!-- Botón Limpiar -->
-                    <a href="/pages/Admin/Bachillerato/bachilleratoVista"
+                    <a href="/pages/Admin/Inicial/educacionInicialVista"
                        class="w-40 py-3 text-center bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50">
                         <i class="fas fa-eraser mr-2"></i> Limpiar Todo
                     </a>
@@ -179,6 +179,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Faltas Injust. 1er Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Atrasos 1er Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Total Asistencias 1er Trimestre</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Nota Final Cualitativa 1er Trim</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Comportamiento 1er Trimestre</th>
                         <!-- Trim2 -->
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">Nota 2do Trimestre</th>
@@ -188,6 +189,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">Faltas Injust. 2do Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">Atrasos 2do Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">Total Asistencias 2do Trimestre</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Nota Final Cualitativa 2do Trim</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim2 bg-trim2-header">Comportamiento 2do Trimestre</th>
                         <!-- Trim3 -->
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">Nota 3er Trimestre</th>
@@ -197,6 +199,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">Faltas Injust. 3er Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">Atrasos 3er Trimestre</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">Total Asistencias 3er Trimestre</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim1 bg-trim1-header">Nota Final Cualitativa 3er Trim</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider trim3 bg-trim3-header">Comportamiento 3er Trimestre</th>
                         <!-- Estado -->
                         <th scope="col" class="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">Estado</th>
@@ -218,6 +221,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell" th:text="${nota.faltasInjustificadasPrimerTrim != null ? nota.faltasInjustificadasPrimerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell" th:text="${nota.atrasosPrimerTrim != null ? nota.atrasosPrimerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell" th:text="${nota.totalAsistenciaPrimerTrim != null ? nota.totalAsistenciaPrimerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell" th:text="${nota.notaCualitativaFinalPrimerTrim != null ? nota.notaCualitativaFinalPrimerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim1 bg-trim1-cell" th:text="${nota.comportamientoFinalVariable1 != null ? nota.comportamientoFinalVariable1 : '---'}"></td>
                         <!-- Trim2 celdas -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.notaNumericaSegundoTrim != null ? nota.notaNumericaSegundoTrim : '---'}"></td>
@@ -227,6 +231,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.faltasInjustificadasSegundoTrim != null ? nota.faltasInjustificadasSegundoTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.atrasosSegundoTrim != null ? nota.atrasosSegundoTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.totalAsistenciaSegundoTrim != null ? nota.totalAsistenciaSegundoTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.notaCualitativaFinalSegundoTrim != null ? nota.notaCualitativaFinalSegundoTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim2 bg-trim2-cell" th:text="${nota.comportamientoFinalVariable2 != null ? nota.comportamientoFinalVariable2 : '---'}"></td>
                         <!-- Trim3 celdas -->
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text="${nota.notaNumericaTercerTrim != null ? nota.notaNumericaTercerTrim : '---'}"></td>
@@ -236,6 +241,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text="${nota.faltasInjustificadasTercerTrim != null ? nota.faltasInjustificadasTercerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text="${nota.atrasosTercerTrim != null ? nota.atrasosTercerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text="${nota.totalAsistenciaTercerTrim != null ? nota.totalAsistenciaTercerTrim : '---'}"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text="${nota.notaCualitativaFinalTercerTrim != null ? nota.notaCualitativaFinalTercerTrim : '---'}"></td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 trim3 bg-trim3-cell" th:text=" ${nota.comportamientoFinalVariable3 != null ? nota.comportamientoFinalVariable3 : '---'}"></td>
 
                         <!-- Estado + PDF fila -->

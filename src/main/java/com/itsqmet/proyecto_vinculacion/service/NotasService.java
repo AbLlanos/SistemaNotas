@@ -74,22 +74,6 @@ public class NotasService {
 
     /*Filtro universal conectado a especification para facilitar el filtrado dinamico de los todos los campos */
 
-    public List<Notas> buscarNotasPorFiltros(String nombrePeriodo,
-                                             String nombreCurso,
-                                             String nombreMateria,
-                                             String cedula,
-                                             String nombreTrimestre) {
-
-        Specification<Notas> spec = NotasSpecification.filtrarPorCampos(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
-
-        return notasRepository.findAll(spec);
-    }
-
-
-
-
 
 
 
@@ -97,14 +81,34 @@ public class NotasService {
                                                        String nombreCurso,
                                                        String nombreMateria,
                                                        String cedula,
-                                                       String nombreTrimestre) {
+                                                       String nombreTrimestre,
+                                                       String nivelFiltro) {
+
+        System.out.println("📥 Entrando a obtenerNotasCompletas()");
+        System.out.println("🎯 Filtros recibidos:");
+        System.out.println(" - Periodo: " + nombrePeriodo);
+        System.out.println(" - Curso: " + nombreCurso);
+        System.out.println(" - Materia: " + nombreMateria);
+        System.out.println(" - Cédula: " + cedula);
+        System.out.println(" - Trimestre: " + nombreTrimestre);
+        System.out.println(" - Nivel filtro: " + nivelFiltro);
 
         Specification<Notas> spec = NotasSpecification.filtrarPorCampos(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre);
+                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre, nivelFiltro);
 
         List<Notas> notas = notasRepository.findAll(spec);
+        System.out.println("📝 Total notas encontradas con spec: " + notas.size());
 
-        // Mapa clave = "cedulaEstudiante|materia|periodo" para agrupar por estudiante y materia
+        // Filtro adicional por nivel educativo
+        if (nivelFiltro != null && !nivelFiltro.isBlank()) {
+            notas = notas.stream()
+                    .filter(n -> n.getNivelEducativo() != null
+                            && n.getNivelEducativo().getNombre() != null
+                            && n.getNivelEducativo().getNombre().toLowerCase().replace(" ", "").equals(nivelFiltro))
+                    .collect(Collectors.toList());
+            System.out.println("🧪 Total notas después de filtrar por nivel educativo (" + nivelFiltro + "): " + notas.size());
+        }
+
         Map<String, NotaCompletaDTO> mapaNotas = new LinkedHashMap<>();
 
         for (Notas n : notas) {
@@ -112,18 +116,22 @@ public class NotasService {
                     n.getMateria().getNombre() + "|" +
                     n.getPeriodoAcademico().getNombre();
 
+            System.out.println("🧩 Procesando clave agrupación: " + key);
+
             NotaCompletaDTO dto = mapaNotas.computeIfAbsent(key, k -> {
                 NotaCompletaDTO nuevoDto = new NotaCompletaDTO();
                 nuevoDto.setIdNota(n.getId());
                 nuevoDto.setTipoMateria(n.getMateria() != null ? n.getMateria().getTipoMateria() : null);
 
-                // Datos del estudiante
                 if (n.getEstudiante() != null) {
-                    nuevoDto.setCedulaEstudiante(n.getEstudiante().getCedula());
+                    String ced = n.getEstudiante().getCedula();
+                    String nombre = n.getEstudiante().getNombre();
+                    String apellido = n.getEstudiante().getApellido();
+
+                    nuevoDto.setCedulaEstudiante(ced);
                     nuevoDto.setNombreCompletoEstudiante(
-                            (n.getEstudiante().getNombre() != null ? n.getEstudiante().getNombre() : "") + " " +
-                                    (n.getEstudiante().getApellido() != null ? n.getEstudiante().getApellido() : "")
-                                            .trim());
+                            (nombre != null ? nombre : "") + " " + (apellido != null ? apellido : ""));
+                    System.out.println("👤 Estudiante: " + nuevoDto.getNombreCompletoEstudiante() + " (" + ced + ")");
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
                     nuevoDto.setNombreCompletoEstudiante("---");
@@ -136,7 +144,6 @@ public class NotasService {
                 return nuevoDto;
             });
 
-            // Notas por trimestre
             if (n.getTrimestre() != null) {
                 String trimestre = n.getTrimestre().getNombre().toLowerCase();
                 if (trimestre.contains("primer")) {
@@ -154,7 +161,6 @@ public class NotasService {
                 }
             }
 
-            // **Obtener comportamiento final**
             ComportamientoFinal comportamiento = comportamientoFinalRepository
                     .findByEstudianteAndCursoAndPeriodo(n.getEstudiante(), n.getCurso(), n.getPeriodoAcademico())
                     .orElse(null);
@@ -167,19 +173,43 @@ public class NotasService {
                 dto.setComportamientoFinalVariable1("---");
                 dto.setComportamientoFinalVariable2("---");
                 dto.setComportamientoFinalVariable3("---");
+
+
+
             }
         }
 
-
         List<NotaCompletaDTO> lista = new ArrayList<>(mapaNotas.values());
+
+        // Aquí asignas las notas cualitativas finales, con variable diferente en el for
+        for (NotaCompletaDTO dtoFinal : lista) {
+            Estudiante estudiante = estudianteService.buscarPorCedula(dtoFinal.getCedulaEstudiante());
+            Curso curso = cursoService.buscarPorNombre(dtoFinal.getNombreCurso());
+            PeriodoAcademico periodo = periodoAcademicoService.buscarPorNombre(dtoFinal.getNombrePeriodo());
+
+            if (estudiante != null && curso != null && periodo != null) {
+                notaCualitativaFinalRepository.findByEstudianteAndCursoAndPeriodo(estudiante, curso, periodo)
+                        .ifPresent(ncf -> {
+                            dtoFinal.setNotaCualitativaFinalPrimerTrim(ncf.getNotaFinalPrimerTrim());
+                            dtoFinal.setNotaCualitativaFinalSegundoTrim(ncf.getNotaFinalSegundoTrim());
+                            dtoFinal.setNotaCualitativaFinalTercerTrim(ncf.getNotaFinalTercerTrim());
+                        });
+            } else {
+                dtoFinal.setNotaCualitativaFinalPrimerTrim("---");
+                dtoFinal.setNotaCualitativaFinalSegundoTrim("---");
+                dtoFinal.setNotaCualitativaFinalTercerTrim("---");
+            }
+        }
 
         double NOTA_MINIMA_APROBACION = 7.0;
         for (NotaCompletaDTO dto : lista) {
             calcularEstado(dto, NOTA_MINIMA_APROBACION);
         }
 
-        return new ArrayList<>(mapaNotas.values());
+        System.out.println("✅ Total DTOs construidos: " + lista.size());
+        return lista;
     }
+
 
 
 
@@ -285,6 +315,8 @@ public class NotasService {
 
 
 
+@Autowired
+private  NivelEducativoService nivelEducativoService;
 
 
     @Transactional
@@ -293,6 +325,15 @@ public class NotasService {
         Estudiante estudiante = null;
         if (form.getCedulaEstudiante() != null && !form.getCedulaEstudiante().isBlank()) {
             estudiante = estudianteService.buscarPorCedula(form.getCedulaEstudiante());
+
+            if (form.getNivelEducativoId() != null) {
+                NivelEducativo nivel = nivelEducativoService.buscarOptionalPorId(form.getNivelEducativoId());
+                if (nivel != null && (estudiante.getNivelEducativo() == null ||
+                        !nivel.getId().equals(estudiante.getNivelEducativo().getId()))) {
+                    estudiante.setNivelEducativo(nivel);
+                    estudianteService.guardarEstudiante(estudiante);
+                }
+            }
         }
 
         // ----- Resolver curso -----
@@ -358,78 +399,68 @@ public class NotasService {
         // Guardar para cada trimestre nota, comportamiento y asistencia
 
         // Primer trimestre
-        upsertNotaYRelacionados(
-                estudiante, materia, periodo, t1,
+        upsertNotaYRelacionados(estudiante, materia, periodo, t1,
                 form.getNotaNumericaPrimerTrim(), form.getNotaCualitativaPrimerTrim(),
                 form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
                 form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
-                form.getComportamientoPrimerTrim(),
-                form.getTotalAsistenciaPrimerTrim(),
-                curso
-        );
+                form.getComportamientoPrimerTrim(), form.getTotalAsistenciaPrimerTrim(), curso);
         upsertComportamiento(estudiante, materia, periodo, t1, form.getComportamientoPrimerTrim());
         upsertAsistencia(estudiante, materia, periodo, t1,
-                form.getAsistenciaPrimerTrim(),
-                form.getFaltasJustificadasPrimerTrim(),
-                form.getFaltasInjustificadasPrimerTrim(),
-                form.getAtrasosPrimerTrim(),
-                form.getTotalAsistenciaPrimerTrim()
-        );
+                form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
+                form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
+                form.getTotalAsistenciaPrimerTrim());
 
         // Segundo trimestre
-        upsertNotaYRelacionados(
-                estudiante, materia, periodo, t2,
+        upsertNotaYRelacionados(estudiante, materia, periodo, t2,
                 form.getNotaNumericaSegundoTrim(), form.getNotaCualitativaSegundoTrim(),
                 form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
                 form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
-                form.getComportamientoSegundoTrim(),
-                form.getTotalAsistenciaSegundoTrim(),
-                curso
-        );
+                form.getComportamientoSegundoTrim(), form.getTotalAsistenciaSegundoTrim(), curso);
         upsertComportamiento(estudiante, materia, periodo, t2, form.getComportamientoSegundoTrim());
         upsertAsistencia(estudiante, materia, periodo, t2,
-                form.getAsistenciaSegundoTrim(),
-                form.getFaltasJustificadasSegundoTrim(),
-                form.getFaltasInjustificadasSegundoTrim(),
-                form.getAtrasosSegundoTrim(),
-                form.getTotalAsistenciaSegundoTrim()
-        );
+                form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
+                form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
+                form.getTotalAsistenciaSegundoTrim());
 
         // Tercer trimestre
-        upsertNotaYRelacionados(
-                estudiante, materia, periodo, t3,
+        upsertNotaYRelacionados(estudiante, materia, periodo, t3,
                 form.getNotaNumericaTercerTrim(), form.getNotaCualitativaTercerTrim(),
                 form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
                 form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
-                form.getComportamientoTercerTrim(),
-                form.getTotalAsistenciaTercerTrim(),
-                curso
-        );
+                form.getComportamientoTercerTrim(), form.getTotalAsistenciaTercerTrim(), curso);
         upsertComportamiento(estudiante, materia, periodo, t3, form.getComportamientoTercerTrim());
         upsertAsistencia(estudiante, materia, periodo, t3,
-                form.getAsistenciaTercerTrim(),
-                form.getFaltasJustificadasTercerTrim(),
-                form.getFaltasInjustificadasTercerTrim(),
-                form.getAtrasosTercerTrim(),
-                form.getTotalAsistenciaTercerTrim()
-        );
+                form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
+                form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
+                form.getTotalAsistenciaTercerTrim());
 
-        // Guardar Comportamiento Final por Curso si hay algún dato
+        // Guardar comportamiento final por curso
         if (curso != null &&
                 (notBlank(form.getComportamientoFinalVariable1()) ||
                         notBlank(form.getComportamientoFinalVariable2()) ||
                         notBlank(form.getComportamientoFinalVariable3()))) {
-
-            upsertComportamientoCursoFinal(
-                    estudiante,
-                    curso,
-                    periodo,
+            upsertComportamientoCursoFinal(estudiante, curso, periodo,
                     form.getComportamientoFinalVariable1(),
                     form.getComportamientoFinalVariable2(),
-                    form.getComportamientoFinalVariable3()
+                    form.getComportamientoFinalVariable3());
+        }
+
+        // --- Guardar nota cualitativa final ---
+        if (curso != null &&
+                (notBlank(form.getNotaCualitativaFinalPrimerTrim()) ||
+                        notBlank(form.getNotaCualitativaFinalSegundoTrim()) ||
+                        notBlank(form.getNotaCualitativaFinalTercerTrim()))) {
+
+            upsertNotaCualitativaFinal(
+                    estudiante, curso, periodo,
+                    form.getNotaCualitativaFinalPrimerTrim(),
+                    form.getNotaCualitativaFinalSegundoTrim(),
+                    form.getNotaCualitativaFinalTercerTrim()
             );
         }
+
     }
+
 
 // Métodos auxiliares (ya tienes estos, pero para referencia):
 
@@ -469,11 +500,19 @@ public class NotasService {
         nota.setNotaNumerica(notaNumerica);
         nota.setNotaCualitativa(notaCualitativa);
 
-        // ** Asignamos el curso **
+        // Asignar curso
         nota.setCurso(curso);
+
+        // ** Asignar nivel educativo **
+        if (estudiante != null && estudiante.getNivelEducativo() != null) {
+            nota.setNivelEducativo(estudiante.getNivelEducativo());
+        } else {
+            nota.setNivelEducativo(null);
+        }
 
         notasRepository.save(nota);
     }
+
 
     private void upsertAsistencia(Estudiante estudiante, Materia materia, PeriodoAcademico periodo,
                                   Trimestre trimestre, Integer asistencias,
@@ -531,6 +570,36 @@ public class NotasService {
 
 
 
+    @Autowired
+    private NotaCualitativaFinalRepository notaCualitativaFinalRepository;
+
+
+    private void upsertNotaCualitativaFinal(
+            Estudiante estudiante,
+            Curso curso,
+            PeriodoAcademico periodo,
+            String nota1,
+            String nota2,
+            String nota3
+    ) {
+        NotaCualitativaFinal ent = notaCualitativaFinalRepository
+                .findByEstudianteAndCursoAndPeriodo(estudiante, curso, periodo)
+                .orElseGet(() -> {
+                    NotaCualitativaFinal nueva = new NotaCualitativaFinal();
+                    nueva.setEstudiante(estudiante);
+                    nueva.setCurso(curso);
+                    nueva.setPeriodo(periodo);
+                    return nueva;
+                });
+
+        ent.setNotaFinalPrimerTrim(nota1);
+        ent.setNotaFinalSegundoTrim(nota2);
+        ent.setNotaFinalTercerTrim(nota3);
+
+        notaCualitativaFinalRepository.save(ent);
+    }
+
+
 
 
 
@@ -550,7 +619,7 @@ public class NotasService {
         String nombreCurso = "---";
         Long cursoId = null;
         Long periodoId = null;
-        Curso cursoRelacionado = null; // <--- NUEVO para comportamiento final
+        Curso cursoRelacionado = null; // para comportamiento final
 
         if (nota.getMateria() != null && nota.getMateria().getCursos() != null && !nota.getMateria().getCursos().isEmpty()) {
             cursoRelacionado = nota.getMateria().getCursos().get(0);
@@ -561,17 +630,23 @@ public class NotasService {
             }
         }
 
+        // Obtener nivelFiltro a partir del estudiante de la nota
+        String nivelFiltro = (nota.getEstudiante() != null && nota.getEstudiante().getNivelEducativo() != null)
+                ? nota.getEstudiante().getNivelEducativo().getNombre().toLowerCase().replace(" ", "")
+                : null;
+
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
                 nota.getPeriodoAcademico().getNombre(),
                 nombreCurso,
                 nota.getMateria().getNombre(),
                 nota.getEstudiante().getCedula(),
-                null
+                null,  // nombreTrimestre
+                nivelFiltro
         );
 
         NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
 
-        // asegurar id nota
+        // asegurar id nota y otros campos
         dto.setIdNota(nota.getId());
         dto.setCursoId(cursoId);
         dto.setPeriodoAcademicoId(periodoId);
@@ -589,7 +664,7 @@ public class NotasService {
                             (e.getApellido() != null ? e.getApellido() : "")).trim()
             );
 
-            // --- Recuperar Comportamiento Final (si existe) --- // NUEVO
+            // Recuperar Comportamiento Final (si existe)
             if (cursoRelacionado != null && periodoId != null) {
                 comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(e, cursoRelacionado, nota.getPeriodoAcademico())
                         .ifPresent(cf -> {
@@ -621,14 +696,7 @@ public class NotasService {
      * Si materia = null/"" => todas las materias del curso.
      * Si trimestre = "todos"/null => trae los 3 trimestres.
      */
-    public List<NotaCompletaDTO> obtenerNotasParaPDF(String periodo,
-                                                     String curso,
-                                                     String materia,
-                                                     String cedula,
-                                                     String trimestre) {
-        // Usamos el método existente que agrupa y llena los 3 trimestres
-        return obtenerNotasCompletas(periodo, curso, materia, cedula, trimestre);
-    }
+
 
     /**
      * Retorna un solo NotaCompletaDTO por idNota.
@@ -649,12 +717,17 @@ public class NotasService {
             nombreCurso = cursoRelacionado.getNombre();
         }
 
+        String nivelFiltro = nota.getEstudiante() != null && nota.getEstudiante().getNivelEducativo() != null
+                ? nota.getEstudiante().getNivelEducativo().getNombre().toLowerCase().replace(" ", "")
+                : null;
+
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
                 nota.getPeriodoAcademico().getNombre(),
                 nombreCurso,
                 nota.getMateria().getNombre(),
                 nota.getEstudiante().getCedula(),
-                null
+                null,
+                nivelFiltro  // <-- aquí pasa el nivel educativo
         );
 
         NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
@@ -726,12 +799,20 @@ public class NotasService {
 
         // Obtener todas las materias del reporte (pasamos materia=null para TODAS)
         // Ajusta si tu método requiere exactamente null vs ""
+        String nivelFiltro = (est != null && est.getNivelEducativo() != null)
+                ? est.getNivelEducativo().getNombre().toLowerCase().replace(" ", "")
+                : null;
+
+        String nombrePeriodoString = (periodo != null) ? periodo.getNombre() : null;
+        String nombreMateria = null; // si quieres todas las materias, pasa null o ""
+
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
-                nombrePeriodo,
+                nombrePeriodoString,
                 nombreCurso,
-                null,                // MATERIA = TODAS
-                cedulaEstudiante,
-                null                 // trimestreSeleccionado (null = todos)
+                nombreMateria,
+                (est != null) ? est.getCedula() : null,
+                null,  // nombreTrimestre
+                nivelFiltro
         );
 
         System.out.println("DEBUG obtenerReporteFinal(): size dtos antes de compFinal = " + dtos.size());

@@ -9,6 +9,7 @@ import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
 import com.itsqmet.proyecto_vinculacion.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -98,36 +99,33 @@ public class EstudianteController {
    3. Guardar Estudiante (nuevo o editado)
    ========================================== */
     @PostMapping("/pages/Admin/guardarEstudiante")
-    public String guardarEstudiante(
-            @Valid @ModelAttribute Estudiante estudiante,
-            BindingResult result,
-            @RequestParam(name = "nivelId", required = false) Long nivelId,
-            @RequestParam(name = "cursosSeleccionados", required = false) List<Long> cursosIds,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+    public String guardarEstudiante(@ModelAttribute("estudiante") Estudiante estudiante,
+                                    BindingResult result,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model,
+                                    @RequestParam("nivelId") Long nivelId) {
 
-        estudiante.setRol("ESTUDIANTE");
         boolean esEdicion = estudiante.getId() != null;
 
-        // Validación de email duplicado
+        // Verificar duplicado por email
         Optional<Estudiante> estudiantePorEmail = estudianteService.buscarPorEmail(estudiante.getEmail());
         if (estudiantePorEmail.isPresent()) {
-            Estudiante otro = estudiantePorEmail.get();
-            if (!esEdicion || !otro.getId().equals(estudiante.getId())) {
-                result.rejectValue("email", "error.estudiante", "Ya existe un registro con este correo");
+            Estudiante existente = estudiantePorEmail.get();
+            if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
+                result.rejectValue("email", "error.estudiante", "Ya existe un estudiante con este correo.");
             }
         }
 
-        // Validación de cédula duplicada
+        // Verificar duplicado por cédula
         Optional<Estudiante> estudiantePorCedula = estudianteService.buscarOptionalPorCedula(estudiante.getCedula());
         if (estudiantePorCedula.isPresent()) {
-            Estudiante otro = estudiantePorCedula.get();
-            if (!esEdicion || !otro.getId().equals(estudiante.getId())) {
-                result.rejectValue("cedula", "error.estudiante", "Ya existe un registro con esta cédula");
+            Estudiante existente = estudiantePorCedula.get();
+            if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
+                result.rejectValue("cedula", "error.estudiante", "Ya existe un estudiante con esta cédula.");
             }
         }
 
-        // Validación de otros errores
+        // Si hay errores, recargar datos del formulario
         if (result.hasErrors()) {
             model.addAttribute("niveles", nivelEducativoService.listarTodos());
             model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
@@ -135,28 +133,38 @@ public class EstudianteController {
             return "pages/Admin/estudianteForm";
         }
 
-        // Asignar nivel
-        estudiante.setNivelEducativo(nivelId != null
-                ? nivelEducativoService.buscarNivelPorId(nivelId).orElse(null)
-                : null);
+        // Asignar NivelEducativo antes de guardar
+        Optional<NivelEducativo> nivelOpt = nivelEducativoService.buscarNivelPorId(nivelId);
+        if (nivelOpt.isPresent()) {
+            estudiante.setNivelEducativo(nivelOpt.get());
+        } else {
+            result.reject("nivelId", "Nivel educativo no válido.");
+        }
 
-        // Asignar cursos
-        if (cursosIds == null) cursosIds = Collections.emptyList();
-        List<Curso> cursos = cursoService.obtenerCursosPorIds(cursosIds);
-        estudiante.setCursos(cursos);
-
-        for (Curso curso : cursos) {
-            if (curso.getEstudiantes() == null) curso.setEstudiantes(new ArrayList<>());
-            if (!curso.getEstudiantes().contains(estudiante)) {
-                curso.getEstudiantes().add(estudiante);
+        if (esEdicion) {
+            Estudiante estudianteExistente = estudianteService.buscarEstudiantePorId(estudiante.getId()).orElse(null);
+            if (estudianteExistente != null) {
+                if (estudiante.getCursos() == null || estudiante.getCursos().isEmpty()) {
+                    estudiante.setCursos(estudianteExistente.getCursos());
+                }
             }
         }
 
-        estudianteService.guardarEstudiante(estudiante);
-        redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
 
-        return "redirect:/pages/Admin/estudianteVista";
+        try {
+            estudianteService.guardarEstudiante(estudiante);
+            redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
+            return "redirect:/pages/Admin/estudianteVista";
+        } catch (DataIntegrityViolationException ex) {
+            result.reject("error.general", "Ya existe un estudiante con ese email o cédula.");
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
+            model.addAttribute("nivelSeleccionado", nivelId);
+            return "pages/Admin/estudianteForm";
+        }
     }
+
+
 
     /* ==========================================
        4. Editar Estudiante
