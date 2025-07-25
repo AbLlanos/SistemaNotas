@@ -1,0 +1,160 @@
+
+.inputGroup {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 1em 0 1em 0;
+  max-width: 250px;
+  position: relative;
+}
+
+.inputGroup input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(150, 150, 150);
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+}
+
+.inputGroup label {
+  font-size: 100%;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: rgb(100, 100, 100);
+}
+
+.inputGroup :is(input:focus, input:valid)~label {
+  transform: translateY(-50%) scale(.9);
+  margin: 0em;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: white;
+}
+
+.inputGroup :is(input:focus, input:valid) {
+}
+
+.inputGroupFull {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 1em 0 1em 0;
+  position: relative;
+  width: 100%;
+}
+
+.inputGroupFull input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid rgb(150, 150, 150);
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+}
+
+.inputGroupFull label {
+  font-size: 100%;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: rgb(75, 75, 75);
+}
+
+.inputGroupFull :is(input:focus, input:valid)~label {
+  transform: translateY(-50%) scale(.9);
+  margin: 0em;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: white;
+}
+
+.form_main {
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+}
+
+.form_main::before {
+  content: "";
+  position: absolute;
+  bottom: 100px;
+  left: -150px;
+  width: 900px;
+  height: 400px;
+  background-image: url('https://thumbs.dreamstime.com/b/profesor-icon-vector-male-person-profile-avatar-con-un-libro-en-el-ejemplo-del-s%C3%ADmbolo-pictograma-glyph-113755183.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.form_main * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* From Uiverse.io by vikiWayne */
+.button {
+  padding: 1em 2em;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #2c9caf;
+  transition: all 1000ms;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #2c9caf;
+
+
+
+
+}
+
+button:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+  outline: 2px solid #70bdca;
+  box-shadow: 4px 5px 17px -4px #268391;
+}
+
+button::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #2c9caf;
+  transform: skewX(45deg);
+  z-index: -1;
+  transition: width 1000ms;
+}
+
+button:hover::before {
+  width: 250%;
+}
+.button-container {
+ display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+.fuente-titulo {
+  font-family: "Notable", sans-serif;
+font-weight: 100;
+  font-style: normal;}
+
+
+
