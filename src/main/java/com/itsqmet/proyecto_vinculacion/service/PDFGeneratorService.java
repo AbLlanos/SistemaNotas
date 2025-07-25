@@ -259,77 +259,106 @@ public class PDFGeneratorService {
 
 
 
-
-        // Tabla contenedora para las dos tablas lado a lado
-        Table tablaContenedora = new Table(UnitValue.createPercentArray(new float[]{75f, 25f}))
-                .useAllAvailableWidth();
-
-// ======== Tabla Notas Regulares ========
+        // ======== Tabla Notas Regulares ========
         if (!notasRegular.isEmpty()) {
-            float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f};
-            Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths))
-                    .useAllAvailableWidth();
+            float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f}; // Suma ≈100
+            Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
 
-            // Cabecera con tamaño y padding pequeño para compactar
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold().setFontSize(8)).setPadding(3));
-            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold().setFontSize(8)).setPadding(3));
+            // --- Cabecera ---
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
 
-            // Celdas con datos, tamaño pequeño y padding reducido
+            // Acumuladores para promedios numéricos
+            double sumaNota1T = 0; int countNota1T = 0;
+            double sumaNota2T = 0; int countNota2T = 0;
+            double sumaNota3T = 0; int countNota3T = 0;
+
             for (NotaCompletaDTO dto : notasRegular) {
-                tablaNotas.addCell(new Cell().add(new Paragraph(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---").setFontSize(8)).setPadding(3));
+                tablaNotas.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado)).setFontSize(8)).setPadding(3));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+                tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
 
-
+                // Acumular para promedio
+                if (mostrarColumna("Primer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaPrimerTrim() != null) {
+                    sumaNota1T += dto.getNotaNumericaPrimerTrim();
+                    countNota1T++;
+                }
+                if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado) && dto.getNotaNumericaSegundoTrim() != null) {
+                    sumaNota2T += dto.getNotaNumericaSegundoTrim();
+                    countNota2T++;
+                }
+                if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaTercerTrim() != null) {
+                    sumaNota3T += dto.getNotaNumericaTercerTrim();
+                    countNota3T++;
+                }
             }
 
             // Fila de Promedios
-            tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold().setFontSize(8)).setPadding(3));
+            tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold()));
 
-            // Lo mismo para las demás columnas, usando formato pequeño y padding reducido
-            // (omitido aquí para brevedad, pero repite el mismo patrón)
+            if (mostrarColumna("Primer Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
+            }
 
-            // Añades tablaNotas a la primera celda de la tabla contenedora
-            tablaContenedora.addCell(new Cell().add(tablaNotas).setBorder(Border.NO_BORDER));
+            if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
+            }
+
+            if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado)) {
+                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));
+                tablaNotas.addCell("--");
+            } else {
+                tablaNotas.addCell("--");
+                tablaNotas.addCell("--");
+            }
+
+            document.add(tablaNotas);
+            document.add(new Paragraph("\n"));
         }
 
-// ======== Tabla Comportamiento Final ========
+
+
+
+        /* =======================================================================
+         * COMPORTAMIENTO FINAL
+         * ======================================================================= */
+        document.add(new Paragraph("Comportamiento Final del Estudiante")
+                .setBold().setFontSize(14));
+
         NotaCompletaDTO first = notas.isEmpty() ? null : notas.get(0);
         if (first != null) {
             Table tablaCompFinal = new Table(UnitValue.createPercentArray(new float[]{33f, 33f, 34f}))
                     .useAllAvailableWidth();
+            tablaCompFinal.addHeaderCell("1T");
+            tablaCompFinal.addHeaderCell("2T");
+            tablaCompFinal.addHeaderCell("3T");
 
-            tablaCompFinal.addHeaderCell(new Cell().add(new Paragraph("1T").setFontSize(8).setBold()).setPadding(3));
-            tablaCompFinal.addHeaderCell(new Cell().add(new Paragraph("2T").setFontSize(8).setBold()).setPadding(3));
-            tablaCompFinal.addHeaderCell(new Cell().add(new Paragraph("3T").setFontSize(8).setBold()).setPadding(3));
+            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable1()));
+            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable2()));
+            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable3()));
 
-            tablaCompFinal.addCell(new Cell().add(new Paragraph(safeVal(first.getComportamientoFinalVariable1())).setFontSize(8)).setPadding(3));
-            tablaCompFinal.addCell(new Cell().add(new Paragraph(safeVal(first.getComportamientoFinalVariable2())).setFontSize(8)).setPadding(3));
-            tablaCompFinal.addCell(new Cell().add(new Paragraph(safeVal(first.getComportamientoFinalVariable3())).setFontSize(8)).setPadding(3));
-
-            // Añades tablaCompFinal a la segunda celda de la tabla contenedora
-            tablaContenedora.addCell(new Cell().add(tablaCompFinal).setBorder(Border.NO_BORDER).setVerticalAlignment(VerticalAlignment.MIDDLE));
+            document.add(tablaCompFinal);
         }
-
-        document.add(tablaContenedora);
-
-
-
-
-
-
 
 
 
