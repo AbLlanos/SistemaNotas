@@ -20,10 +20,11 @@ public interface ComportamientoRepository extends JpaRepository<Comportamiento, 
             Trimestre trimestre,
             PeriodoAcademico periodo);
 
-    @Query("SELECT c FROM Comportamiento c WHERE c.estudiante = :estudiante AND c.trimestre = :trimestre AND c.periodo = :periodo")
-    Optional<Comportamiento> findUniqueByEstudianteAndTrimestreAndPeriodo(
-            @Param("estudiante") Estudiante estudiante,
-            @Param("trimestre") Trimestre trimestre,
-            @Param("periodo") PeriodoAcademico periodo);
+    Optional<Comportamiento> findByEstudianteAndMateriaAndPeriodoAndTrimestre(
+            Estudiante estudiante,
+            Materia materia,
+            PeriodoAcademico periodo,
+            Trimestre trimestre
+    );
 
 }

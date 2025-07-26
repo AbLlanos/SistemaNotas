@@ -3,14 +3,22 @@ package com.itsqmet.proyecto_vinculacion.controller;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
+import com.itsqmet.proyecto_vinculacion.dto.CursoDTO;
+import com.itsqmet.proyecto_vinculacion.dto.EstudianteOptionDTO;
+import com.itsqmet.proyecto_vinculacion.dto.MateriaOptionDTO;
 import com.itsqmet.proyecto_vinculacion.dto.NotaCompletaDTO;
 import com.itsqmet.proyecto_vinculacion.entity.*;
 import com.itsqmet.proyecto_vinculacion.service.*;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.swing.text.Document;
 import java.io.IOException;
@@ -19,6 +27,8 @@ import java.time.Period;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/pages/Admin")
@@ -48,8 +58,10 @@ public class AdminController {
     @Autowired
     private PDFGeneratorService pdfGeneratorService;
 
+    @Autowired
+    private  AdminService adminService;
 
-    //1. Sistema de notas
+
 
     @GetMapping("/vistaAdmin")
     public String vistaAdmin(){
@@ -58,209 +70,102 @@ public class AdminController {
 
 
 
-
-
-
-    //Ruta educacion inicial
-
-    @GetMapping("/Inicial/educacionInicialVista")
-    public String vistaAdminEducaionInicial(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model) {
-
-        String nombreNivel = "EducacionInicial";
-
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
-
-        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
-        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
-
-        model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        model.addAttribute("cursos", cursosFiltrados);
-        model.addAttribute("materias", materiasFiltradas);
-
-        return "pages/Admin/Inicial/educacionInicialVista";
-    }
-
-
-
-
-
-
-
-
-
-    //Ruta educaion basica
-
-    @GetMapping("/EducacionBasica/educacionBasicaVista")
-    public String vistaAdminEscuela(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model) {
-
-        String nombreNivel = "EducacionBasica";
-
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
-
-        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
-        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
-
-        model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        model.addAttribute("cursos", cursosFiltrados);
-        model.addAttribute("materias", materiasFiltradas);
-
-        return "pages/Admin/EducacionBasica/educacionBasicaVista";
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //Ruta bachillerato
-
-    @GetMapping("/Bachillerato/bachilleratoVista")
-    public String vistaBachillerato(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model) {
-
-        // Selects
-        List<PeriodoAcademico> aniosLectivos = periodoAcademicoService.listarTodosPeriodosAcademicos();
-        List<Curso> cursos = cursoService.listarTodosCursos();
-        List<Materia> materias = materiaService.listarTodasMaterias();
-        List<String> trimestres = List.of("Primer Trimestre", "Segundo Trimestre", "Tercer Trimestre");
-
-        // 🔁 AQUÍ el cambio: usamos obtenerNotasCompletas (agrupado por materia y trimestre)
-        List<NotaCompletaDTO> notas = notasService.obtenerNotasCompletas(
-                nombrePeriodo,
-                nombreCurso,
-                nombreMateria,
-                cedula,
-                nombreTrimestre
-        );
-
-        // Parámetros para mantener filtros en la vista
-        Map<String, Object> param = new HashMap<>();
-        param.put("nombrePeriodo", nombrePeriodo);
-        param.put("nombreCurso", nombreCurso);
-        param.put("nombreMateria", nombreMateria);
-        param.put("cedula", cedula);
-        param.put("nombreTrimestre", nombreTrimestre);
-
-        model.addAttribute("aniosLectivos", aniosLectivos);
-        model.addAttribute("cursos", cursos);
-        model.addAttribute("materias", materias);
-        model.addAttribute("trimestres", trimestres);
-
-        model.addAttribute("notas", notas);
-        model.addAttribute("param", param);
-
-        return "pages/Admin/Bachillerato/bachilleratoVista";
-    }
-
-
-
-    @GetMapping("/notas/nuevo")
-    public String mostrarFormularioNota(Model model) {
-        model.addAttribute("nota", new NotaCompletaDTO());
-        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
-        model.addAttribute("materias", materiaService.listarTodasMaterias());
-        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        return "pages/Admin/Bachillerato/bachilleratoForm";
-    }
-
-
-
-    @PostMapping("/notas/guardar")
-    public String guardarNotaCompleta(@ModelAttribute NotaCompletaDTO notaCompletaDTO) {
-        notasService.guardarNotasDesdeFormulario(notaCompletaDTO);
-        return "redirect:/Bachillerato/bachilleratoVista";
-    }
-
-    @GetMapping("/notas/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
-        NotaCompletaDTO notaCompletaDTO = notasService.obtenerNotaCompletaPorId(id);
-        model.addAttribute("nota", notaCompletaDTO);
-
-        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
-        model.addAttribute("materias", materiaService.listarTodasMaterias());
-        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-
-        return "pages/Admin/Bachillerato/bachilleratoForm";
-    }
-
-
-
-
-
-
-
-
-
-    //Ruta Bachillerato Tecnico
-
-    @GetMapping("/BachilleratoTecnico/bachilleratoTecnicoVista")
-    public String vistaAdminBachilleratoTecnico(
-            @RequestParam(required = false) String nombrePeriodo,
-            @RequestParam(required = false) String nombreCurso,
-            @RequestParam(required = false) String nombreMateria,
-            @RequestParam(required = false) String cedula,
-            @RequestParam(required = false) String nombreTrimestre,
-            Model model) {
-
-        String nombreNivel = "BachilleratoTecnico";
-
-        List<Notas> notas = notasService.buscarNotasPorFiltros(
-                nombrePeriodo, nombreCurso, nombreMateria, cedula, nombreTrimestre
-        );
-
-        List<Curso> cursosFiltrados = cursoService.findByNivelEducativoNombre(nombreNivel);
-        List<Materia> materiasFiltradas = materiaService.findByCursoNivelEducativoNombre(nombreNivel);
-
-        model.addAttribute("notas", notas);
-        model.addAttribute("aniosLectivos", periodoAcademicoService.listarTodosPeriodosAcademicos());
-        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
-        model.addAttribute("cursos", cursosFiltrados);
-        model.addAttribute("materias", materiasFiltradas);
-
-        return "pages/Admin/Bachillerato/bachilleratoVista";
-    }
-
-
-
-    @Autowired
-    private PDFGeneratorService pdfService;
-    //Generar PDF dinamico
-
+        /* ==========================================
+           1. Vista principal con filtros
+           ========================================== */
+        @GetMapping("/adminPerfilVista")
+        public String mostrarAdminVista(
+                Model model,
+                @RequestParam(name = "nombre", required = false) String nombre,
+                @RequestParam(name = "cedula", required = false) String cedula) {
+
+            List<Admin> admins;
+
+            if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
+                admins = adminService.listarTodosAdmin();
+            } else {
+                admins = adminService.buscarPorNombreYCedula(nombre, cedula);
+            }
+
+            model.addAttribute("admins", admins);
+            model.addAttribute("paramNombre", nombre);
+            model.addAttribute("paramCedula", cedula);
+
+            return "pages/Admin/adminPerfilVista";
+        }
+
+        /* ==========================================
+           2. Formulario NUEVO Admin
+           ========================================== */
+        @GetMapping("/adminPerfilForm")
+        public String mostrarAdminForm(Model model) {
+            Admin admin = new Admin(); // nuevo
+            admin.setVisible(true); // por defecto visible
+            model.addAttribute("admin", admin);
+            return "pages/Admin/adminPerfilForm";
+        }
+
+        /* ==========================================
+           3. Guardar Admin
+           ========================================== */
+        @PostMapping("/guardarAdmin")
+        public String guardarAdmin(
+                @Valid @ModelAttribute("admin") Admin admin,
+                BindingResult result,
+                RedirectAttributes redirectAttributes) {
+
+            boolean esEdicion = admin.getId() != null;
+
+            // Validación de email duplicado
+            Optional<Admin> adminPorEmail = adminService.listarTodosAdmin().stream()
+                    .filter(a -> a.getEmail().equalsIgnoreCase(admin.getEmail()))
+                    .findFirst();
+            if (adminPorEmail.isPresent() && (!esEdicion || !adminPorEmail.get().getId().equals(admin.getId()))) {
+                result.rejectValue("email", "error.admin", "Ya existe un registro con este correo");
+            }
+
+            // Validación de cédula duplicada
+            Optional<Admin> adminPorCedula = adminService.listarTodosAdmin().stream()
+                    .filter(a -> a.getCedula().equalsIgnoreCase(admin.getCedula()))
+                    .findFirst();
+            if (adminPorCedula.isPresent() && (!esEdicion || !adminPorCedula.get().getId().equals(admin.getId()))) {
+                result.rejectValue("cedula", "error.admin", "Ya existe un registro con esta cédula");
+            }
+
+            if (result.hasErrors()) {
+                return "pages/Admin/adminPerfilForm";
+            }
+
+            admin.setRol("ADMIN");
+            adminService.guardarAdmin(admin);
+            redirectAttributes.addFlashAttribute("success", "Admin guardado correctamente.");
+            return "redirect:/pages/Admin/adminPerfilVista";
+        }
+
+        /* ==========================================
+           4. Editar Admin
+           ========================================== */
+        @GetMapping("/editarAdmin/{id}")
+        public String editarAdmin(@PathVariable Long id, Model model) {
+            Admin admin = adminService.buscarAdminPorId(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Admin no encontrado: " + id));
+            model.addAttribute("admin", admin);
+            return "pages/Admin/adminPerfilForm";
+        }
+
+        /* ==========================================
+           5. Eliminar Admin
+           ========================================== */
+        @GetMapping("/eliminarAdmin/{id}")
+        public String eliminarAdmin(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+            try {
+                adminService.eliminarAdmin(id);
+                redirectAttributes.addFlashAttribute("success", "Admin eliminado.");
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("error", "No se pudo eliminar: " + e.getMessage());
+            }
+            return "redirect:/pages/Admin/adminPerfilVista";
+        }
 
     @GetMapping("/admin/generar-pdf")
     public void generarPdf(
@@ -285,30 +190,5 @@ public class AdminController {
 
         pdfGeneratorService.generarPdfNotas(datos, trimestre, response.getOutputStream());
     }
-
-
-
-    @GetMapping("/admin/reporte-notas")
-    public void generarReporteNotas(
-            @RequestParam(value = "cedula", required = false) String cedula,
-            @RequestParam(value = "periodo", required = false) String periodo,
-            @RequestParam(value = "curso", required = false) String curso,
-            @RequestParam(value = "trimestre", required = false, defaultValue = "todos") String trimestre,
-            HttpServletResponse response
-    ) throws IOException {
-        // Ajusta este método para filtrar por periodo, cedula y curso
-        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
-
-        String nombreEstudiante = notas.isEmpty() ? "Estudiante" : notas.get(0).getNombreEstudiante();
-
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "inline; filename=reporte-notas.pdf");
-
-        pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
-    }
-
-
-
-
 
 }

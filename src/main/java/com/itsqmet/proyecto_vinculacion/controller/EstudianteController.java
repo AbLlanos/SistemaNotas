@@ -6,15 +6,20 @@ import com.itsqmet.proyecto_vinculacion.entity.NivelEducativo;
 import com.itsqmet.proyecto_vinculacion.service.CursoService;
 import com.itsqmet.proyecto_vinculacion.service.EstudianteService;
 import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
+import com.itsqmet.proyecto_vinculacion.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class EstudianteController {
@@ -22,6 +27,10 @@ public class EstudianteController {
     @Autowired private EstudianteService estudianteService;
     @Autowired private NivelEducativoService nivelEducativoService;
     @Autowired private CursoService cursoService;
+    @Autowired
+    private UsuarioService usuarioService;
+
+
 
     /* ==========================================
        1. Vista principal con filtros + visibilidad
@@ -36,7 +45,7 @@ public class EstudianteController {
         List<Estudiante> estudiantes;
 
         if (mostrarOcultos) {
-            // incluir NO visibles
+
             if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
                 estudiantes = estudianteService.listarTodosEstudiantes();
             } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
@@ -47,7 +56,7 @@ public class EstudianteController {
                 estudiantes = estudianteService.buscarPorNombreYCedula(nombre, cedula);
             }
         } else {
-            // sólo visibles
+
             if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
                 estudiantes = estudianteService.listarVisibles();
             } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
@@ -87,52 +96,75 @@ public class EstudianteController {
     }
 
     /* ==========================================
-       3. Guardar Estudiante (nuevo o editado)
-       ========================================== */
+   3. Guardar Estudiante (nuevo o editado)
+   ========================================== */
     @PostMapping("/pages/Admin/guardarEstudiante")
-    public String guardarEstudiante(
-            @ModelAttribute Estudiante estudiante,
-            @RequestParam(name = "nivelId", required = false) Long nivelId,
-            @RequestParam(name = "cursosSeleccionados", required = false) List<Long> cursosIds,
-            RedirectAttributes redirectAttributes) {
+    public String guardarEstudiante(@ModelAttribute("estudiante") Estudiante estudiante,
+                                    BindingResult result,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model,
+                                    @RequestParam("nivelId") Long nivelId) {
 
-        try {
-            estudiante.setRol("ESTUDIANTE");
+        boolean esEdicion = estudiante.getId() != null;
 
-            // Nivel
-            if (nivelId != null) {
-                NivelEducativo nivel = nivelEducativoService.buscarNivelPorId(nivelId).orElse(null);
-                estudiante.setNivelEducativo(nivel);
-            } else {
-                estudiante.setNivelEducativo(null);
+        // Verificar duplicado por email
+        Optional<Estudiante> estudiantePorEmail = estudianteService.buscarPorEmail(estudiante.getEmail());
+        if (estudiantePorEmail.isPresent()) {
+            Estudiante existente = estudiantePorEmail.get();
+            if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
+                result.rejectValue("email", "error.estudiante", "Ya existe un estudiante con este correo.");
             }
-
-            // Cursos
-            if (cursosIds == null) cursosIds = Collections.emptyList();
-
-            List<Curso> cursos = cursoService.obtenerCursosPorIds(cursosIds);
-            estudiante.setCursos(cursos);
-
-            // Agrega el estudiante a la lista de cada curso (relación inversa)
-            for (Curso curso : cursos) {
-                if (curso.getEstudiantes() == null) {
-                    curso.setEstudiantes(new ArrayList<>());
-                }
-                if (!curso.getEstudiantes().contains(estudiante)) {
-                    curso.getEstudiantes().add(estudiante);
-                }
-            }
-
-            // Guarda el estudiante
-            estudianteService.guardarEstudiante(estudiante);
-
-            redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al guardar el estudiante: " + e.getMessage());
         }
 
-        return "redirect:/pages/Admin/estudianteVista";
+        // Verificar duplicado por cédula
+        Optional<Estudiante> estudiantePorCedula = estudianteService.buscarOptionalPorCedula(estudiante.getCedula());
+        if (estudiantePorCedula.isPresent()) {
+            Estudiante existente = estudiantePorCedula.get();
+            if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
+                result.rejectValue("cedula", "error.estudiante", "Ya existe un estudiante con esta cédula.");
+            }
+        }
+
+        // Si hay errores, recargar datos del formulario
+        if (result.hasErrors()) {
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
+            model.addAttribute("nivelSeleccionado", nivelId);
+            return "pages/Admin/estudianteForm";
+        }
+
+        // Asignar NivelEducativo antes de guardar
+        Optional<NivelEducativo> nivelOpt = nivelEducativoService.buscarNivelPorId(nivelId);
+        if (nivelOpt.isPresent()) {
+            estudiante.setNivelEducativo(nivelOpt.get());
+        } else {
+            result.reject("nivelId", "Nivel educativo no válido.");
+        }
+
+        if (esEdicion) {
+            Estudiante estudianteExistente = estudianteService.buscarEstudiantePorId(estudiante.getId()).orElse(null);
+            if (estudianteExistente != null) {
+                if (estudiante.getCursos() == null || estudiante.getCursos().isEmpty()) {
+                    estudiante.setCursos(estudianteExistente.getCursos());
+                }
+            }
+        }
+
+
+        try {
+            estudianteService.guardarEstudiante(estudiante);
+            redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
+            return "redirect:/pages/Admin/estudianteVista";
+        } catch (DataIntegrityViolationException ex) {
+            result.reject("error.general", "Ya existe un estudiante con ese email o cédula.");
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("cursos", nivelId != null ? cursoService.listarPorNivelId(nivelId) : Collections.emptyList());
+            model.addAttribute("nivelSeleccionado", nivelId);
+            return "pages/Admin/estudianteForm";
+        }
     }
+
+
 
     /* ==========================================
        4. Editar Estudiante

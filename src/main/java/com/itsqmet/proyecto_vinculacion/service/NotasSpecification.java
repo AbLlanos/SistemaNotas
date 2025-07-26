@@ -1,56 +1,52 @@
 package com.itsqmet.proyecto_vinculacion.service;
 
-import com.itsqmet.proyecto_vinculacion.entity.Curso;
-import com.itsqmet.proyecto_vinculacion.entity.Materia;
-import com.itsqmet.proyecto_vinculacion.entity.Notas;
+import com.itsqmet.proyecto_vinculacion.entity.*;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NotasSpecification {
 
-    public static Specification<Notas> filtrarPorCampos(
-            String nombrePeriodo,
-            String nombreCurso,
-            String nombreMateria,
-            String cedula,
-            String nombreTrimestre) {
 
-        return (Root<Notas> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+        public static Specification<Notas> filtrarPorCampos(
+                String nombrePeriodo,
+                String nombreCurso,
+                String nombreMateria,
+                String cedula,
+                String nombreTrimestre,
+                String nivelFiltro) {
 
-            query.distinct(true);
+            return (root, query, cb) -> {
+                List<Predicate> predicates = new ArrayList<>();
 
-            Predicate predicate = cb.conjunction();
+                if (nombrePeriodo != null && !nombrePeriodo.isBlank()) {
+                    predicates.add(cb.equal(root.get("periodoAcademico").get("nombre"), nombrePeriodo));
+                }
+                if (nombreCurso != null && !nombreCurso.isBlank()) {
+                    predicates.add(cb.equal(root.get("curso").get("nombre"), nombreCurso));
+                }
+                if (nombreMateria != null && !nombreMateria.isBlank()) {
+                    predicates.add(cb.equal(root.get("materia").get("nombre"), nombreMateria));
+                }
+                if (cedula != null && !cedula.isBlank()) {
+                    predicates.add(cb.equal(root.get("estudiante").get("cedula"), cedula));
+                }
+                if (nombreTrimestre != null && !nombreTrimestre.isBlank()) {
+                    predicates.add(cb.equal(root.get("trimestre").get("nombre"), nombreTrimestre));
+                }
+                if (nivelFiltro != null && !nivelFiltro.isBlank()) {
+                    predicates.add(cb.equal(
+                            cb.lower(cb.function("REPLACE", String.class,
+                                    root.get("estudiante").get("nivelEducativo").get("nombre"),
+                                    cb.literal(" "), cb.literal(""))),
+                            nivelFiltro.toLowerCase()
+                    ));
+                }
 
-            Join<Notas, Materia> joinMateria = root.join("materia");
-            Join<Materia, Curso> joinCurso = joinMateria.join("cursos", JoinType.LEFT);
+                return cb.and(predicates.toArray(new Predicate[0]));
+            };
+        }
 
-            if (nombreCurso != null && !nombreCurso.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(cb.lower(joinCurso.get("nombre")), nombreCurso.trim().toLowerCase()));
-            }
-
-            if (nombreMateria != null && !nombreMateria.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(cb.lower(joinMateria.get("nombre")), nombreMateria.trim().toLowerCase()));
-            }
-
-            if (cedula != null && !cedula.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("estudiante").get("cedula"), cedula.trim()));
-            }
-
-            if (nombreTrimestre != null && !nombreTrimestre.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("trimestre").get("nombre"), nombreTrimestre.trim()));
-            }
-
-            if (nombrePeriodo != null && !nombrePeriodo.isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("periodoAcademico").get("nombre"), nombrePeriodo.trim()));
-            }
-
-            return predicate;
-        };
     }
-
-}

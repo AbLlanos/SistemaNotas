@@ -18,17 +18,15 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Long> {
     // NUEVO: por nivel educativo
     List<Estudiante> findByNivelEducativo_Id(Long nivelId);
 
-
-
     // nuevos (visibles)
     List<Estudiante> findByVisibleTrueAndNivelEducativo_Id(Long nivelId);
-    List<Estudiante> findByVisibleTrue();
-    List<Estudiante> findByVisibleTrueAndNombreContainingIgnoreCase(String nombre);
-    List<Estudiante> findByVisibleTrueAndCedulaContainingIgnoreCase(String cedula);
-    List<Estudiante> findByVisibleTrueAndNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(String nombre, String cedula);
-
 
     List<Estudiante> findByVisibleTrueAndNivelEducativoNombre(String nombreNivel);
 
+    List<Estudiante> findByCursos_Id(Long cursoId);
+
+    List<Estudiante> findDistinctByCursos_NombreIgnoreCase(String nombreCurso);
+
+    Optional<Estudiante> findByEmail(String email);
 
 }

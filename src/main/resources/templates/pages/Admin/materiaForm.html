@@ -26,13 +26,10 @@
                 th:text="${materia.id} != null ? 'Editar Materia' : 'Registro de Materia'">
                 Registro de Materia
             </h2>
+            <h3 class="text-2xl font-extrabold text-blue-700 mb-2">
+                Colocar tildes en el nombre de la materia puede generar errores
+            </h3>
             <p class="text-gray-500">Complete los datos.</p>
-        </div>
-
-        <!-- DEBUG (quítalo luego) -->
-        <div class="mb-4 text-xs text-gray-500 italic">
-            Docentes cargados: <span th:text="${docentesCount}">?</span> /
-            Niveles cargados: <span th:text="${nivelesCount}">?</span>
         </div>
 
         <form th:action="@{/pages/Admin/materiaGuardar}" method="post" th:object="${materia}" class="space-y-6">
@@ -40,38 +37,70 @@
 
             <!-- Nombre -->
             <div>
-                <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre de la Materia</label>
+                <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Ingrese el nombre de la Materia</label>
                 <input type="text" id="nombre" th:field="*{nombre}" required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                        placeholder="Ej: Matemáticas" />
             </div>
 
+
             <!-- Docente -->
             <div>
-                <label for="docenteSelect" class="block text-sm font-semibold text-gray-700 mb-1">Docente responsable</label>
-                <select id="docenteSelect" name="docenteId"
+                <label for="docenteSelect" class="block text-sm font-semibold text-gray-700 mb-1">Docente responsable (opcional)</label>
+                <select id="docenteSelect" th:field="*{docente.id}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
                     <option value="">-- Sin docente --</option>
                     <option th:each="doc : ${docentes}"
                             th:value="${doc.id}"
-                            th:text="${doc.nombre + ' ' + doc.apellido}"
-                            th:selected="${materia.docente} != null ? (doc.id == materia.docente.id) : false">
+                            th:text="${doc.nombre}">
                     </option>
                 </select>
             </div>
 
             <!-- Nivel Educativo -->
+            <!-- Nivel Educativo -->
             <div>
-                <label for="nivelSelect" class="block text-sm font-semibold text-gray-700 mb-1">Nivel Educativo</label>
-                <select id="nivelSelect" name="nivelId"
+                <label for="nivelSelect" class="block text-sm font-semibold text-gray-700 mb-1">Seleccione el nivel Educativo</label>
+                <select id="nivelSelect" th:field="*{nivelEducativo.id}"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
                     <option value="">-- Seleccione nivel --</option>
                     <option th:each="niv : ${niveles}"
                             th:value="${niv.id}"
-                            th:text="${niv.nombre}"
-                            th:selected="${materia.nivelEducativo} != null ? (niv.id == materia.nivelEducativo.id) : false">
+                            th:text="${niv.nombre}">
                     </option>
                 </select>
+            </div>
+
+
+
+            <!-- Tipo de Materia -->
+            <div>
+                <label for="tipoMateria" class="block text-sm font-semibold text-gray-700 mb-1">Seleccione el tipo de Materia</label>
+                <select id="tipoMateria" th:field="*{tipoMateria}" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                    <option value="NORMAL" th:selected="${materia.tipoMateria == 'NORMAL'}">Normal</option>
+                    <option value="COMPLEMENTARIA" th:selected="${materia.tipoMateria == 'COMPLEMENTARIA'}">Materia Complementaria</option>
+                </select>
+            </div>
+
+
+            <!-- Periodo Académico -->
+            <div>
+                <label for="periodoSelect" class="block text-sm font-semibold text-gray-700 mb-1">Seleccione el Periodo Académico</label>
+                <select id="periodoSelect" th:field="*{periodoAcademico.id}"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                    <option value="">-- Seleccione periodo --</option>
+                    <option th:each="per : ${periodos}"
+                            th:value="${per.id}"
+                            th:text="${per.nombre}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Visible -->
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="visible" th:field="*{visible}" class="h-4 w-4 border-gray-300 rounded">
+                <label for="visible" class="text-sm text-gray-700">¿Visible?</label>
             </div>
 
             <div class="pt-6">

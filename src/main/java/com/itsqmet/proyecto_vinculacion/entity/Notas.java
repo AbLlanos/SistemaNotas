@@ -20,6 +20,9 @@ public class Notas {
     private String notaCualitativa;
 
     @ManyToOne
+    private Curso curso;
+
+    @ManyToOne
     private Estudiante estudiante;
 
     @ManyToOne
@@ -30,6 +33,10 @@ public class Notas {
 
     @ManyToOne
     private PeriodoAcademico periodoAcademico;
+
+    @ManyToOne
+    @JoinColumn(name = "nivel_educativo_id")
+    private NivelEducativo nivelEducativo;
 
     public Long getId() {
         return id;

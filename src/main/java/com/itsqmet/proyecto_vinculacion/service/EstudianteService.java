@@ -161,10 +161,21 @@ public class EstudianteService {
         return estudianteRepository.findByVisibleTrueAndNivelEducativo_Id(nivelId);
     }
 
-    public List<Estudiante> listarVisiblesPorNivelEducativoNombre(String nombreNivel) {
-        return estudianteRepository.findByVisibleTrueAndNivelEducativoNombre(nombreNivel);
+    /** Estudiantes inscritos en un curso (por ID). */
+    public List<Estudiante> listarPorCurso(Long cursoId) {
+        if (cursoId == null) return List.of();
+        return estudianteRepository.findByCursos_Id(cursoId);
+    }
+
+    public Optional<Estudiante> buscarPorEmail(String email) {
+        return estudianteRepository.findByEmail(email);
+    }
+
+    public Optional<Estudiante> buscarOptionalPorCedula(String cedula) {
+        return estudianteRepository.findByCedula(cedula);
     }
 
 
-
 }
+
+

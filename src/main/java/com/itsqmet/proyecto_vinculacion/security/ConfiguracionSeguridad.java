@@ -17,7 +17,7 @@ public class ConfiguracionSeguridad {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index",
-                                "/login", "/notas/guardar",
+                                "/login", "/notas/guardar","/img/**",
                                 "/css/**", "/js/**", "/imagenes/**").permitAll()
                         //.requestMatchers("/pages/Admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
