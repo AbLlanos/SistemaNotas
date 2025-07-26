@@ -61,6 +61,31 @@
           border-color: #2563eb;
           box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5);
         }
+        .filtros {
+        background: linear-gradient(135deg, #dbeafe, #ffffff);
+        border: 2px solid #93c5fd;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
+    }
+
+    .select-filter, .input-filter {
+        background-color: #e0f2ff;
+        border: 1px solid #60a5fa;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        font-size: 1rem;
+        color: #1e3a8a;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .select-filter:focus, .input-filter:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5);
+    }
     </style>
     <style>
         /* Scroll vertical en el cuerpo de la tabla */
@@ -131,111 +156,80 @@
 </nav>
 
 <!-- CONTENEDOR -->
-<div class="container mx-auto px-4 mt-8">
-    <div class="max-w-7xl mx-auto rounded-xl border border-gray-200 shadow-xl bg-white p-6">
-
-        <!-- ENCABEZADO -->
-        <div class="mb-6 text-center bg-blue-100 rounded-lg p-6 shadow-inner">
-            <h4 class="text-4xl font-extrabold text-blue-900 mb-2">Listado de Calificaciones</h4>
-            <p class="text-blue-700 text-xl font-medium">Educación básica</p>
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Contenedor principal -->
+    <div class="bg-blue-50 rounded-2xl shadow-lg p-6 border border-blue-200">
+        <!-- Encabezado -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-blue-900">Listado de Calificaciones</h1>
+            <p class="text-lg text-blue-700">Educación Básica</p>
         </div>
 
-        <!-- FILTROS -->
-        <div class="filtros">
-            <form method="get" action="/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista" id="formFiltros" class="space-y-6">
+        <!-- Mensajes -->
+        <div class="mb-4">
+            <div id="mensajeExito" class="bg-green-100 text-green-700 text-sm font-medium rounded-lg px-4 py-2 border border-green-300 mb-2" style="display:none;"></div>
+            <div id="mensajeError" class="bg-red-100 text-red-700 text-sm font-medium rounded-lg px-4 py-2 border border-red-300" style="display:none;"></div>
+        </div>
 
-                <!-- Mensajes -->
-                <div th:if="${exito}"
-                     class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded shadow">
-                    <span th:text="${exito}"></span>
+        <!-- Formulario -->
+        <div class="bg-blue-100 p-6 rounded-xl border border-blue-200 shadow-inner space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Periodo Académico -->
+                <div>
+                    <label for="periodo" class="block mb-2 text-sm font-semibold text-blue-900">Periodo Académico</label>
+                    <select id="periodo" class="w-full rounded-lg border border-blue-300 text-sm px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option>-- Seleccione el periodo académico --</option>
+                    </select>
                 </div>
 
-                <div th:if="${error}"
-                     class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded shadow">
-                    <span th:text="${error}"></span>
+                <!-- Curso -->
+                <div>
+                    <label for="curso" class="block mb-2 text-sm font-semibold text-blue-900">Curso</label>
+                    <select id="curso" class="w-full rounded-lg border border-blue-300 text-sm px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option>-- Seleccione el curso --</option>
+                    </select>
                 </div>
 
-                <!-- Fila 1 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Periodo -->
-                    <div>
-                        <label for="nombrePeriodo" class="block text-sm font-semibold text-blue-900 mb-2">Periodo Académico</label>
-                        <select id="nombrePeriodo" name="nombrePeriodo" class="select-filter">
-                            <option value="">-- Seleccione el periodo académico --</option>
-                            <option th:each="periodo : ${aniosLectivos}"
-                                    th:value="${periodo.nombre}"
-                                    th:text="${periodo.nombre}"
-                                    th:selected="${periodo.nombre == param.nombrePeriodo}"></option>
-                        </select>
-                    </div>
+                <!-- Asignatura -->
+                <div>
+                    <label for="materia" class="block mb-2 text-sm font-semibold text-blue-900">Asignatura</label>
+                    <select id="materia" class="w-full rounded-lg border border-blue-300 text-sm px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option>-- Seleccione la materia --</option>
+                    </select>
+                </div>
+            </div>
 
-                    <!-- Curso -->
-                    <div>
-                        <label for="nombreCurso" class="block text-sm font-semibold text-blue-900 mb-2">Curso</label>
-                        <select id="nombreCurso" name="nombreCurso" class="select-filter">
-                            <option value="">-- Seleccione el curso --</option>
-                            <option th:each="curso : ${cursos}"
-                                    th:value="${curso.nombre}"
-                                    th:text="${curso.nombre}"
-                                    th:attr="data-id=${curso.id}"
-                                    th:selected="${curso.nombre == param.nombreCurso}"></option>
-                        </select>
-                    </div>
-
-                    <!-- Materia -->
-                    <div>
-                        <label for="nombreMateria" class="block text-sm font-semibold text-blue-900 mb-2">Asignatura</label>
-                        <select id="nombreMateria" name="nombreMateria" class="select-filter">
-                            <option value="">-- Seleccione la materia --</option>
-                            <option th:each="materia : ${materias}"
-                                    th:value="${materia.nombre}"
-                                    th:text="${materia.nombre}"
-                                    th:selected="${materia.nombre == param.nombreMateria}"></option>
-                        </select>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Cédula -->
+                <div>
+                    <label for="cedula" class="block mb-2 text-sm font-semibold text-blue-900">Cédula del Estudiante</label>
+                    <input id="cedula" type="text" placeholder="Ej: 1234567890" class="w-full rounded-lg border border-blue-300 text-sm px-4 py-2 focus:ring-2 focus:ring-blue-500 bg-blue-50 placeholder-blue-400">
                 </div>
 
-                <!-- Fila 2 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Cédula -->
-                    <div>
-                        <label for="cedula" class="block text-sm font-semibold text-blue-900 mb-2">Cédula del Estudiante</label>
-                        <input type="text" id="cedula" name="cedula" th:value="${param.cedula}" placeholder="Ej: 1234567890" />
-                    </div>
-
-                    <!-- Semestre -->
-                    <div>
-                        <label for="nombreTrimestre" class="block text-sm font-semibold text-blue-900 mb-2">Semestre</label>
-                        <select id="nombreTrimestre" name="nombreTrimestre" class="select-filter">
-                            <option value="">-- Seleccione el semestre --</option>
-                            <option th:each="tri : ${trimestres}" th:value="${tri}" th:text="${tri}" th:selected="${tri == param.nombreTrimestre}"></option>
-                        </select>
-                    </div>
+                <!-- Semestre -->
+                <div>
+                    <label for="semestre" class="block mb-2 text-sm font-semibold text-blue-900">Semestre</label>
+                    <select id="semestre" class="w-full rounded-lg border border-blue-300 text-sm px-4 py-2 focus:ring-2 focus:ring-blue-500">
+                        <option>-- Seleccione el semestre --</option>
+                    </select>
                 </div>
+            </div>
 
-                <!-- Checkbox -->
-                <div class="flex items-center mt-4">
-                    <label class="inline-flex items-center space-x-2">
-                        <input type="checkbox" name="mostrarOcultos"
-                               class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                               th:checked="${mostrarOcultos}" />
-                        <span class="text-sm text-blue-800 font-medium">Mostrar estudiantes ocultos</span>
-                    </label>
-                </div>
+            <!-- Checkbox -->
+            <div class="flex items-center space-x-2">
+                <input id="ocultos" type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                <label for="ocultos" class="text-sm text-blue-900 font-medium">Mostrar estudiantes ocultos</label>
+            </div>
 
-                <!-- Botones -->
-                <div class="flex justify-center pt-6 gap-4">
-                    <button type="submit" id="btnFiltrar"
-                            class="w-40 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                        <i class="fas fa-filter mr-2"></i> Filtrar Notas
-                    </button>
-
-                    <a href="/pages/Admin/Bachillerato/bachilleratoVista"
-                       class="w-40 py-3 text-center bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50">
-                        <i class="fas fa-eraser mr-2"></i> Limpiar Todo
-                    </a>
-                </div>
-            </form>
+            <!-- Botones -->
+            <div class="flex justify-center gap-4 pt-4">
+                <button class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
+                    Filtrar Notas
+                </button>
+                <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
+                    Limpiar Todo
+                </button>
+            </div>
         </div>
     </div>
 </div>

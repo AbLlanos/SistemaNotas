@@ -4,31 +4,41 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles/stylesBachillerato.css">
     <title>Lista de Educación Inicial</title>
     <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
         .bg-trim1-header {
             background-color: #3B82F6;
         }
+
         .bg-trim1-cell {
             background-color: #DBEAFE;
         }
+
         .bg-trim2-header {
             background-color: #22C55E;
         }
+
         .bg-trim2-cell {
             background-color: #DCFCE7;
         }
+
         .bg-trim3-header {
             background-color: #FBBF24;
         }
+
         .bg-trim3-cell {
             background-color: #FFFBEB;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 min-h-screen">
 
 <nav class="bg-gradient-to-r from-blue-700 to-blue-900 p-6 shadow-lg">
     <div class="container mx-auto flex flex-wrap items-center justify-between">
@@ -39,22 +49,23 @@
     </div>
 </nav>
 
-<div class="container mx-auto px-4 mt-8">
-    <div class="max-w-7xl mx-auto rounded-xl border border-gray-200 shadow-xl bg-white p-6">
+<div class="container mx-auto px-4 mt-10">
+    <div class="max-w-7xl mx-auto rounded-2xl border border-blue-200 shadow-2xl bg-white p-8 backdrop-blur">
 
-        <div class="mb-6 text-center bg-blue-50 rounded-lg p-5">
-            <h4 class="text-4xl font-extrabold text-blue-800 mb-2">Listado de Calificaciones</h4>
-            <p class="text-blue-700 text-xl font-medium">Educación Inicial</p>
+        <!-- Encabezado -->
+        <div class="mb-8 text-center bg-blue-100 rounded-xl p-6 shadow-inner">
+            <h4 class="text-4xl font-extrabold text-blue-900 mb-2 tracking-tight">📋 Listado de Calificaciones</h4>
+            <p class="text-blue-700 text-lg font-medium">Educación Inicial</p>
         </div>
 
+        <!-- Formulario de Filtros -->
         <div class="px-6 pb-6 bg-gray-50 rounded-b-xl border-t border-gray-100 pt-6">
             <form method="get" action="/pages/Admin/Bachillerato/bachilleratoVista" id="formFiltros" class="space-y-6">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
                     <div>
                         <label for="nombrePeriodo" class="block text-sm font-semibold text-gray-800 mb-2">Periodo académico</label>
-                        <select id="nombrePeriodo" name="nombrePeriodo" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <select id="nombrePeriodo" name="nombrePeriodo" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">
                             <option value="">-- Seleccione el periodo académico --</option>
                             <option th:each="periodo : ${aniosLectivos}" th:value="${periodo.nombre}" th:text="${periodo.nombre}" th:selected="${periodo.nombre == param.nombrePeriodo}"></option>
                         </select>
@@ -62,7 +73,7 @@
 
                     <div>
                         <label for="nombreCurso" class="block text-sm font-semibold text-gray-800 mb-2">Curso</label>
-                        <select id="nombreCurso" name="nombreCurso" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <select id="nombreCurso" name="nombreCurso" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">
                             <option value="">-- Seleccione Curso --</option>
                             <option th:each="curso : ${cursos}" th:value="${curso.nombre}" th:text="${curso.nombre}" th:selected="${curso.nombre == param.nombreCurso}"></option>
                         </select>
@@ -70,7 +81,7 @@
 
                     <div>
                         <label for="nombreMateria" class="block text-sm font-semibold text-gray-800 mb-2">Materia</label>
-                        <select id="nombreMateria" name="nombreMateria" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <select id="nombreMateria" name="nombreMateria" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">
                             <option value="">-- Seleccione Materia --</option>
                             <option th:each="materia : ${materias}" th:value="${materia.nombre}" th:text="${materia.nombre}" th:selected="${materia.nombre == param.nombreMateria}"></option>
                         </select>
@@ -78,15 +89,14 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                     <div>
                         <label for="cedula" class="block text-sm font-semibold text-gray-800 mb-2">Cédula Estudiante</label>
-                        <input type="text" id="cedula" name="cedula" th:value="${param.cedula}" placeholder="Ej: 1234567890" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm"/>
+                        <input type="text" id="cedula" name="cedula" th:value="${param.cedula}" placeholder="Ej: 1234567890" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white"/>
                     </div>
 
                     <div>
                         <label for="nombreTrimestre" class="block text-sm font-semibold text-gray-800 mb-2">Semestre</label>
-                        <select id="nombreTrimestre" name="nombreTrimestre" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-200 ease-in-out shadow-sm">
+                        <select id="nombreTrimestre" name="nombreTrimestre" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">
                             <option value="">-- Seleccione Semestre --</option>
                             <option th:each="trimestre : ${trimestres}" th:value="${trimestre.nombre}" th:text="${trimestre.nombre}" th:selected="${trimestre.nombre == param.nombreTrimestre}"></option>
                         </select>
@@ -94,16 +104,16 @@
                 </div>
 
                 <div class="flex justify-center pt-4">
-                    <button type="submit" id="btnFiltrar" class="w-full md:w-1/2 lg:w-1/3 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    <button type="submit" id="btnFiltrar" class="w-full md:w-1/2 lg:w-1/3 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-40">
                         <i class="fas fa-filter mr-2"></i> Filtrar Notas
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
+</div>
 
-    <div class="mt-8 bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+<div class="mt-8 bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-blue-700 text-white">
