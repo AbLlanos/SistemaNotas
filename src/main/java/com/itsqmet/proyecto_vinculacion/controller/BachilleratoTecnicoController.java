@@ -174,16 +174,24 @@ public class BachilleratoTecnicoController {
     @PostMapping("/notas/guardarTecnico")
     public String guardarNotas(
             @ModelAttribute("nota") NotaCompletaDTO form,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
         try {
             notasService.guardarNotasDesdeFormulario(form);
-            redirectAttributes.addFlashAttribute("exito", "¡Las notas se guardaron correctamente!");
-        } catch (IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            model.addAttribute("exito", "¡Las notas se guardaron correctamente!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al guardar las notas: " + e.getMessage());
+            model.addAttribute("error", "Error al guardar las notas: " + e.getMessage());
         }
-        return "redirect:/pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista";
+
+        // Recargar datos del formulario
+        model.addAttribute("nota", form);
+        model.addAttribute("estudiantes", estudianteService.listarTodosEstudiantes());
+        model.addAttribute("materias", materiaService.listarTodasMaterias());
+        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+        model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
+        model.addAttribute("cursos", cursoService.listarTodosCursos());
+
+
+        return "pages/Admin/BachilleratoTecnico/bachilleratoTecnicoForm";
     }
 
     @GetMapping("/notas/editarTecnico/{id}")

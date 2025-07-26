@@ -387,7 +387,7 @@ private  NivelEducativoService nivelEducativoService;
         if (form.getIdNota() == null) {
             boolean existe = notasRepository.existsByEstudianteAndMateriaAndPeriodoAcademico(estudiante, materia, periodo);
             if (existe) {
-                throw new IllegalStateException("Ya existe un registro de notas para este estudiante, materia y periodo.");
+                throw new IllegalStateException("Ya existe un registro de notas para este estudiante,curso, materia y periodo.");
             }
         }
 
