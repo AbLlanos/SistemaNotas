@@ -1,0 +1,135 @@
+.inputGroup,
+.inputGroupFull {
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.inputGroup input,
+.inputGroupFull input,
+.inputGroupFull select,
+.inputGroup select {
+  font-size: 1rem;
+  padding: 0.8em;
+  border: 2px solid #c084fc; /* Morado */
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+  outline: none;
+}
+
+.inputGroup label,
+.inputGroupFull label {
+  font-size: 1rem;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  color: #7e22ce; /* Morado oscuro */
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.inputGroup :is(input:focus, input:valid)~label,
+.inputGroupFull :is(input:focus, input:valid)~label {
+  transform: translateY(-50%) scale(0.9);
+  margin: 0;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: white;
+}
+
+/* Contenedor principal del formulario */
+.form_main_purple {
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 1rem;
+}
+
+.form_main_purple::before {
+  content: "";
+  position: absolute;
+  bottom: 200px;
+  left: -10px;
+  width: 600px;
+  height: 400px;
+  background-image: url('https://i.pinimg.com/564x/5b/c9/2a/5bc92afbd89762aff5b58807c88e76c9.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.08;
+  z-index: 0;
+}
+
+.form_main_purple * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Botón */
+.button_purple {
+  padding: 1em 2em;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #6b21a8;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #c084fc;
+  transition: all 0.4s ease;
+}
+
+.button_purple:hover {
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(192, 132, 252, 0.6);
+}
+
+.button_purple::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #c084fc;
+  transform: skewX(45deg);
+  z-index: -1;
+  transition: width 0.4s ease;
+}
+
+.button_purple:hover::before {
+  width: 250%;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Título */
+.fuente-titulo {
+  font-family: "Notable", sans-serif;
+  font-weight: 100;
+}
+
+/* Navbar difuminado morado */
+nav.blur-navbar-purple {
+  background: rgba(192, 132, 252, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 1.5rem;
+  border-bottom-left-radius: 1.5em;
+  border-bottom-right-radius: 1.5rem;
+}

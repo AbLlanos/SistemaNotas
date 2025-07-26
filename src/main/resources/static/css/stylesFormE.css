@@ -1,0 +1,179 @@
+/* Estilos para los inputs pequeños */
+.inputGroup {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0.5em 0;
+  max-width: 250px;
+  position: relative;
+}
+
+.inputGroup input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid #60a5fa; /* Azul */
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+}
+
+.inputGroup label {
+  font-size: 100%;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: #3b82f6; /* Azul */
+}
+
+.inputGroup :is(input:focus, input:valid) ~ label {
+  transform: translateY(-50%) scale(0.9);
+  margin: 0;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: white;
+}
+
+.inputGroup :is(input:focus, input:valid) {
+  border-color: #2563eb; /* Azul más oscuro */
+}
+
+.inputGroupFull {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 1em 0;
+  position: relative;
+  width: 100%;
+}
+
+.inputGroupFull input {
+  font-size: 100%;
+  padding: 0.8em;
+  outline: none;
+  border: 2px solid #60a5fa;
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+}
+
+.inputGroupFull label {
+  font-size: 100%;
+  position: absolute;
+  left: 0;
+  padding: 0.8em;
+  margin-left: 0.5em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  color: #3b82f6;
+}
+
+.inputGroupFull :is(input:focus, input:valid) ~ label {
+  transform: translateY(-50%) scale(0.9);
+  margin: 0;
+  margin-left: 1.3em;
+  padding: 0.4em;
+  background-color: white;
+}
+
+/* Contenedor del formulario */
+.form_main {
+  position: relative;
+  overflow: hidden;
+  background-color: white;
+  border-radius: 1rem;
+}
+
+/* Imagen de fondo del formulario */
+.form_main::before {
+  content: "";
+  position: absolute;
+  bottom: 100px;
+  left: -20px;
+  width: 600px;
+  height:400px;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/194/194931.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.07;
+  z-index: 0;
+}
+
+/* Asegura que los elementos estén sobre la imagen */
+.form_main * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Botón de enviar */
+.button {
+  padding: 1em 2em;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #1e3a8a; /* Texto azul oscuro */
+  transition: all 1000ms;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #2563eb; /* Azul */
+}
+
+.button:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+  outline: 2px solid #60a5fa;
+  box-shadow: 4px 5px 17px -4px #2563eb;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #2563eb;
+  transform: skewX(45deg);
+  z-index: -1;
+  transition: width 1000ms;
+}
+
+.button:hover::before {
+  width: 250%;
+}
+
+/* Centrar botón */
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Título con fuente especial */
+.fuente-titulo {
+  font-family: "Notable", sans-serif;
+  font-style: normal;
+}
+
+/* Fondo general */
+body {
+  background: linear-gradient(135deg, #bfdbfe, #1d4ed8);
+}
+
+/* Navbar difuminado */
+nav.blur-navbar {
+  background: rgba(37, 99, 235, 0.6); /* Azul */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 1.5rem;
+  border-bottom-left-radius: 1.5em;
+  border-bottom-right-radius: 1.5rem;
+}
