@@ -9,6 +9,7 @@ import com.itsqmet.proyecto_vinculacion.repository.CursoRepository;
 import com.itsqmet.proyecto_vinculacion.repository.EstudianteRepository;
 import com.itsqmet.proyecto_vinculacion.repository.MateriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,9 @@ public class AdminService {
 
     @Autowired
     private AdminRepository adminRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public List<Admin> buscarPorNombreYCedula(String nombre, String cedula) {
@@ -33,6 +37,10 @@ public class AdminService {
 
     /** Guardar/actualizar entidad completa ya armada (con cursos y nivel seteados). */
     public Admin guardarAdmin(Admin admin) {
+        // Encriptar solo si la contraseña no está vacía
+        if (admin.getPassword() != null && !admin.getPassword().isEmpty()) {
+            admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        }
         return adminRepository.save(admin);
     }
 

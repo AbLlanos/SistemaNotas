@@ -2,6 +2,7 @@ package com.itsqmet.proyecto_vinculacion.service;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -19,6 +20,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -279,9 +283,10 @@ public class PDFGeneratorService {
 
 
 
-
+// === Tabla Notas Regulares ===
+// === Tabla Notas Regulares ===
         if (!notasRegular.isEmpty()) {
-            float[] columnWidths = {28f, 12f, 12f, 12f, 12f, 12f, 12f}; // Suma ≈100
+            float[] columnWidths = {20f, 8f, 10f, 8f, 10f, 8f, 10f, 8f, 6f, 6f, 6f}; // 11 columnas
             Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
 
             // --- Cabecera ---
@@ -292,10 +297,16 @@ public class PDFGeneratorService {
             tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
             tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
             tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("Comportamiento").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("1T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("2T").setBold()));
+            tablaNotas.addHeaderCell(new Cell().add(new Paragraph("3T").setBold()));
 
             double sumaNota1T = 0; int countNota1T = 0;
             double sumaNota2T = 0; int countNota2T = 0;
             double sumaNota3T = 0; int countNota3T = 0;
+
+            int fila = 1; // Contador de filas para controlar a partir de cuál ocultar datos
 
             for (NotaCompletaDTO dto : notasRegular) {
                 tablaNotas.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
@@ -309,7 +320,20 @@ public class PDFGeneratorService {
                 tablaNotas.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
                 tablaNotas.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
 
-                // Acumular para promedio
+                if (fila < 2) {
+                    // Mostrar comportamiento solo en las dos primeras filas
+                    tablaNotas.addCell(new Cell().add(new Paragraph(safeVal((" ")))));
+                    tablaNotas.addCell(new Cell().add(new Paragraph(safeVal(dto.getComportamientoFinalVariable1()))));
+                    tablaNotas.addCell(new Cell().add(new Paragraph(safeVal(dto.getComportamientoFinalVariable2()))));
+                    tablaNotas.addCell(new Cell().add(new Paragraph(safeVal(dto.getComportamientoFinalVariable3()))));
+                } else {
+                    tablaNotas.addCell(new Cell());
+                    tablaNotas.addCell(new Cell());
+                    tablaNotas.addCell(new Cell());
+                    tablaNotas.addCell(new Cell());
+                }
+
+                // Acumular para promedios
                 if (mostrarColumna("Primer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaPrimerTrim() != null) {
                     sumaNota1T += dto.getNotaNumericaPrimerTrim();
                     countNota1T++;
@@ -322,37 +346,132 @@ public class PDFGeneratorService {
                     sumaNota3T += dto.getNotaNumericaTercerTrim();
                     countNota3T++;
                 }
+
+                fila++;
             }
 
-
-
-
-            // Fila de Promedios (intercalando cuantitativa y cualitativa)
+            // --- Fila de Promedios ---
             tablaNotas.addCell(new Cell().add(new Paragraph("PROMEDIO").setBold()));
 
             if (mostrarColumna("Primer Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));      // promedio cuantitativa 1T
-                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Primer Trimestre")); // cualitativa 1T
+                tablaNotas.addCell(formatProm(countNota1T, sumaNota1T));
+                String notaFinalCualitativa1T = notasRegular.stream()
+                        .map(NotaCompletaDTO::getNotaCualitativaFinalPrimerTrim)
+                        .filter(Objects::nonNull).findFirst().orElse("--");
+                tablaNotas.addCell(notaFinalCualitativa1T);
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");
             }
 
             if (mostrarColumna("Segundo Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));      // promedio cuantitativa 2T
-                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Segundo Trimestre")); // cualitativa 2T
+                tablaNotas.addCell(formatProm(countNota2T, sumaNota2T));
+                String notaFinalCualitativa2T = notasRegular.stream()
+                        .map(NotaCompletaDTO::getNotaCualitativaFinalSegundoTrim)
+                        .filter(Objects::nonNull).findFirst().orElse("--");
+                tablaNotas.addCell(notaFinalCualitativa2T);
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");
             }
 
             if (mostrarColumna("Tercer Trimestre", trimestreSeleccionado)) {
-                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));      // promedio cuantitativa 3T
-                tablaNotas.addCell(getNotaFinalCualitativaPorTrimestre(notasRegular, "Tercer Trimestre")); // cualitativa 3T
+                tablaNotas.addCell(formatProm(countNota3T, sumaNota3T));
+                String notaFinalCualitativa3T = notasRegular.stream()
+                        .map(NotaCompletaDTO::getNotaCualitativaFinalTercerTrim)
+                        .filter(Objects::nonNull).findFirst().orElse("--");
+                tablaNotas.addCell(notaFinalCualitativa3T);
             } else {
                 tablaNotas.addCell("--");
                 tablaNotas.addCell("--");
             }
+
+            // En la fila de promedios dejamos vacío el espacio para "Comportamiento" y sus trimestres
+            tablaNotas.addCell("");
+            tablaNotas.addCell("");
+            tablaNotas.addCell("");
+            tablaNotas.addCell("");
+
+            // --- Fila de "Actividades Complementarias" ---
+            if (!notasComplementarias.isEmpty()) {
+                Cell celdaTituloComplementarias = new Cell(1, 11)
+                        .add(new Paragraph("Actividades Complementarias").setBold().setFontSize(12))
+                        .setTextAlignment(TextAlignment.LEFT)
+                        .setBackgroundColor(new DeviceRgb(230, 230, 230));
+                tablaNotas.addCell(celdaTituloComplementarias);
+
+                for (NotaCompletaDTO dtoComp : notasComplementarias) {
+                    tablaNotas.addCell(dtoComp.getAreaMateria() != null ? dtoComp.getAreaMateria() : "---");
+
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
+
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
+
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+                    tablaNotas.addCell(mostrarTrimestre(dtoComp.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
+
+                    // Vacíos para comportamiento en complementarias
+                    tablaNotas.addCell("");
+                    tablaNotas.addCell("");
+                    tablaNotas.addCell("");
+                    tablaNotas.addCell("");
+                }
+            }
+
+            // --- FILAS DE ASISTENCIA JUSTO DEBAJO DE COMPORTAMIENTO ---
+
+            // Obtén el primer dto para los datos de asistencia
+            NotaCompletaDTO primerDto = notasRegular.get(0);
+
+            // FILA con título "TRIMESTRE" que ocupa últimas 3 columnas, con espacio vacío con colspan 8 para alinear
+            tablaNotas.addCell(new Cell(1, 8).setBorder(Border.NO_BORDER).add(new Paragraph(""))); // primeras 8 columnas vacías
+            tablaNotas.addCell(new Cell(1, 3)
+                    .add(new Paragraph("TRIMESTRE"))
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER));
+
+            // FILA con I, II, III en últimas 3 columnas
+            tablaNotas.addCell(new Cell(1, 8).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("I")).setBold().setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph("II")).setBold().setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph("III")).setBold().setTextAlignment(TextAlignment.CENTER));
+
+            // FILA Asistencias
+            tablaNotas.addCell(new Cell(1, 7).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("Asistencias")).setBold());
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAsistenciaPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAsistenciaSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAsistenciaTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+            // FILA Faltas Justificadas
+            tablaNotas.addCell(new Cell(1, 7).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("Faltas Just.")).setBold());
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasJustificadasPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasJustificadasSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasJustificadasTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+            // FILA Faltas Injustificadas
+            tablaNotas.addCell(new Cell(1, 7).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("Faltas Injust.")).setBold());
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasInjustificadasPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasInjustificadasSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getFaltasInjustificadasTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+            // FILA Atrasos
+            tablaNotas.addCell(new Cell(1, 7).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("Atrasos")).setBold());
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAtrasosPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAtrasosSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getAtrasosTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+            // FILA Total Asistencias
+            tablaNotas.addCell(new Cell(1, 7).setBorder(Border.NO_BORDER).add(new Paragraph("")));
+            tablaNotas.addCell(new Cell().add(new Paragraph("Total Asist.")).setBold());
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getTotalAsistenciaPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getTotalAsistenciaSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+            tablaNotas.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getTotalAsistenciaTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
 
             document.add(tablaNotas);
             document.add(new Paragraph("\n"));
@@ -361,136 +480,150 @@ public class PDFGeneratorService {
 
 
 
-        /* =======================================================================
-         * COMPORTAMIENTO FINAL
-         * ======================================================================= */
-        document.add(new Paragraph("Comportamiento Final del Estudiante")
-                .setBold().setFontSize(14));
 
-        NotaCompletaDTO first = notas.isEmpty() ? null : notas.get(0);
-        if (first != null) {
-            Table tablaCompFinal = new Table(UnitValue.createPercentArray(new float[]{33f, 33f, 34f}))
-                    .useAllAvailableWidth();
-            tablaCompFinal.addHeaderCell("1T");
-            tablaCompFinal.addHeaderCell("2T");
-            tablaCompFinal.addHeaderCell("3T");
 
-            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable1()));
-            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable2()));
-            tablaCompFinal.addCell(safeVal(first.getComportamientoFinalVariable3()));
 
-            document.add(tablaCompFinal);
+
+
+
+
+
+
+
+
+
+        final String primerCurso = notas.stream()
+                .map(NotaCompletaDTO::getNombreCurso)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+
+        if (primerCurso == null) {
+            System.out.println("No se encontró curso para el estudiante.");
+            return;
         }
 
+        List<NotaCompletaDTO> notasDelPrimerCurso = notas.stream()
+                .filter(dto -> primerCurso.equals(dto.getNombreCurso()))
+                .collect(Collectors.toList());
+
+// Usamos la primera nota del curso para extraer datos
+        NotaCompletaDTO notaDTO = notasDelPrimerCurso.get(0);
+
+// Columnas: Campo + 3 trimestres
+        float[] columnWidths = {10f, 5f, 5f, 5f};
+        Table tabla = new Table(UnitValue.createPercentArray(columnWidths)).useAllAvailableWidth();
+
+        /*
+
+                        .setBorderTop(Border.NO_BORDER)       // Sin borde arriba
+                .setBorderLeft(Border.NO_BORDER)      // Sin borde izquierdo
+                .setBorderBottom(Border.NO_BORDER)    // Sin borde abajo
+                .setBorderRight(Border.NO_BORDER)
+         */
+
+// Cabeceras
+        tabla.addHeaderCell(    new Cell(2, 1)
+                .add(new Paragraph(" "))
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBorderTop(Border.NO_BORDER)
+                .setBorderLeft(Border.NO_BORDER)
+        );;
+        tabla.addHeaderCell(new Cell(1, 3).add(new Paragraph("TRIMESTRE")).setBold().setTextAlignment(TextAlignment.CENTER));
+        tabla.addHeaderCell(new Cell().add(new Paragraph("I")).setBold().setTextAlignment(TextAlignment.CENTER));
+        tabla.addHeaderCell(new Cell().add(new Paragraph("II")).setBold().setTextAlignment(TextAlignment.CENTER));
+        tabla.addHeaderCell(new Cell().add(new Paragraph("III")).setBold().setTextAlignment(TextAlignment.CENTER));
+
+// FILAS DIRECTAS, SIN CÁLCULOS
+
+        tabla.addCell(new Cell().add(new Paragraph("Asistencias")).setBold());
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAsistenciaPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAsistenciaSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAsistenciaTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+        tabla.addCell(new Cell().add(new Paragraph("Faltas Just.")).setBold());
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasJustificadasPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasJustificadasSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasJustificadasTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+        tabla.addCell(new Cell().add(new Paragraph("Faltas Injust.")).setBold());
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasInjustificadasPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasInjustificadasSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getFaltasInjustificadasTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+        tabla.addCell(new Cell().add(new Paragraph("Atrasos")).setBold());
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAtrasosPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAtrasosSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getAtrasosTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
+
+// FILA TOTAL ABAJO (directo desde DTO, sin cálculos)
+        tabla.addCell(new Cell()                .add(new Paragraph(" "))
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setBorderBottom(Border.NO_BORDER)
+                .setBorderLeft(Border.NO_BORDER)
+        );;
 
 
-        // ======== Tabla Notas Complementarias ========
-        if (!notasComplementarias.isEmpty()) {
-            document.add(new Paragraph("Materias Complementarias").setBold().setFontSize(14));
-            float[] columnWidthsComp = {28f, 12f, 12f, 12f, 12f, 12f, 12f};
-            Table tablaComp = new Table(UnitValue.createPercentArray(columnWidthsComp)).useAllAvailableWidth();
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getTotalAsistenciaPrimerTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getTotalAsistenciaSegundoTrim()))).setTextAlignment(TextAlignment.CENTER));
+        tabla.addCell(new Cell().add(new Paragraph(stringSeguro(notaDTO.getTotalAsistenciaTercerTrim()))).setTextAlignment(TextAlignment.CENTER));
 
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Materia").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 1T").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 1T").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 2T").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 2T").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Nota 3T").setBold()));
-            tablaComp.addHeaderCell(new Cell().add(new Paragraph("Cualitativa 3T").setBold()));
+        document.add(tabla);
 
-            for (NotaCompletaDTO dto : notasComplementarias) {
-                tablaComp.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
 
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
 
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
 
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-                tablaComp.addCell(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            }
 
-            document.add(tablaComp);
-            document.add(new Paragraph("\n"));
-        }
 
-        /* =======================================================================
-         * TABLA DETALLADA DE ASISTENCIAS + FILA TOTAL POR MATERIA
-         * ======================================================================= */
-        // Materia + (4 columnas x 3 trimestres) = 13 columnas
-        float[] asistColumnWidths = {
-                24f,  6f,6f,6f,6f,   // 1T
-                6f,6f,6f,6f,         // 2T
-                6f,6f,6f,6f          // 3T
-        }; // suma 96f (está bien <100)
-        Table tablaAsistencias = new Table(UnitValue.createPercentArray(asistColumnWidths)).useAllAvailableWidth();
 
-        tablaAsistencias.addHeaderCell("Materia");
-        tablaAsistencias.addHeaderCell("Asist. 1T");
-        tablaAsistencias.addHeaderCell("FJ 1T");
-        tablaAsistencias.addHeaderCell("FI 1T");
-        tablaAsistencias.addHeaderCell("Atr. 1T");
 
-        tablaAsistencias.addHeaderCell("Asist. 2T");
-        tablaAsistencias.addHeaderCell("FJ 2T");
-        tablaAsistencias.addHeaderCell("FI 2T");
-        tablaAsistencias.addHeaderCell("Atr. 2T");
 
-        tablaAsistencias.addHeaderCell("Asist. 3T");
-        tablaAsistencias.addHeaderCell("FJ 3T");
-        tablaAsistencias.addHeaderCell("FI 3T");
-        tablaAsistencias.addHeaderCell("Atr. 3T");
 
-        for (NotaCompletaDTO dto : notas) {
-            // Fila detalle
-            tablaAsistencias.addCell(dto.getAreaMateria() != null ? dto.getAreaMateria() : "---");
-
-            // 1T
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosPrimerTrim(), "Primer Trimestre", trimestreSeleccionado));
-
-            // 2T
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado));
-
-            // 3T
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAsistenciaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasJustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getFaltasInjustificadasTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-            tablaAsistencias.addCell(mostrarTrimestre(dto.getAtrasosTercerTrim(), "Tercer Trimestre", trimestreSeleccionado));
-
-            // Fila TOTAL ASISTENCIA por materia
-            String etiquetaTot = "Total Asist. " + (dto.getAreaMateria() != null ? dto.getAreaMateria() : "");
-            tablaAsistencias.addCell(new Cell().add(new Paragraph(etiquetaTot)).setItalic());
-
-            tablaAsistencias.addCell(new Cell(1, 4).add(new Paragraph(
-                    mostrarTrimestre(dto.getTotalAsistenciaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado))));
-
-            tablaAsistencias.addCell(new Cell(1, 4).add(new Paragraph(
-                    mostrarTrimestre(dto.getTotalAsistenciaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado))));
-
-            tablaAsistencias.addCell(new Cell(1, 4).add(new Paragraph(
-                    mostrarTrimestre(dto.getTotalAsistenciaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado))));
-        }
-
-        document.add(tablaAsistencias);
 
         // Un poco más de espacio antes del comportamiento final
         document.add(new Paragraph("\n\n"));
 
 
-        // Footer
-        document.add(new Paragraph("\nDocumento generado automáticamente")
-                .setFontSize(10)
-                .setTextAlignment(TextAlignment.CENTER));
+
+        // Crear una tabla de 2 columnas
+        Table footerTable = new Table(UnitValue.createPercentArray(new float[]{50, 50}))
+                .useAllAvailableWidth()
+                .setMarginTop(30);
+
+// Celda izquierda: "DIRECCIÓN" con padding izquierdo ~3cm (≈ 85pt)
+        Cell direccionCell = new Cell()
+                .add(new Paragraph("DIRECCIÓN").setFontSize(10))
+                .setBorder(Border.NO_BORDER)
+                .setPaddingLeft(85) // Aprox 3cm
+                .setTextAlignment(TextAlignment.LEFT);
+
+// Celda derecha: "SECRETARÍA" con padding derecho ~3cm (≈ 85pt)
+        Cell secretariaCell = new Cell()
+                .add(new Paragraph("SECRETARÍA").setFontSize(10))
+                .setBorder(Border.NO_BORDER)
+                .setPaddingRight(85) // Aprox 3cm
+                .setTextAlignment(TextAlignment.RIGHT);
+
+// Agregar las celdas
+        footerTable.addCell(direccionCell);
+        footerTable.addCell(secretariaCell);
+
+// Agregar la tabla al documento
+        document.add(footerTable);
 
         document.close();
     }
+
+
+
+
+
+
+
+
+
 
     /* -----------------------------------------------------------------------
      * Helper: devuelve "--" si el texto es nulo o está vacío
@@ -499,6 +632,9 @@ public class PDFGeneratorService {
         return (val == null || val.trim().isEmpty()) ? "--" : val.trim();
     }
 
+    private String stringSeguro(Integer val) {
+        return val != null ? val.toString() : "";
+    }
 
 
 

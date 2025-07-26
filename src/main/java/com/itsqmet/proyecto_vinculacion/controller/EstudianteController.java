@@ -152,6 +152,7 @@ public class EstudianteController {
 
 
         try {
+            estudiante.setRol("ESTUDIANTE");
             estudianteService.guardarEstudiante(estudiante);
             redirectAttributes.addFlashAttribute("success", "Estudiante guardado correctamente.");
             return "redirect:/pages/Admin/estudianteVista";
