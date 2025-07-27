@@ -103,7 +103,7 @@ public class EstudianteController {
                                     BindingResult result,
                                     RedirectAttributes redirectAttributes,
                                     Model model,
-                                    @RequestParam("nivelId") Long nivelId) {
+                                    @RequestParam(value = "nivelId", required = false) Long nivelId) {
 
         boolean esEdicion = estudiante.getId() != null;
 
