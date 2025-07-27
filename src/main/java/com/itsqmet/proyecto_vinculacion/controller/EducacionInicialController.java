@@ -188,7 +188,7 @@ public class EducacionInicialController {
         model.addAttribute("trimestres", trimestreService.listarTodosPeriodos());
         model.addAttribute("cursos", cursoService.listarTodosCursos());
 
-        return "redirect:/pages/Admin/Inicial/educacionInicialForm";
+        return "pages/Admin/Inicial/educacionInicialForm";
     }
 
     @GetMapping("/notas/editarEducacionInicial/{id}")

@@ -19,8 +19,19 @@
     <div class="content-grid">
         <div class="info-card">
             <i class="fas fa-book-reader card-icon"></i>
-            <button class="button">Manual de usuario</button>
+            <button class="button" id="btnManual">Manual de usuario</button>
         </div>
+
+        <script>
+            document.getElementById('btnManual').addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.href = '/pdf/manual.pdf';
+                link.download = 'manual.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        </script>
 
         <div class="info-card">
             <i class="fas fa-sign-in-alt card-icon"></i>

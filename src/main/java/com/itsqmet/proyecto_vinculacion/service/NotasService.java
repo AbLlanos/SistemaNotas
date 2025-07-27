@@ -130,7 +130,7 @@ public class NotasService {
 
                     nuevoDto.setCedulaEstudiante(ced);
                     nuevoDto.setNombreCompletoEstudiante(
-                            (nombre != null ? nombre : "") + " " + (apellido != null ? apellido : ""));
+                            (nombre != null ? nombre : ""));
                     System.out.println("👤 Estudiante: " + nuevoDto.getNombreCompletoEstudiante() + " (" + ced + ")");
                 } else {
                     nuevoDto.setCedulaEstudiante("---");
@@ -660,8 +660,7 @@ private  NivelEducativoService nivelEducativoService;
             dto.setCedulaEstudiante(e.getCedula());
             dto.setNombreEstudiante(e.getNombre());
             dto.setNombreCompletoEstudiante(
-                    ((e.getNombre() != null ? e.getNombre() : "") + " " +
-                            (e.getApellido() != null ? e.getApellido() : "")).trim()
+                    ((e.getNombre() != null ? e.getNombre() : ""))
             );
 
             // Recuperar Comportamiento Final (si existe)
@@ -743,8 +742,7 @@ private  NivelEducativoService nivelEducativoService;
             Estudiante e = nota.getEstudiante();
             dto.setCedulaEstudiante(e.getCedula());
             dto.setNombreEstudiante(e.getNombre());
-            dto.setNombreCompletoEstudiante(((e.getNombre() != null ? e.getNombre() : "") + " " +
-                    (e.getApellido() != null ? e.getApellido() : "")).trim());
+            dto.setNombreCompletoEstudiante(((e.getNombre() != null ? e.getNombre() : "")));
 
             // Recuperar comportamiento final usando entidades completas:
             if (cursoRelacionado != null && nota.getPeriodoAcademico() != null) {

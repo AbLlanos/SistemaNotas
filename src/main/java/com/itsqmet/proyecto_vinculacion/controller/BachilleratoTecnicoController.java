@@ -195,7 +195,7 @@ public class BachilleratoTecnicoController {
     }
 
     @GetMapping("/notas/editarTecnico/{id}")
-    public String mostrarFormularioEditar(@PathVariable("id") Long id, Model model) {
+    public String mostrarFormularioEditar111(@PathVariable("id") Long id, Model model) {
         System.out.println("DEBUG: Entrando a mostrarFormularioEditar con idNota=" + id);
 
         NotaCompletaDTO notaCompletaDTO = notasService.obtenerNotaCompletaPorId(id);
@@ -222,7 +222,7 @@ public class BachilleratoTecnicoController {
             model.addAttribute("cursos", cursoService.listarTodosCursos());
         }
 
-        return "pages/Admin/BachilleratoTecnico/bachilleratoTecnicoVista";
+        return "pages/Admin/BachilleratoTecnico/bachilleratoTecnicoForm";
     }
 
 

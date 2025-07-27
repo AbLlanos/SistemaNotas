@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -20,22 +21,28 @@ public class Notas {
     private String notaCualitativa;
 
     @ManyToOne
+    @ToString.Exclude
     private Curso curso;
 
     @ManyToOne
+    @ToString.Exclude
     private Estudiante estudiante;
 
     @ManyToOne
+    @ToString.Exclude
     private Materia materia;
 
     @ManyToOne
+    @ToString.Exclude
     private Trimestre trimestre;
 
     @ManyToOne
+    @ToString.Exclude
     private PeriodoAcademico periodoAcademico;
 
     @ManyToOne
     @JoinColumn(name = "nivel_educativo_id")
+    @ToString.Exclude
     private NivelEducativo nivelEducativo;
 
     public Long getId() {
