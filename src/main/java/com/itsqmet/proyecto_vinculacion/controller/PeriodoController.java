@@ -2,9 +2,11 @@ package com.itsqmet.proyecto_vinculacion.controller;
 
 import com.itsqmet.proyecto_vinculacion.entity.PeriodoAcademico;
 import com.itsqmet.proyecto_vinculacion.service.PeriodoAcademicoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,9 +66,19 @@ public class PeriodoController {
     }
 
     // 3. Guardar o actualizar Periodo
+
     @PostMapping("/guardarPeriodoAcademico")
-    public String guardarPeriodo(@ModelAttribute PeriodoAcademico periodo) {
-        periodoService.guardar(periodo);
+    public String guardarPeriodoAcademico(@Valid @ModelAttribute("periodoAcademico") PeriodoAcademico periodoAcademico,
+                                          BindingResult result,
+                                          Model model) {
+        if (result.hasErrors()) {
+            // Devuelve el formulario con errores
+            return "pages/Admin/periodoAcademicoForm";
+        }
+
+        // Guardar en base de datos (servicio, repositorio, etc.)
+        periodoService.guardar(periodoAcademico);
+
         return "redirect:/pages/Admin/periodoAcademicoVista";
     }
 

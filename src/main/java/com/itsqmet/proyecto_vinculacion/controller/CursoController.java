@@ -11,9 +11,11 @@ import com.itsqmet.proyecto_vinculacion.service.MateriaService;
 import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
 import com.itsqmet.proyecto_vinculacion.service.PeriodoAcademicoService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -76,55 +78,56 @@ public class CursoController {
 // ------------------------------------------------------------
 // 2. Formulario nuevo curso (con filtrado opcional por nivel)
 // ------------------------------------------------------------
+@GetMapping("/pages/Admin/cursoForm")
+public String mostrarCursoForm(
+        @RequestParam(value = "nivelId", required = false) Long nivelId,
+        @RequestParam(value = "periodoId", required = false) Long periodoId,
+        Model model) {
 
-    @GetMapping("/pages/Admin/cursoForm")
-    public String mostrarCursoForm(
-            @RequestParam(value = "nivelId", required = false) Long nivelId,
-            @RequestParam(value = "periodoId", required = false) Long periodoId,
-            Model model) {
+    List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
 
-        List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
+    // Solo periodos académicos visibles
+    List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
+            .stream()
+            .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+            .toList();
 
-        // Solo periodos académicos visibles
-        List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
+    List<Materia> materias;
+    List<Estudiante> estudiantes;
+
+    if (nivelId != null) {
+        // Listar materias por nivel que sean visibles
+        materias = materiaService.listarPorNivelId(nivelId)
                 .stream()
-                .filter(p -> Boolean.TRUE.equals(p.getVisible()))
+                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
                 .toList();
 
-        List<Materia> materias;
-        List<Estudiante> estudiantes;
+        // Listar solo estudiantes visibles por nivel
+        estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
+    } else {
+        // Listar todas las materias visibles (crea este método si no existe)
+        materias = materiaService.listarTodasMaterias()
+                .stream()
+                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                .toList();
 
-        if (nivelId != null) {
-            // Listar materias por nivel que sean visibles
-            materias = materiaService.listarPorNivelId(nivelId)
-                    .stream()
-                    .filter(m -> Boolean.TRUE.equals(m.getVisible()))
-                    .toList();
-
-            // Listar solo estudiantes visibles por nivel
-            estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
-        } else {
-            // Listar todas las materias visibles (crea este método si no existe)
-            materias = materiaService.listarTodasMaterias()
-                    .stream()
-                    .filter(m -> Boolean.TRUE.equals(m.getVisible()))
-                    .toList();
-
-            // Listar solo estudiantes visibles sin filtro de nivel
-            estudiantes = estudianteService.listarVisibles();
-        }
-
-        model.addAttribute("niveles", niveles);
-        model.addAttribute("periodos", periodos);
-        model.addAttribute("materias", materias);
-        model.addAttribute("estudiantes", estudiantes);
-        model.addAttribute("nivelSeleccionado", nivelId);
-        model.addAttribute("periodoSeleccionado", periodoId);
-        model.addAttribute("curso", new Curso());
-
-        return "pages/Admin/cursoForm";
+        // Listar solo estudiantes visibles sin filtro de nivel
+        estudiantes = estudianteService.listarVisibles();
     }
 
+    model.addAttribute("niveles", niveles);
+    model.addAttribute("periodos", periodos);
+    model.addAttribute("materias", materias);
+    model.addAttribute("estudiantes", estudiantes);
+    model.addAttribute("nivelSeleccionado", nivelId);
+    model.addAttribute("periodoSeleccionado", periodoId);
+    model.addAttribute("curso", new Curso());
+
+    // Nuevo atributo para indicar si el filtro se aplicó o no
+    model.addAttribute("filtroAplicado", nivelId != null);
+
+    return "pages/Admin/cursoForm";
+}
     // ----------------------------------------
 // Mostrar formulario para editar curso
 // ----------------------------------------
@@ -156,21 +159,25 @@ public class CursoController {
 
         model.addAttribute("nivelSeleccionado", nivelId);
 
-        // Listar materias visibles por nivel
-        List<Materia> materias = materiaService.listarPorNivelId(nivelId)
-                .stream()
-                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
-                .toList();
+        List<Materia> materias = (nivelId != null) ?
+                materiaService.listarPorNivelId(nivelId)
+                        .stream()
+                        .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                        .toList()
+                : Collections.emptyList();
 
-        // Listar estudiantes visibles por nivel
-        List<Estudiante> estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
+        List<Estudiante> estudiantes = (nivelId != null) ?
+                estudianteService.listarVisiblesPorNivelId(nivelId)
+                : Collections.emptyList();
 
         model.addAttribute("niveles", niveles);
         model.addAttribute("periodos", periodos);
         model.addAttribute("materias", materias);
         model.addAttribute("estudiantes", estudiantes);
-        model.addAttribute("nivelSeleccionado", nivelId);
         model.addAttribute("curso", curso);
+
+        // Variable para evitar errores en Thymeleaf con valores booleanos null
+        model.addAttribute("filtroAplicado", nivelId != null);
 
         return "pages/Admin/cursoForm";
     }
@@ -178,12 +185,24 @@ public class CursoController {
     // ------------------------------------------------------------
 // 4. Guardar curso (nuevo o editado)
 // ------------------------------------------------------------
+
     @PostMapping("/pages/Admin/cursoGuardar")
     @Transactional
-    public String guardarCurso(@ModelAttribute Curso curso,
-                               @RequestParam(value = "materiasSeleccionadas", required = false) List<Long> materiasIds,
-                               @RequestParam(value = "estudiantesSeleccionados", required = false) List<Long> estudiantesIds,
-                               RedirectAttributes redirectAttributes) {
+    public String guardarCurso(
+            @Valid @ModelAttribute Curso curso,
+            BindingResult result,
+            @RequestParam(value = "materiasSeleccionadas", required = false) List<Long> materiasIds,
+            @RequestParam(value = "estudiantesSeleccionados", required = false) List<Long> estudiantesIds,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("materias", materiaService.listarPorNivelId(curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
+            model.addAttribute("estudiantes", estudianteService.buscarEstudiantePorId(curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
+            return "pages/Admin/cursoForm";
+        }
         try {
             Curso cursoPersistido = (curso.getId() != null)
                     ? cursoService.buscarCursoPorId(curso.getId()).orElse(new Curso())
@@ -196,7 +215,7 @@ public class CursoController {
 
             cursoPersistido.setNombre(curso.getNombre());
 
-            // Cargar PeriodoAcademico completo por id
+            // Cargar PeriodoAcademico completo por id solo si no es null
             if (curso.getPeriodoAcademico() != null && curso.getPeriodoAcademico().getId() != null) {
                 PeriodoAcademico pa = periodoAcademicoService.buscarPorId(curso.getPeriodoAcademico().getId());
                 cursoPersistido.setPeriodoAcademico(pa);
@@ -204,10 +223,14 @@ public class CursoController {
                 cursoPersistido.setPeriodoAcademico(null);
             }
 
-            // Cargar NivelEducativo completo por id
-            Optional<NivelEducativo> optionalNe = nivelEducativoService.buscarPorId(curso.getNivelEducativo().getId());
-            if (optionalNe.isPresent()) {
-                cursoPersistido.setNivelEducativo(optionalNe.get());
+            // Cargar NivelEducativo completo por id solo si no es null
+            if (curso.getNivelEducativo() != null && curso.getNivelEducativo().getId() != null) {
+                Optional<NivelEducativo> optionalNe = nivelEducativoService.buscarPorId(curso.getNivelEducativo().getId());
+                if (optionalNe.isPresent()) {
+                    cursoPersistido.setNivelEducativo(optionalNe.get());
+                } else {
+                    cursoPersistido.setNivelEducativo(null);
+                }
             } else {
                 cursoPersistido.setNivelEducativo(null);
             }
@@ -280,6 +303,7 @@ public class CursoController {
 
         return "redirect:/pages/Admin/cursoVista";
     }
+
 
 
 

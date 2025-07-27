@@ -5,6 +5,7 @@
     <p class="header-subtitle" th:text="${nota.idNota} != null ? 'Editar registro de notas' : 'Registro de notas'">
         Registro de notas</p>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;600;700&display=swap"
           rel="stylesheet">
     <style>
@@ -14,30 +15,32 @@
 </head>
 <body>
 
-<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+
+
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center"> <!-- REDUCIDO padding -->
 
         <!-- Usuario y avatar -->
-        <div class="flex items-center space-x-4">
-            <img src="/img/logoUE.jpg" alt="Logo"
-                 class="w-12 h-12 rounded-full border-2 border-white shadow-md transition-transform hover:scale-105 duration-300">
-            <div class="text-white">
-                <p class="text-sm font-bold  font-light tracking-wide">UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA
-                    BENALCÁZAR"</p>
-                <p class="text-xl font-bold text-yellow-300 leading-tight">Bachillerato General</p>
+        <div class="flex items-center space-x-3"> <!-- REDUCIDO espacio entre logo y texto -->
+            <img src="/img/logoUE.jpg" alt="Logo" class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300">
+
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1">
+                    Gestión de Notas Académicas: Bachillerato General
+                </p>
             </div>
         </div>
 
-        <a th:href="@{/pages/Admin/Bachillerato/bachilleratoVista}">
-            <button type="submit"
-                    class="flex items-center gap-2 text-white bg-red-600 hover:bg-red-700 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m4-8V7a2 2 0 10-4 0v1"/>
-                </svg>
-                <span>Regresar</span>
-            </button>
+        <!-- Botón Regresar con ruta del segundo navbar -->
+        <a th:href="@{/pages/Admin/Bachillerato/bachilleratoVista}"
+           class="flex items-center gap-2 text-white bg-red-600 hover:bg-red-700 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 11-4 0v-1m4-8V7a2 2 0 10-4 0v1" />
+            </svg>
+            <span>Regresar</span>
         </a>
 
     </div>

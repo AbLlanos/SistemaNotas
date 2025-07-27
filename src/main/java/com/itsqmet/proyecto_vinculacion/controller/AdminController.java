@@ -76,19 +76,32 @@ public class AdminController {
     public String mostrarAdminVista(
             Model model,
             @RequestParam(name = "nombre", required = false) String nombre,
-            @RequestParam(name = "cedula", required = false) String cedula) {
+            @RequestParam(name = "cedula", required = false) String cedula,
+            @RequestParam(name = "mostrarOcultos", required = false, defaultValue = "false") boolean mostrarOcultos) {
 
         List<Admin> admins;
 
         if ((nombre == null || nombre.isEmpty()) && (cedula == null || cedula.isEmpty())) {
             admins = adminService.listarTodosAdmin();
+        } else if (nombre != null && !nombre.isEmpty() && (cedula == null || cedula.isEmpty())) {
+            admins = adminService.buscarPorNombre(nombre);
+        } else if ((nombre == null || nombre.isEmpty()) && cedula != null && !cedula.isEmpty()) {
+            admins = adminService.buscarPorCedula(cedula);
         } else {
             admins = adminService.buscarPorNombreYCedula(nombre, cedula);
+        }
+
+        // Filtra si mostrarOcultos == false
+        if (!mostrarOcultos) {
+            admins = admins.stream()
+                    .filter(a -> Boolean.TRUE.equals(a.getVisible()))
+                    .toList();
         }
 
         model.addAttribute("admins", admins);
         model.addAttribute("paramNombre", nombre);
         model.addAttribute("paramCedula", cedula);
+        model.addAttribute("paramMostrarOcultos", mostrarOcultos);
 
         return "pages/Admin/adminPerfilVista";
     }

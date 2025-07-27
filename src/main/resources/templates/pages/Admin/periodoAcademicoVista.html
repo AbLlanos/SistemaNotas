@@ -4,26 +4,49 @@
     <meta charset="UTF-8">
     <title>Lista de Periodos Académicos</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<nav class="bg-blue-700 p-6">
-    <div class="container mx-auto flex justify-between items-center">
-        <span class="text-white font-bold text-3xl">Lista de Periodos Académicos</span>
-        <a th:href="@{/pages/Admin/vistaAdmin}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
-            Regresar
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+
+        <!-- Logo e Institución -->
+        <div class="flex items-center space-x-3">
+            <img src="/img/logoUE.jpg" alt="Logo"
+                 class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300" />
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1">
+                    Lista de Periodos Académicos
+                </p>
+            </div>
+        </div>
+
+        <!-- Botón de regreso -->
+        <a th:href="@{/pages/Admin/vistaAdmin}"
+           class="flex items-center gap-2 text-blue-800 bg-white hover:bg-blue-100 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Regresar</span>
         </a>
+
     </div>
 </nav>
 
-<main class="container mx-auto flex-1 mt-8">
-    <div class="max-w-4xl mx-auto mb-8 rounded-lg border border-gray-300 shadow-md bg-white">
+
+<main class="container mx-auto flex-1 mt-8 mb-20 pt-20 pb-20">
+
+    <div class="max-w-4xl mx-auto mb-8 rounded-lg border border-gray-600 shadow-md bg-white">
         <div class="mb-4 text-center bg-blue-50 rounded-t-lg p-4">
             <h4 class="text-3xl font-semibold text-blue-800">Periodos Registrados</h4>
         </div>
 
         <!-- Filtro -->
-        <div class="px-6 pb-6">
+        <div class="px-6 pb-6 pt-6 bg-gray-200">
             <form th:action="@{/pages/Admin/periodoAcademicoVista}" method="get" class="space-y-4">
                 <div class="flex flex-wrap gap-4 items-end">
                     <div class="flex-1">
@@ -36,27 +59,33 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                                 th:value="${paramNombre}" />
                     </div>
-                    <!-- Mostrar ocultos -->
-                    <div class="flex items-center">
-                        <label class="inline-flex items-center space-x-2">
-                            <input type="checkbox" name="mostrarOcultos"
-                                   class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                   th:checked="${mostrarOcultos}" />
-                            <span class="text-sm text-gray-700">Mostrar ocultos</span>
-                        </label>
-                    </div>
                 </div>
-                <div class="flex justify-center pt-2">
-                    <button type="submit" class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+
+                <!-- Mostrar ocultos abajo y centrado -->
+                <div class="flex justify-center mt-4">
+                    <label class="inline-flex items-center space-x-2">
+                        <input type="checkbox" name="mostrarOcultos"
+                               class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                               th:checked="${mostrarOcultos}" />
+                        <span class="text-sm text-gray-700">Mostrar ocultos</span>
+                    </label>
+                </div>
+
+                <!-- Botones juntos y centrados -->
+                <div class="flex justify-center gap-4 pt-4">
+                    <button type="submit" class="px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                         Filtrar
                     </button>
+                    <a th:href="@{/pages/Admin/periodoAcademicoForm}" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition">
+                        Nuevo Periodo Académico
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Tabla -->
-    <div class="overflow-x-auto bg-white rounded shadow max-h-[300px] overflow-y-auto">
+    <div class="border border-gray-300 overflow-x-auto bg-white rounded shadow max-h-[300px] overflow-y-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-100 sticky top-0 z-10">
             <tr>
@@ -73,11 +102,11 @@
             <tr th:each="p : ${periodos}" class="hover:bg-blue-50 text-center">
                 <td class="px-4 py-2" th:text="${p.id}"></td>
                 <td class="px-4 py-2" th:text="${p.nombre}"></td>
-                <td class="px-4 py-2 text-center">
-                    <span th:if="${p.visible}" class="text-green-700 text-center font-semibold">Sí</span>
-                    <span th:unless="${p.visible}" class="text-red-600 text-center  font-semibold">No</span>
+                <td class="px-4 py-2">
+                    <span th:if="${p.visible}" class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">Sí</span>
+                    <span th:unless="${p.visible}" class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">No</span>
                 </td>
-                <td class="px-4 py-2 text-center">
+                <td class="px-4 py-2">
                     <a th:href="@{'/pages/Admin/editarPeriodo/' + ${p.id}}"
                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm inline-block">
                         Editar
@@ -88,11 +117,6 @@
         </table>
     </div>
 
-    <div class="flex justify-end mt-6">
-        <a th:href="@{/pages/Admin/periodoAcademicoForm}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
-            Nuevo Periodo
-        </a>
-    </div>
 </main>
 </body>
 </html>

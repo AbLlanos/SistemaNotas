@@ -8,9 +8,11 @@ import com.itsqmet.proyecto_vinculacion.service.DocenteService;
 import com.itsqmet.proyecto_vinculacion.service.MateriaService;
 import com.itsqmet.proyecto_vinculacion.service.NivelEducativoService;
 import com.itsqmet.proyecto_vinculacion.service.PeriodoAcademicoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -125,39 +127,75 @@ public class MateriaController {
         return "pages/Admin/materiaForm";
     }
 
-    /* ========================
-       4. Guardar
-       ======================== */
+
+
     @PostMapping("/pages/Admin/materiaGuardar")
-    public String guardarMateria(@ModelAttribute Materia materia,
-                                 RedirectAttributes redirect) {
+    public String guardarMateria(@Valid @ModelAttribute("materia") Materia materia,
+                                 BindingResult result,
+                                 RedirectAttributes redirect,
+                                 Model model) {
+
+        // Validar campos obligatorios para las asociaciones ManyToOne con propiedad .id
+        if (materia.getNivelEducativo() == null || materia.getNivelEducativo().getId() == null) {
+            result.rejectValue("nivelEducativo.id", "NotNull", "Debe seleccionar un nivel educativo");
+        }
+
+        if (materia.getPeriodoAcademico() == null || materia.getPeriodoAcademico().getId() == null) {
+            result.rejectValue("periodoAcademico.id", "NotNull", "Debe seleccionar un periodo académico");
+        }
+
+        if (result.hasErrors()) {
+            // Recargar listas para el formulario
+            model.addAttribute("docentes", docenteService.listarTodosDocentes()
+                    .stream()
+                    .filter(d -> Boolean.TRUE.equals(d.getVisible()))
+                    .toList());
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("periodos", periodoAcademicoService.listarPeriodosVisibles());
+
+            return "pages/Admin/materiaForm"; // sin redirect, para mostrar errores
+        }
+
         try {
-            // Asociar docente si tiene ID
+            // Docente es opcional
             if (materia.getDocente() != null && materia.getDocente().getId() != null) {
-                Docente docente = docenteService.buscarDocenteId(materia.getDocente().getId())
-                        .orElse(null);
-                materia.setDocente(docente);
+                materia.setDocente(docenteService.buscarDocenteId(materia.getDocente().getId()).orElse(null));
             } else {
                 materia.setDocente(null);
             }
 
-            // Asociar nivel educativo si tiene ID
+            // Nivel educativo
             if (materia.getNivelEducativo() != null && materia.getNivelEducativo().getId() != null) {
-                NivelEducativo nivel = nivelEducativoService.buscarPorId(materia.getNivelEducativo().getId())
-                        .orElse(null);
-                materia.setNivelEducativo(nivel);
-            } else {
-                materia.setNivelEducativo(null);
+                materia.setNivelEducativo(nivelEducativoService.buscarPorId(materia.getNivelEducativo().getId()).orElse(null));
             }
 
-            // Guardar materia
+            // Periodo académico
+            if (materia.getPeriodoAcademico() != null && materia.getPeriodoAcademico().getId() != null) {
+                PeriodoAcademico periodo = periodoAcademicoService.buscarPorId(materia.getPeriodoAcademico().getId());
+                if (periodo == null) {
+                    throw new IllegalArgumentException("Periodo académico no válido");
+                }
+                materia.setPeriodoAcademico(periodo);
+            }
+
             materiaService.guardarMateria(materia);
             redirect.addFlashAttribute("success", "¡La materia se guardó correctamente!");
 
+            return "redirect:/pages/Admin/materiaVista";
+
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Error al guardar la materia: " + e.getMessage());
+
+            // Recargar listas para el formulario en caso de error
+            model.addAttribute("docentes", docenteService.listarTodosDocentes()
+                    .stream()
+                    .filter(d -> Boolean.TRUE.equals(d.getVisible()))
+                    .toList());
+            model.addAttribute("niveles", nivelEducativoService.listarTodos());
+            model.addAttribute("periodos", periodoAcademicoService.listarPeriodosVisibles());
+
+            return "pages/Admin/materiaForm"; // sin redirect para mostrar mensaje y formulario
         }
-        return "redirect:/pages/Admin/materiaVista";
     }
 
 
@@ -173,6 +211,6 @@ public class MateriaController {
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Error al eliminar materia: " + e.getMessage());
         }
-        return "redirect:/pages/Admin/materiaVista";
+        return "/pages/Admin/materiaVista";
     }
 }

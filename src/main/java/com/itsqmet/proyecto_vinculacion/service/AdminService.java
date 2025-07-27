@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Service
 public class AdminService {
@@ -52,6 +54,16 @@ public class AdminService {
     /** Buscar por ID. */
     public Optional<Admin> buscarAdminPorId(Long id) {
         return adminRepository.findById(id);
+    }
+
+
+    public List<Admin> buscarPorNombre(String nombre) {
+        return adminRepository.findByNombreContainingIgnoreCase(nombre);
+    }
+
+
+    public List<Admin> buscarPorCedula(String cedula) {
+        return adminRepository.findByCedulaContainingIgnoreCase(cedula);
     }
 
 

@@ -5,34 +5,55 @@
 
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
     <title>Lista de Materias</title>
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}" />
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between">
 
-<nav class="bg-blue-700 p-6">
-    <div class="container mx-auto flex flex-wrap items-center justify-between">
-        <span class="text-white font-bold text-3xl">Lista de Materias</span>
+        <!-- Logo e Institución -->
+        <div class="flex items-center space-x-3">
+            <img src="/img/logoUE.jpg" alt="Logo"
+                 class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300" />
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1"
+                   th:text="'Lista de Materias'">
+                    Lista de Materias
+                </p>
+            </div>
+        </div>
+
+        <!-- Botón de regreso -->
         <a th:href="@{/pages/Admin/vistaAdmin}"
-           class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
-            Regresar
+           class="flex items-center gap-2 text-blue-800 bg-white hover:bg-blue-100 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Regresar</span>
         </a>
+
     </div>
 </nav>
 
-<main class="container mx-auto flex-1 mt-8">
 
-    <div class="max-w-7xl mx-auto mb-8 rounded-lg border border-gray-300 shadow-md bg-white">
+<main class="container mx-auto flex-1 mt-8 mb-20 pt-20 pb-20">
 
-        <div class="mb-4 text-center bg-blue-50 rounded-t-lg p-4">
+    <div class="max-w-7xl mx-auto mb-8 rounded-lg border border-gray-600 shadow-md bg-white">
+
+        <div class="text-center bg-blue-50 rounded-t-lg p-4 bg-border-">
             <h4 class="text-3xl font-semibold text-blue-800">Materias Registradas</h4>
         </div>
 
         <!-- Filtros -->
-        <div class="px-6 pb-6">
+        <div class="px-6 pt-6 pb-6 bg-gray-200">
             <form th:action="@{/pages/Admin/materiaVista}" method="get" class="space-y-6">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
+                <!-- Filtros en una fila -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                     <!-- Nombre -->
                     <div>
                         <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre Materia</label>
@@ -76,30 +97,36 @@
                             </option>
                         </select>
                     </div>
+                </div>
 
-
-                    <!-- Mostrar no visibles -->
+                <!-- Checkbox Mostrar ocultos centrado -->
+                <div class="flex justify-center mb-6">
                     <div class="flex items-center">
                         <input type="checkbox" id="mostrarOcultos" name="mostrarOcultos"
                                th:checked="${paramMostrarOcultos}" class="mr-2">
                         <label for="mostrarOcultos" class="text-sm text-gray-700">Mostrar materias ocultas</label>
                     </div>
-
                 </div>
 
-                <!-- Botón -->
-                <div class="flex justify-center pt-4">
+                <!-- Botones juntos centrados -->
+                <div class="flex justify-center space-x-4">
                     <button type="submit"
-                            class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+                            class="py-2 px-8 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                         Filtrar
                     </button>
+
+                    <a th:href="@{/pages/Admin/materiaForm}"
+                       class="py-2 px-8 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition text-center">
+                        Nueva Materia
+                    </a>
                 </div>
+
             </form>
         </div>
     </div>
 
     <!-- Tabla -->
-    <div class="overflow-x-auto bg-white rounded shadow max-h-[300px] overflow-y-auto custom-scrollbar">
+    <div class="border border-gray-300 overflow-x-auto bg-white rounded shadow max-h-[300px] overflow-y-auto custom-scrollbar">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-blue-100 sticky top-0 z-10">
             <tr>
@@ -108,8 +135,8 @@
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Docente</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Nivel Educativo</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Tipo</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible</th> <!-- Nuevo -->
-                <th class="px-4 py-2 text-left font-medium text-gray-700">Periodo Académico</th> <!-- Nuevo -->
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Periodo Académico</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
             </tr>
             </thead>
@@ -117,7 +144,7 @@
             <tbody class="divide-y divide-gray-100">
 
             <tr th:if="${#lists.isEmpty(materias)}">
-                <td colspan="4" class="px-4 py-4 text-center text-gray-500 italic">
+                <td colspan="8" class="px-4 py-4 text-center text-gray-500 italic">
                     No se encontraron datos.
                 </td>
             </tr>
@@ -128,31 +155,23 @@
                 <td class="px-4 py-2" th:text="${mat.docente != null ? mat.docente.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.nivelEducativo != null ? mat.nivelEducativo.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.tipoMateria != null ? mat.tipoMateria : 'NORMAL'}"></td>
-
-                <!-- Mostrar visible como Sí/No -->
-                <td class="px-4 py-2" th:text="${mat.visible} ? 'Sí' : 'No'"></td>
-
-                <!-- Mostrar Periodo Académico (nombre) -->
+                <td class="px-4 py-2 text-center">
+                <span th:if="${mat.visible}" class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">
+                    Sí
+                </span>
+                    <span th:unless="${mat.visible}" class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">
+                    No
+                </span>
+                </td>
                 <td class="px-4 py-2" th:text="${mat.periodoAcademico != null ? mat.periodoAcademico.nombre : '---'}"></td>
-
                 <td class="px-4 py-2 flex space-x-2">
                     <a th:href="@{/pages/Admin/materiaForm/{id}(id=${mat.id})}"
                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
-                    <a th:href="@{/eliminarMateria/{id}(id=${mat.id})}"
-                       class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
-                       onclick="return confirm('¿Eliminar esta materia?');">Eliminar</a>
                 </td>
             </tr>
 
             </tbody>
         </table>
-    </div>
-
-    <div class="flex justify-end space-x-4 mt-6">
-        <a th:href="@{/pages/Admin/materiaForm}"
-           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
-            Nueva Materia
-        </a>
     </div>
 
 </main>

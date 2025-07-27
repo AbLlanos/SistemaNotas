@@ -7,29 +7,53 @@
 
     <title>Lista de Docentes</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}" />
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
-<nav class="bg-blue-700 p-6">
-    <div class="container mx-auto flex flex-wrap items-center justify-between">
-        <span class="text-white font-bold text-3xl">Lista de Docentes</span>
-        <a th:href="@{/pages/Admin/vistaAdmin}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
-            Regresar
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+
+        <!-- Logo e Institución -->
+        <div class="flex items-center space-x-3">
+            <img src="/img/logoUE.jpg" alt="Logo"
+                 class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300" />
+
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1"
+                   th:text="'Lista de Docentes'">
+                    Lista de Docentes
+                </p>
+            </div>
+        </div>
+
+        <!-- Botón de regreso -->
+        <a th:href="@{/pages/Admin/vistaAdmin}"
+           class="flex items-center gap-2 text-blue-800 bg-white hover:bg-blue-100 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Regresar</span>
         </a>
     </div>
 </nav>
 
-<main class="container mx-auto flex-1 mt-8">
 
-    <div class="max-w-7xl mx-auto mb-8 rounded-lg border border-gray-300 shadow-md bg-white">
+<main class="container mx-auto flex-1 mt-8 pt-20 pb-20">
+
+    <div class="max-w-7xl mx-auto mb-8 border-gray-500 rounded-lg border shadow-md bg-white">
 
         <div class="mb-4 text-center bg-blue-50 rounded-t-lg p-4">
             <h4 class="text-3xl font-semibold text-blue-800">Docentes Registrados</h4>
         </div>
 
         <!-- Filtro por nombre y cédula -->
-        <div class="px-6 pb-6">
+        <div class="px-6 pb-6 bg-gray-200 pt-3">
             <form th:action="@{/pages/Admin/docenteVista}" method="get" class="space-y-6">
+
                 <!-- Contenedor flex para inputs lado a lado -->
                 <div class="flex space-x-4">
                     <div class="flex-1">
@@ -42,6 +66,7 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                                 th:value="${param.nombre}" />
                     </div>
+
                     <div class="flex-1">
                         <label for="filtroCedula" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por Cédula</label>
                         <input
@@ -52,22 +77,29 @@
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                                 th:value="${param.cedula}" />
                     </div>
-                    <div class="flex items-center mt-4">
+                </div>
+
+                <!-- Mostrar Ocultos (centrado debajo de los inputs) -->
+                <div class="flex justify-center mt-4">
+                    <div class="flex items-center">
                         <input type="checkbox" id="mostrarOcultos" name="mostrarOcultos"
                                th:checked="${paramMostrarOcultos}" class="mr-2">
                         <label for="mostrarOcultos" class="text-sm text-gray-700">Mostrar docentes ocultos</label>
                     </div>
-
-
                 </div>
 
-                <!-- Botón centrado debajo -->
-                <div class="flex justify-center">
+                <!-- Botones centrados y en una sola fila -->
+                <div class="flex justify-center space-x-4 mt-6">
                     <button type="submit"
-                            class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+                            class="px-6 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
                         Filtrar
                     </button>
+                    <a th:href="@{/pages/Admin/docenteForm}"
+                       class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition">
+                        Nuevo Docente
+                    </a>
                 </div>
+
             </form>
         </div>
 
@@ -114,22 +146,21 @@
                 <td class="px-4 py-2" th:text="${docente.direccion}"></td>
                 <td class="px-4 py-2" th:text="${docente.email}"></td>
                 <td class="px-4 py-2" th:text="${docente.rol}"></td>
-                <td class="px-4 py-2" th:text="${docente.visible} ? 'Sí' : 'No'"></td>
+                <td class="px-4 py-2 text-center">
+                <span th:if="${docente.visible}" class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">
+                    Sí
+                </span>
+                    <span th:unless="${docente.visible}" class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">
+                    No
+                </span>
+                </td>
                 <td class="px-4 py-2 flex space-x-2">
                     <a th:href="@{/editarDocente/} + ${docente.id}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
-                    <a th:href="@{/eliminarDocente/} + ${docente.id}" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Eliminar</a>
                 </td>
             </tr>
             </tbody>
 
         </table>
-    </div>
-
-
-    <div class="flex justify-end space-x-4 mt-6">
-        <a th:href="@{/pages/Admin/docenteForm}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
-            Nuevo Docente
-        </a>
     </div>
 
 </main>

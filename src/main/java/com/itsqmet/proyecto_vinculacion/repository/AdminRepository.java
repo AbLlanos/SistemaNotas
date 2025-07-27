@@ -14,5 +14,8 @@ public interface AdminRepository extends JpaRepository<Admin, Long> {
 
     List<Admin> findByNombreContainingIgnoreCaseAndCedulaContainingIgnoreCase(String nombre, String cedula);
 
+    List<Admin> findByNombreContainingIgnoreCase(String nombre);
+    List<Admin> findByCedulaContainingIgnoreCase(String cedula);
+
 
 }

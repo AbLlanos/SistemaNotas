@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" th:href="@{/css/stylesAdmin.css}" />
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}" />
 
     <title>Vista de administrador</title>
 </head>
 
 <body class="bg-gray-100">
 
-
-<!-- NAVBAR ADAPTADO -->
 <!-- NAVBAR ADAPTADO CON DEGRADADO Y BOTÓN MEJORADO -->
-<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center"> <!-- REDUCIDO padding -->
 
         <!-- Usuario y avatar -->
-        <div class="flex items-center space-x-4">
-            <img src="/img/logoUE.jpg" alt="Logo" class="w-12 h-12 rounded-full border-2 border-white shadow-md transition-transform hover:scale-105 duration-300">
-            <div class="text-white">
-                <p class="text-sm font-bold  font-light tracking-wide">UNIDAD EDUCATIVA PARTICULAR  "LINCOLN LARREA BENALCÁZAR"</p>
-                <p class="text-xl font-bold text-yellow-300 leading-tight">Bienvenido</p>
+        <div class="flex items-center space-x-3"> <!-- REDUCIDO espacio entre logo y texto -->
+            <img src="/img/logoUE.jpg" alt="Logo" class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300">
+
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1">
+                    Ventana de administrador
+                </p>
             </div>
         </div>
 
@@ -41,7 +45,7 @@
 </nav>
 
 
-<div class="pt-20">
+<div class="pt-20 ">
 
     <div class="max-w-7xl mx-auto mt-8 mb-5 ">
         <h2 class="text-3xl font-bold text-black text-center">🎓 NIVELES EDUCATIVOS</h2>
@@ -106,7 +110,7 @@
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black group-hover:from-black/70 group-hover:via-black/60 group-hover:to-black/70 rounded-xl"></div>
                     <div class="absolute inset-0 flex translate-y-[60%] flex-col items-center justify-center px-9 text-center transition-all duration-500 group-hover:translate-y-0">
-                        <h1 class="text-3xl font-bold text-white">Bachillerato Técnico en Computación</h1>
+                        <h1 class="text-3xl font-bold text-white mb-5">Bachillerato Técnico en Computación</h1>
                         <p class="mb-3 text-lg italic text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">Formación técnica para el futuro profesional.</p>
                         <button class="rounded-full bg-neutral-900 py-2 px-3.5 text-sm capitalize text-white shadow shadow-black/60">Ver registros y generar PDF</button>
                     </div>

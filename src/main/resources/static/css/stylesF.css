@@ -1,0 +1,88 @@
+button, select, input {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Para que el efecto no sea brusco */
+}
+
+button:hover, select:hover, input:hover {
+  transform: scale(1.05); /* Crecer 5% */
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3); /* Sombra más marcada */
+  cursor: pointer; /* Para botón y selects, da sensación clickeable */
+}
+
+
+/* Botones */
+button,
+a.button, /* por si usas enlaces como botones */
+input[type="submit"],
+input[type="button"] {
+  @apply transition-all duration-200 ease-in-out transform hover:scale-105 shadow-md hover:shadow-xl;
+}
+
+/* Inputs y selects */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  @apply transition-all duration-200 ease-in-out transform hover:scale-105 shadow hover:shadow-lg;
+}
+
+/* Formularios */
+form {
+  @apply space-y-4;
+}
+
+/* Opcional: reseteo global básico */
+* {
+  box-sizing: border-box;
+}
+
+/* Enlaces como botones: asegúrate de usar <a class="button"> si aplicas esto */
+a.button {
+  @apply inline-block px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700;
+}
+
+/* Aplicación general a botones en tablas también */
+table button,
+table a {
+  @apply transition-all duration-200 ease-in-out transform hover:scale-105 shadow-sm hover:shadow-md;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  border: 1.5px solid rgba(0, 0, 0, 0.6); /* negro con opacidad para que sea visible pero no muy fuerte */
+  transition: all 0.3s ease;
+  outline: none; /* quitamos el outline por defecto para que no se sume con el borde */
+  box-shadow: none;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(0, 0, 0, 0.9); /* borde negro más oscuro al enfocar */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* sombra suave para destacar */
+}
+
+input,
+select,
+textarea {
+  border: 1px solid rgba(0, 0, 0, 0.4); /* negro con menor opacidad para que sea más sutil */
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(0, 0, 0, 0.7); /* borde negro un poco más oscuro al enfocar */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2); /* sombra suave */
+}

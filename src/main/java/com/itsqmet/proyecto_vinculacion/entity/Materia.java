@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -22,34 +24,35 @@ public class Materia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    @NotBlank(message = "Debe seleccionar un tipo de materia")
     @Column(name = "tipo_materia")
     private String tipoMateria;
 
+    @NotNull(message = "Debe indicar si es visible")
     @Column(name = "visible")
     private Boolean visible = true;
 
-    /* Docente responsable (opcional). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "docente_id")
     private Docente docente;
 
-    /* Nivel educativo al que pertenece esta materia (para filtrar en formularios). */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "nivel_educativo_id")
+    @NotNull(message = "Debe seleccionar un nivel educativo")
     private NivelEducativo nivelEducativo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "periodo_academico_id")
+    @NotNull(message = "Debe seleccionar un periodo académico")
     private PeriodoAcademico periodoAcademico;
 
-    /* Relación inversa: cursos que incluyen esta materia. */
     @ManyToMany(mappedBy = "materias", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Curso> cursos;
 
-    /* Otras relaciones */
     @OneToMany(mappedBy = "materia", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Asistencia> asistencias;

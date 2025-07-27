@@ -13,23 +13,26 @@
     <title>Iniciar sesión</title>
 </head>
 <body>
+<!-- NAVBAR ADAPTADO -->
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
 
-<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-
-        <!-- Usuario y avatar -->
-        <div class="flex items-center space-x-4">
+        <!-- Logo y nombre de la institución -->
+        <div class="flex items-center space-x-3">
             <img src="/img/logoUE.jpg" alt="Logo"
-                 class="w-12 h-12 rounded-full border-2 border-white shadow-md transition-transform hover:scale-105 duration-300">
-            <div class="text-white">
-                <p class="text-sm font-bold  font-light tracking-wide">UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA
-                    BENALCÁZAR"</p>
-                <p class="text-xl font-bold text-yellow-300 leading-tight">Bienvenido</p>
+                 class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300">
+            <div class="text-white leading-tight">
+                <p class="text-sm font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-xl font-bold text-yellow-300 pt-1">
+                    Bienvenido
+                </p>
             </div>
         </div>
 
+        <!-- Botón de regreso -->
         <a th:href="@{/}">
-
             <button type="submit"
                     class="flex items-center gap-2 text-white bg-red-600 hover:bg-red-700 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"
@@ -39,10 +42,11 @@
                 </svg>
                 <span>Regresar</span>
             </button>
-
         </a>
+
     </div>
 </nav>
+
 
 <div class="mt-20">
 

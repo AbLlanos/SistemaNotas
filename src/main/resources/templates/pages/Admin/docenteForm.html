@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Docente</title>
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/stylesForm.css}" />
+    <link rel="stylesheet" th:href="@{/css/stylesForm.css}"/>
     <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" th:href="@{/css/stylesF.css}"/>
 
 </head>
 <style>
@@ -19,111 +19,135 @@
         display: block;
     }
 </style>
-<body class="bg-gradient-to-br from-blue-100 to-blue-300 min-h-screen">
+<body class="bg-gradient-to-br from-blue-100 to-blue-200 min-h-screen">
 
-<nav class="bg-blue-700 p-6">
-    <div class="container mx-auto flex flex-wrap items-center justify-between">
-        <span class="text-white font-bold text-3xl">Docente</span>
-        <a th:href="@{/pages/Admin/docenteVista}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
-            Regresar
+<nav class="bg-gradient-to-r from-blue-700 via-blue-800 to-blue-900 backdrop-blur-md bg-opacity-90 shadow-2xl fixed w-full top-0 left-0 z-50 px-7">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex justify-between items-center">
+
+        <!-- Logo e Institución -->
+        <div class="flex items-center space-x-3">
+            <img src="/img/logoUE.jpg" alt="Logo"
+                 class="w-16 h-16 rounded-full border border-white shadow-md transition-transform hover:scale-105 duration-300"/>
+
+            <div class="text-white leading-tight">
+                <p class="text-lg font-bold tracking-wide">
+                    UNIDAD EDUCATIVA PARTICULAR "LINCOLN LARREA BENALCÁZAR"
+                </p>
+                <p class="text-lg text-yellow-300 font-semibold pt-1">
+                    Formulario de docente
+                </p>
+            </div>
+        </div>
+
+        <!-- Botón de regreso -->
+        <a th:href="@{/pages/Admin/docenteVista}"
+           class="flex items-center gap-2 text-blue-800 bg-white hover:bg-blue-100 px-5 py-2 rounded-full font-semibold shadow-lg transition-transform transform hover:scale-105 duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-800" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+            <span>Regresar</span>
         </a>
     </div>
 </nav>
 
-<section class="flex justify-center mt-10 px-4 pb-5 ">
-    <div class="w-full max-w-xl bg-white rounded-2xl shadow-2xl p-10 form_main">
+
+<section class="flex justify-center mt-10 px-4 pt-20 pb-20 ">
+    <div class="w-full max-w-xl bg-white bo  rounded-2xl shadow-2xl p-10 form_main">
         <div class="mb-8 text-center">
-            <h2 class="text-3xl font-extrabold text-blue-800 mb-4 fuente-titulo">Registro de Docente</h2>
+            <h2 class="text-3xl font-extrabold text-blue-800 mb-4">Registro de Docente</h2>
             <p class="text-gray-500">Por favor, completa todos los campos para registrar un nuevo docente.</p>
         </div>
 
 
-
         <form th:action="@{/guardarDocente}" method="post" th:object="${docente}" class="space-y-6">
-            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{id}"/>
 
             <!-- Error general (por ejemplo, excepciones de base de datos) -->
-            <div th:if="${#fields.hasGlobalErrors()}" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div th:if="${#fields.hasGlobalErrors()}"
+                 class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                 <ul>
                     <li th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error general</li>
                 </ul>
             </div>
 
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
                     <input type="text" id="nombre" th:field="*{nombre}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                           placeholder="Ej: Juan Pérez"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"/>
                     <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="error-message"></span>
                 </div>
 
-                <!--
-                <div>
-                    <label for="apellido" class="block text-sm font-semibold text-gray-700 mb-1">Apellido</label>
-                    <input type="text" id="apellido" th:field="*{apellido}" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
-                    <span th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}" class="error-message"></span>
-                </div>
-                -->
-
                 <div>
                     <label for="cedula" class="block text-sm font-semibold text-gray-700 mb-1">Cédula</label>
-                    <input type="text" id="cedula" maxlength="10"  th:field="*{cedula}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                    <input type="text" id="cedula" maxlength="10" th:field="*{cedula}"
+                           placeholder="Ej: 0123456789"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"/>
                     <span th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}" class="error-message"></span>
                 </div>
 
                 <div class="md:col-span-2">
-                    <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-1">Telefono</label>
-                    <input type="tel" id="telefono" maxlength="10"  th:field="*{telefono}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                    <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" id="telefono" maxlength="10" th:field="*{telefono}"
+                           placeholder="Ej: 0987654321"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"/>
                     <span th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="error-message"></span>
                 </div>
 
-                <div>
+                <!-- Dirección -->
+                <div class="md:col-span-2">
                     <label for="direccion" class="block text-sm font-semibold text-gray-700 mb-1">Dirección</label>
                     <input type="text" id="direccion" th:field="*{direccion}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                           placeholder="Ej: Av. Amazonas N35-45 y Padre Solano"
+                           class="w-full px-4 py-2 border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition"/>
                     <span th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" class="error-message"></span>
                 </div>
 
                 <div class="md:col-span-2">
                     <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
                     <input type="email" max="10" id="email" th:field="*{email}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                           placeholder="ejemplo@correo.com"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"/>
                     <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message"></span>
                 </div>
 
-                <!--
+                <!-- Contraseña -->
                 <div class="md:col-span-2">
                     <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
                     <input type="password" id="password" th:field="*{password}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition" />
+                           placeholder="********"
+                           class="w-full px-4 py-2 border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition" />
                     <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message"></span>
                 </div>
-                -->
-
 
                 <div class="md:col-span-2 hidden">
                     <label for="rol" class="block text-sm font-semibold text-gray-700 mb-1">Rol</label>
                     <input type="hidden" id="rol" th:field="*{rol}" value="DOCENTE" readonly
-                           class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-500" />
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-100 text-gray-500"/>
                 </div>
             </div>
 
-            <div class="md:col-span-2">
-                <label for="visible" class="block text-sm font-semibold text-gray-700 mb-1">Visible</label>
-                <input type="checkbox" id="visible" th:field="*{visible}"
-                       class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                <span class="ml-2 text-gray-700 text-sm">¿Docente visible?</span>
+            <div class="flex justify-center">
+                <div class="md:col-span-2">
+                    <input type="checkbox" id="visible" th:field="*{visible}"
+                           class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-2 text-gray-700 text-sm">¿Docente visible?</span>
+                </div>
             </div>
 
-            <div class="pt-2 button-container ">
-                <button class="button"> Registrar </button>
-
+            <!-- Botón Registrar -->
+            <div class="pt-4">
+                <button type="submit"
+                        class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-semibold rounded-md shadow-lg transition">
+                    Registrar docente
+                </button>
             </div>
+
         </form>
+
+
     </div>
 </section>
 </body>
