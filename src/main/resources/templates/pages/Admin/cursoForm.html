@@ -5,7 +5,7 @@
     <title th:text="${curso.id} != null ? 'Editar Curso' : 'Registro de Curso'">Curso</title>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@1.5.1/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/stylesFormC.css" />
+    <link rel="stylesheet" th:href="@{/css/stylesFormC.css}" />
     <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet" />
 </head>
 
@@ -32,7 +32,7 @@
             <input type="hidden" th:field="*{id}" />
 
             <div class="inputGroupFull">
-                <input type="text" id="nombre" th:field="*{nombre}" required autocomplete="off" />
+                <input type="text" id="nombre" th:field="*{nombre}" required minlength="3" autocomplete="off" />
                 <label for="nombre">Nombre del Curso</label>
             </div>
 
@@ -40,8 +40,8 @@
                 <label for="periodoSelectForm" class="block text-sm font-semibold text-purple-800 mb-1">
                     Periodo Académico
                 </label>
-                <select id="periodoSelectForm" th:field="*{periodoAcademico.id}"
-                        class="w-full px-4 py-2 border-2 border-purple-400 rounded-full focus:ring-2 focus:ring-purple-300 focus:outline-none transition">
+                <select id="periodoSelectForm" th:field="*{periodoAcademico.id}" required
+                        class="w-full px-4 py-2 border-2 border-purple-400 rounded-full focus:ring-2 focus:ring-purple-300 focus:outline-none transition bg-transparent">
                     <option value="">-- Seleccione periodo --</option>
                     <option th:each="per : ${periodos}" th:value="${per.id}" th:text="${per.nombre}"></option>
                 </select>
@@ -51,8 +51,8 @@
                 <label for="nivelSelectForm" class="block text-sm font-semibold text-purple-800 mb-1">
                     Nivel Educativo
                 </label>
-                <select id="nivelSelectForm" th:field="*{nivelEducativo.id}"
-                        class="w-full px-4 py-2 border-2 border-purple-400 rounded-full focus:ring-2 focus:ring-purple-300 focus:outline-none transition">
+                <select id="nivelSelectForm" th:field="*{nivelEducativo.id}" required
+                        class="w-full px-4 py-2 border-2 border-purple-400 rounded-full focus:ring-2 focus:ring-purple-300 focus:outline-none transition bg-transparent">
                     <option value="">-- Seleccione nivel --</option>
                     <option th:each="nivel : ${niveles}" th:value="${nivel.id}" th:text="${nivel.nombre}"></option>
                 </select>
@@ -62,8 +62,10 @@
                 <label for="materiasSeleccionadas" class="block text-sm font-medium text-purple-800 mb-1">
                     Materias del Curso
                 </label>
-                <select id="materiasSeleccionadas" name="materiasSeleccionadas" multiple size="5"
-                        class="w-full px-3 py-2 border border-purple-400 rounded-lg bg-white focus:ring-2 focus:ring-purple-300 focus:outline-none shadow-sm transition">
+                <select id="materiasSeleccionadas" name="materiasSeleccionadas" multiple size="5" required
+                        oninvalid="this.setCustomValidity('Selecciona al menos una materia')"
+                        oninput="setCustomValidity('')"
+                        class="w-full px-3 py-2 border border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none shadow-sm transition  bg-transparent">
                     <option th:each="materia : ${materias}"
                             th:value="${materia.id}"
                             th:text="${materia.nombre + ' (' + (materia.tipoMateria != null ? materia.tipoMateria : 'NORMAL') + ')'}"
@@ -77,8 +79,10 @@
                 <label for="estudiantesSeleccionados" class="block text-sm font-medium text-purple-800 mb-1">
                     Estudiantes Inscritos
                 </label>
-                <select id="estudiantesSeleccionados" name="estudiantesSeleccionados" multiple size="5"
-                        class="w-full px-3 py-2 border border-purple-400 rounded-lg bg-white focus:ring-2 focus:ring-purple-300 focus:outline-none shadow-sm transition">
+                <select id="estudiantesSeleccionados" name="estudiantesSeleccionados" multiple size="5" required
+                        oninvalid="this.setCustomValidity('Selecciona al menos un estudiante')"
+                        oninput="setCustomValidity('')"
+                        class="w-full px-3 py-2 border border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 focus:outline-none shadow-sm transition  bg-transparent">
                     <option th:each="est : ${estudiantes}"
                             th:value="${est.id}"
                             th:text="${est.cedula + ' - ' + est.nombre}"
@@ -93,8 +97,6 @@
                     Registrar Curso
                 </button>
             </div>
-
-    </div>
         </form>
     </div>
 </section>

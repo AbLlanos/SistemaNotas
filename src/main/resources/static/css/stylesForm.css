@@ -4,6 +4,7 @@
   margin: 0,3em 0;
   max-width: 250px;
   position: relative;
+  background: transparent;
 
 }
 
@@ -12,7 +13,6 @@
   padding: 0.8em;
   outline: none;
   border: 2px solid rgb(150, 150, 150);
-  background-color: transparent;
   border-radius: 25px;
   width: 100%;
 }
@@ -107,7 +107,7 @@
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  letter-spacing: 5px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   cursor: pointer;
   color: green;

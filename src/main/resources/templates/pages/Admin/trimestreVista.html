@@ -4,48 +4,45 @@
     <meta charset="UTF-8">
     <title>Lista de Trimestres</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/styleFormT.css}" />
+
+
+
 </head>
-<body class="bg-blue-50 min-h-screen flex flex-col">
+<body class="bg-orange-50 min-h-screen flex flex-col">
 
 <!-- NAVBAR -->
-<nav class="bg-blue-700 p-6">
-    <div class="container mx-auto flex justify-between items-center">
-        <span class="text-white font-bold text-3xl">Lista de Trimestres</span>
-        <a th:href="@{/pages/Admin/vistaAdmin}" class="bg-white text-blue-700 font-semibold px-4 py-2 rounded hover:bg-blue-100 transition">
-            Regresar
-        </a>
-    </div>
+<nav class="navbar-orange flex justify-between items-center container mx-auto">
+  <span class="text-white font-extrabold text-3xl tracking-wide fuente-titulo">
+    LISTA DE TRIMESTRE
+  </span>
+    <a th:href="@{/pages/Admin/vistaAdmin}"
+       class="bg-white text-orange-600 font-semibold px-5 py-2 rounded-lg shadow-md hover:bg-orange-100 transition duration-300">
+        Regresar
+    </a>
 </nav>
-
-<main class="container mx-auto flex-1 mt-8">
+<main class="container mx-auto flex-1 mt-10">
 
     <!-- CONTENEDOR -->
-    <div class="max-w-5xl mx-auto mb-8 rounded-lg border border-gray-300 shadow-md bg-white">
+    <div class="max-w-5xl mx-auto mb-10 rounded-3xl border-3  shadow-lg bg-orange-50 overflow-hidden">
 
         <!-- ENCABEZADO -->
-        <div class="text-center bg-blue-50 rounded-t-lg p-4">
-            <h4 class="text-3xl font-semibold text-blue-800">Trimestres Registrados</h4>
+        <div class="bg-orange-200 py-5 text-center">
+            <h4 class="font-extrabold text-3xl text-orange-600">TRIMESTRES REGISTRADOS</h4>
         </div>
 
         <!-- FILTRO -->
-        <div class="px-6 pt-6 pb-4">
-            <form th:action="@{/pages/Admin/trimestreVista}" method="get" class="space-y-4">
-                <div class="flex space-x-4">
-                    <div class="flex-1">
-                        <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">
-                            Filtrar por Nombre de Trimestre
-                        </label>
-                        <input
-                                type="text"
-                                id="filtroNombre"
-                                name="nombre"
-                                placeholder="Ingrese nombre del trimestre"
-                                th:value="${nombre}"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none transition"/>
-                    </div>
-                </div>
-                <div class="flex justify-center">
-                    <button type="submit" class="w-1/2 py-2 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg shadow-lg transition">
+        <div class="px-6 pt-6 pb-4 bg-orange-50 ml-40">
+            <form th:action="@{/pages/Admin/trimestreVista}" method="get">
+                <label for="filtroNombre" class="block text-sm font-semibold text-gray-700 mb-2 ml-40">
+                    Filtrar por Nombre de Trimestre
+                </label>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+                    <input type="text" id="filtroNombre" name="nombre" placeholder="Ingrese nombre del trimestre"
+                           th:value="${nombre}"
+                           class="w-full sm:w-2/3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none transition"/>
+                    <button type="submit"
+                            class="w-full sm:w-auto px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg shadow transition">
                         Filtrar
                     </button>
                 </div>
@@ -53,31 +50,32 @@
         </div>
 
         <!-- TABLA -->
-        <div class="overflow-x-auto px-6 pb-6">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-100 sticky top-0 z-10">
+        <div class="overflow-hidden rounded-xl shadow-md border border-gray-200 mx-6 mb-6">
+            <table class="min-w-full text-left text-sm table-auto border-collapse">
+                <thead class="bg-orange-200 text-gray-800 uppercase text-xs">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-700">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-700">Nombre</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
+                    <th class="px-6 py-3 border-b">ID</th>
+                    <th class="px-6 py-3 border-b text-center">Nombre</th>
+                    <th class="px-6 py-3 border-b text-center   ">Controles</th>
                 </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="bg-white divide-y divide-gray-200">
                 <tr th:if="${#lists.isEmpty(trimestres)}">
-                    <td colspan="3" class="px-4 py-4 text-center text-gray-500 italic">No hay trimestres registrados.</td>
+                    <td colspan="3" class="px-6 py-4 text-center text-gray-500 italic">No hay trimestres registrados.</td>
                 </tr>
-                <tr th:each="trimestre : ${trimestres}" class="hover:bg-blue-50" th:unless="${#lists.isEmpty(trimestres)}">
-                    <td class="px-4 py-2" th:text="${trimestre.id}"></td>
-                    <td class="px-4 py-2 font-medium" th:text="${trimestre.nombre}"></td>
-                    <td class="px-4 py-2">
-                        <div class="flex space-x-2">
+                <tr th:each="trimestre : ${trimestres}" class="hover:bg-orange-50 transition">
+                    <td class="px-6 py-3" th:text="${trimestre.id}"></td>
+                    <td class="px-6 py-3 font-medium text-gray-800 text-center" th:text="${trimestre.nombre}"></td>
+                    <td class="px-6 py-3 text-center">
+                        <div class="flex justify-center space-x-2">
                             <a th:href="@{/pages/Admin/editarTrimestre/{id}(id=${trimestre.id})}"
-                               class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                               class="bg-white text-blue-800 font-semibold border-2 border-blue-600 hover:bg-blue-700 hover:text-white px-4 py-1 rounded-xl text-sm shadow transition">
+
                                 Editar
                             </a>
                             <a th:href="@{/pages/Admin/eliminarTrimestre/{id}(id=${trimestre.id})}"
                                onclick="return confirm('¿Seguro que desea eliminar este trimestre?')"
-                               class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                               class="bg-white text-red-700 font-semibold border-2 border-red-600 hover:bg-red-700 hover:text-white px-4 py-1 rounded-xl text-sm shadow transition">
                                 Eliminar
                             </a>
                         </div>
@@ -86,15 +84,17 @@
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- BOTONES -->
-    <div class="flex justify-end space-x-4 mt-6">
-        <a th:href="@{/pages/Admin/trimestreForm}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+        <div class="flex justify-center max-w-5xl mx-auto mb-10 px-6">
+        <a th:href="@{/pages/Admin/trimestreForm}" class="custom-button">
             Nuevo Trimestre
         </a>
     </div>
-</main>
 
+
+    </div>
+
+
+</main>
 </body>
 </html>

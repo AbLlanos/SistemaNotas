@@ -52,10 +52,10 @@
 .form_main::before {
   content: "";
   position: absolute;
-  bottom: 150px;
-  left: -10px;
-  width: 600px;
-  height: 400px;
+  bottom: 210px;
+  left: 80px;
+  width: 400px;
+  height: 300px;
   background-image: url('https://cdn-icons-png.flaticon.com/512/2920/2920323.png');
   background-size: contain;
   background-repeat: no-repeat;
@@ -73,7 +73,7 @@
 .button {
   padding: 1em 2em;
   border: none;
-  border-radius: 5px;
+  border-radius: 3px;
   font-weight: bold;
   letter-spacing: 3px;
   text-transform: uppercase;

@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Notable&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #fff3e0, #ffe0b2);
+}
+
+.fuente-titulo {
+  font-weight: 100;
+}
+
+.navbar-orange, .blur-navbar-orange {
+  background: rgba(255, 152, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+  padding: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom-left-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+}
+
+.blur-navbar-orange .text-white {
+  color: #ffffff;
+}
+
+.blur-navbar-orange a {
+  background: white;
+  color: #f57c00;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.blur-navbar-orange a:hover {
+  background-color: #ffe0b2;
+}
+
+.form_main_orange {
+  position: relative;
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Imagen decorativa naranja suave */
+.form_main_orange::before {
+  content: "";
+  position: absolute;
+  bottom:120px;
+  left: 160px;
+  width: 250px;
+  height: 150px;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/496/496957.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.07;
+  z-index: 0;
+}
+
+.form_main_orange * {
+  position: relative;
+  z-index: 2;
+}
+
+.inputGroupFull {
+  position: relative;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.inputGroupFull input {
+  font-size: 1rem;
+  padding: 0.8em 1em;
+  border: 2px solid #ffcc80;
+  background-color: transparent;
+  border-radius: 25px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.inputGroupFull label {
+  font-size: 1rem;
+  position: absolute;
+  left: 0.8em;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #e65100;
+  background-color: white;
+  padding: 0 0.3em;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.inputGroupFull input:focus + label,
+.inputGroupFull input:not(:placeholder-shown) + label {
+  top: -0.6em;
+  left: 1em;
+  font-size: 0.8rem;
+  color: #f57c00;
+}
+
+.button_orange {
+  padding: 1em 2em;
+  border: none;
+  border-radius: 3px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 15px;
+  color: #e65100;
+  position: relative;
+  overflow: hidden;
+  outline: 2px solid #ffcc80;
+  background-color: transparent;
+  transition: all 0.4s ease;
+}
+
+.button_orange:hover {
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.6);
+}
+
+.button_orange::before {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: #ffcc80;
+  transform: skewX(45deg);
+  z-index: -1;
+  transition: width 0.4s ease;
+}
+
+.button_orange:hover::before {
+  width: 250%;
+}
+
+.button_orange span {
+  position: relative;
+  z-index: 2;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-button {
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  padding: 0.6em 1.5em;
+  border: 2px solid #F97316;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.1);
+  color: #F97316;
+  text-decoration: none;
+  transition: 0.3s ease all;
+  z-index: 1;
+  background-color: transparent;
+}
+
+.custom-button::before {
+  transition: 0.5s all ease;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  opacity: 0;
+  content: '';
+  background-color: #F97316;
+  z-index: -1;
+}
+
+.custom-button:hover,
+.custom-button:focus {
+  color: white;
+}
+
+.custom-button:hover::before,
+.custom-button:focus::before {
+  transition: 0.5s all ease;
+  left: 0;
+  right: 0;
+  opacity: 1;
+}
+
+.custom-button:active {
+  transform: scale(0.9);
+}

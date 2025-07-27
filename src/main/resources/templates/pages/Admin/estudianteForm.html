@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Notable&display=swap" rel="stylesheet" />
 </head>
 
-<body class="bg-cover bg-center" style="background-image: url('/images/tu-imagen-fondo.jpg');">
+<body class="bg-cover bg-center">
 
 <nav class="blur-navbar flex justify-between items-center container mx-auto rounded-b-lg p-6">
     <span class="text-white font-extrabold text-3xl tracking-wide cursor-pointer hover:text-green-300 transition"
@@ -75,7 +75,7 @@
             <!-- Nivel Educativo -->
             <div class="inputGroupFull md:col-span-2">
                 <select id="nivelSelect" name="nivelId"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition bg-transparent"
                         onchange="estudianteNivelChange(this)">
                     <option value="">-- Seleccione nivel --</option>
                     <option th:each="niv : ${niveles}"
