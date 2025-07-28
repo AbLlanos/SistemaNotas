@@ -158,13 +158,16 @@
                 </span>
                 </td>
 
+
                 <!-- Controles -->
                 <td class="px-4 py-2 flex space-x-2">
                     <a th:href="@{/editarEstudiante/{id}(id=${estudiante.id})}"
                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>
+                    <!--
                     <a th:href="@{/eliminarEstudiante/{id}(id=${estudiante.id})}"
                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
                        onclick="return confirm('¿Eliminar este estudiante?');">Eliminar</a>
+                       -->
                 </td>
             </tr>
             </tbody>
