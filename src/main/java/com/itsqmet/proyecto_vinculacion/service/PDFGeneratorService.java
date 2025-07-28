@@ -10,6 +10,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
@@ -284,7 +285,7 @@ public class PDFGeneratorService {
 
         Color grisPlomo = new DeviceRgb(180, 180, 180);
 
-        if (!notasRegular.isEmpty()) {
+
             // ================= PRIMERA TABLA ======================
             float[] columnWidthsPrimeraTabla = {20f, 10f, 10f, 10f, 10f, 10f, 10f}; // 7 columnas
             Table tablaNotas = new Table(UnitValue.createPercentArray(columnWidthsPrimeraTabla)).useAllAvailableWidth();
@@ -343,7 +344,7 @@ public class PDFGeneratorService {
             // Complementarias
             if (!notasComplementarias.isEmpty()) {
                 tablaNotas.addCell(new Cell(1, 7).add(new Paragraph("Actividades Complementarias").setBold().setFontSize(12))
-                        .setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(230, 230, 230)));
+                        .setTextAlignment(TextAlignment.LEFT));
 
                 for (NotaCompletaDTO dto : notasComplementarias) {
                     tablaNotas.addCell(new Cell().add(new Paragraph(safeVal(dto.getAreaMateria()))).setFontSize(10));
@@ -415,14 +416,28 @@ public class PDFGeneratorService {
             tablaComportamiento.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getTotalAsistenciaSegundoTrim()))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
             tablaComportamiento.addCell(new Cell().add(new Paragraph(stringSeguro(primerDto.getTotalAsistenciaTercerTrim()))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
 
+
+
             // ========== TABLA CONTENEDORA QUE UNE AMBAS LADO A LADO ==========
-            Table tablaContenedora = new Table(UnitValue.createPercentArray(new float[]{70f, 30f})).useAllAvailableWidth();
+            Table tablaContenedora = new Table(UnitValue.createPercentArray(new float[]{60f, 40f})).useAllAvailableWidth();
             tablaContenedora.addCell(new Cell().add(tablaNotas).setBorder(Border.NO_BORDER));
             tablaContenedora.addCell(new Cell().add(tablaComportamiento).setBorder(Border.NO_BORDER).setMarginRight(5));
 
             document.add(tablaContenedora);
             document.add(new Paragraph("\n"));
-        }
+
+            String rutaImagen = "src/main/resources/static/img/notaCriterios.png";
+            ImageData imageData = ImageDataFactory.create(rutaImagen);
+            Image imagen = new Image(imageData)
+                    .setWidth(330)
+                    .setHeight(100)
+                    .setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            document.add(imagen);
+
+
+
+
+
 
 
 

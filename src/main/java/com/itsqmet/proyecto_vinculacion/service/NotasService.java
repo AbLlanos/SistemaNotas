@@ -704,8 +704,11 @@ private  NivelEducativoService nivelEducativoService;
 
 
     public NotaCompletaDTO obtenerNotaCompletaPorIdParaPDF(Long idNota) {
+        System.out.println("DEBUG obtenerNotaCompletaPorIdParaPDF(): Buscando nota con ID = " + idNota);
+
         Notas nota = buscarNotaPorId(idNota);
         if (nota == null) {
+            System.out.println("ERROR: Nota no encontrada con ID = " + idNota);
             throw new RuntimeException("Nota no encontrada con id: " + idNota);
         }
 
@@ -716,9 +719,13 @@ private  NivelEducativoService nivelEducativoService;
             nombreCurso = cursoRelacionado.getNombre();
         }
 
+        System.out.println("DEBUG: nombreCurso = " + nombreCurso);
+
         String nivelFiltro = nota.getEstudiante() != null && nota.getEstudiante().getNivelEducativo() != null
                 ? nota.getEstudiante().getNivelEducativo().getNombre().toLowerCase().replace(" ", "")
                 : null;
+
+        System.out.println("DEBUG: nivelFiltro = " + nivelFiltro);
 
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
                 nota.getPeriodoAcademico().getNombre(),
@@ -726,8 +733,10 @@ private  NivelEducativoService nivelEducativoService;
                 nota.getMateria().getNombre(),
                 nota.getEstudiante().getCedula(),
                 null,
-                nivelFiltro  // <-- aquí pasa el nivel educativo
+                nivelFiltro
         );
+
+        System.out.println("DEBUG: notas encontradas = " + dtos.size());
 
         NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
 
@@ -744,19 +753,26 @@ private  NivelEducativoService nivelEducativoService;
             dto.setNombreEstudiante(e.getNombre());
             dto.setNombreCompletoEstudiante(((e.getNombre() != null ? e.getNombre() : "")));
 
-            // Recuperar comportamiento final usando entidades completas:
+            System.out.println("DEBUG: Estudiante = " + e.getCedula() + " - " + e.getNombre());
+
             if (cursoRelacionado != null && nota.getPeriodoAcademico() != null) {
                 comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(e, cursoRelacionado, nota.getPeriodoAcademico())
                         .ifPresentOrElse(cf -> {
+                            System.out.println("DEBUG: Comportamiento encontrado: "
+                                    + cf.getComportamientoPrimerTrim() + ", "
+                                    + cf.getComportamientoSegundoTrim() + ", "
+                                    + cf.getComportamientoTercerTrim());
                             dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
                             dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
                             dto.setComportamientoFinalVariable3(cf.getComportamientoTercerTrim());
                         }, () -> {
-                            // Opcional: valores por defecto si no hay comportamiento
+                            System.out.println("DEBUG: Comportamiento no encontrado para el estudiante.");
                             dto.setComportamientoFinalVariable1("--");
                             dto.setComportamientoFinalVariable2("--");
                             dto.setComportamientoFinalVariable3("--");
                         });
+            } else {
+                System.out.println("DEBUG: No hay curso relacionado o periodo académico, no se busca comportamiento.");
             }
         }
 
@@ -768,10 +784,11 @@ private  NivelEducativoService nivelEducativoService;
      */
     public List<NotaCompletaDTO> obtenerReporteFinal(String nombrePeriodo, String nombreCurso, String cedulaEstudiante) {
 
-        System.out.println("DEBUG obtenerReporteFinal(): periodo=" + nombrePeriodo +
-                " | curso=" + nombreCurso + " | cedula=" + cedulaEstudiante);
+        System.out.println("DEBUG obtenerReporteFinal():");
+        System.out.println(" - nombrePeriodo = " + nombrePeriodo);
+        System.out.println(" - nombreCurso = " + nombreCurso);
+        System.out.println(" - cedulaEstudiante = " + cedulaEstudiante);
 
-        // Resolver entidades
         PeriodoAcademico periodo = (nombrePeriodo != null && !nombrePeriodo.isBlank())
                 ? periodoAcademicoService.buscarPorNombre(nombrePeriodo)
                 : null;
@@ -782,49 +799,49 @@ private  NivelEducativoService nivelEducativoService;
 
         Curso curso = null;
         if (periodo != null && nombreCurso != null && !nombreCurso.isBlank()) {
-            // Ideal: método que busque curso por nombre + periodo
             curso = cursoService.buscarCursoPorPeriodoAndNombre(periodo, nombreCurso);
         }
         if (curso == null && nombreCurso != null && !nombreCurso.isBlank()) {
-            // fallback: por nombre solamente
             curso = cursoService.buscarPorNombre(nombreCurso);
+            System.out.println("DEBUG: Curso encontrado por nombre sin periodo = " + (curso != null ? curso.getNombre() : "null"));
+        }
+
+        if (periodo == null) {
+            System.out.println("ERROR: Periodo académico no encontrado.");
+        }
+        if (est == null) {
+            System.out.println("ERROR: Estudiante no encontrado.");
         }
 
         if (periodo == null || est == null) {
-            System.out.println("DEBUG obtenerReporteFinal(): Falta periodo o estudiante. Retornando lista vacía.");
+            System.out.println("DEBUG obtenerReporteFinal(): Retornando lista vacía por falta de datos.");
             return java.util.Collections.emptyList();
         }
 
-        // Obtener todas las materias del reporte (pasamos materia=null para TODAS)
-        // Ajusta si tu método requiere exactamente null vs ""
-        String nivelFiltro = (est != null && est.getNivelEducativo() != null)
+        String nivelFiltro = (est.getNivelEducativo() != null)
                 ? est.getNivelEducativo().getNombre().toLowerCase().replace(" ", "")
                 : null;
 
-        String nombrePeriodoString = (periodo != null) ? periodo.getNombre() : null;
-        String nombreMateria = null; // si quieres todas las materias, pasa null o ""
+        System.out.println("DEBUG: nivelFiltro = " + nivelFiltro);
 
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
-                nombrePeriodoString,
+                periodo.getNombre(),
                 nombreCurso,
-                nombreMateria,
-                (est != null) ? est.getCedula() : null,
-                null,  // nombreTrimestre
+                null, // nombreMateria
+                est.getCedula(),
+                null, // nombreTrimestre
                 nivelFiltro
         );
 
-        System.out.println("DEBUG obtenerReporteFinal(): size dtos antes de compFinal = " + dtos.size());
+        System.out.println("DEBUG: Notas encontradas = " + dtos.size());
 
-        // Recuperar comportamiento final (si hay curso)
         if (curso != null) {
-            comportamientoCursoFinalRepository
-                    .findByEstudianteAndCursoAndPeriodo(est, curso, periodo)
+            comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(est, curso, periodo)
                     .ifPresent(cf -> {
-                        System.out.println("DEBUG obtenerReporteFinal(): compFinal encontrado -> "
-                                + cf.getComportamientoPrimerTrim() + ", "
-                                + cf.getComportamientoSegundoTrim() + ", "
-                                + cf.getComportamientoTercerTrim());
-                        // Copiar en todos los DTO
+                        System.out.println("DEBUG: Comportamiento final encontrado para estudiante:");
+                        System.out.println("  - 1T: " + cf.getComportamientoPrimerTrim());
+                        System.out.println("  - 2T: " + cf.getComportamientoSegundoTrim());
+                        System.out.println("  - 3T: " + cf.getComportamientoTercerTrim());
                         for (NotaCompletaDTO dto : dtos) {
                             dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
                             dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
@@ -832,7 +849,7 @@ private  NivelEducativoService nivelEducativoService;
                         }
                     });
         } else {
-            System.out.println("DEBUG obtenerReporteFinal(): curso nulo; no se busca comportamiento final.");
+            System.out.println("DEBUG: No se encontró curso para comportamiento final.");
         }
 
         return dtos;

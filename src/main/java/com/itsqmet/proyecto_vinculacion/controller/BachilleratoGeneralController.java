@@ -12,6 +12,7 @@ import com.itsqmet.proyecto_vinculacion.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.PrintWriter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -231,7 +230,6 @@ public class BachilleratoGeneralController {
 
 
 
-
     @GetMapping("/admin/reporte-notas")
     public void generarReporteNotas(
             @RequestParam(value = "cedula", required = false) String cedula,
@@ -240,22 +238,36 @@ public class BachilleratoGeneralController {
             @RequestParam(value = "trimestre", required = false, defaultValue = "todos") String trimestre,
             HttpServletResponse response
     ) throws IOException {
-
         List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
 
         if (notas.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No se encontraron notas para los filtros indicados.");
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("No se encontraron notas para los filtros indicados. Debe cerrar esta ventana e intentar con un registroe existente");
             return;
         }
 
-        // Usar nombre completo, no solo nombre
         String nombreEstudiante = notas.get(0).getNombreCompletoEstudiante();
+        String periodoSanitizado = (periodo != null) ? periodo.replaceAll("[^a-zA-Z0-9]", "_") : "periodo";
+        String trimestreSanitizado = (trimestre != null) ? trimestre.replaceAll("[^a-zA-Z0-9]", "_") : "trimestre";
+        String nombreEstudianteSanitizado = (nombreEstudiante != null) ? nombreEstudiante.replaceAll("[^a-zA-Z0-9]", "_") : "estudiante";
+        String nombreArchivo = String.format("reporte_notas_%s_%s_%s.pdf", periodoSanitizado, trimestreSanitizado, nombreEstudianteSanitizado);
 
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "inline; filename=reporte-notas.pdf");
+        response.setHeader("Content-Disposition", "inline; filename=" + nombreArchivo);
 
-        pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
+        try {
+            pdfGeneratorService.generarReporteNotas(nombreEstudiante, periodo, notas, trimestre, response.getOutputStream());
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.reset();
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write("Error al generar el PDF: " + e.getMessage());
+        }
     }
+
+
+
     //Rutas generales
 
     @GetMapping("/{cursoId}/materias")
@@ -331,6 +343,22 @@ public class BachilleratoGeneralController {
     }
 
 
+
+
+    @GetMapping("/admin/validar-reporte-notas")
+    @ResponseBody
+    public ResponseEntity<?> validarReporteNotas(
+            @RequestParam(value = "cedula", required = false) String cedula,
+            @RequestParam(value = "periodo", required = false) String periodo,
+            @RequestParam(value = "curso", required = false) String curso
+    ) {
+        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
+        if (notas.isEmpty()) {
+            return ResponseEntity.ok(Collections.singletonMap("mensaje", "No se encontraron notas para los filtros seleccionados."));
+        } else {
+            return ResponseEntity.ok(Collections.singletonMap("exito", true));
+        }
+    }
 
 
 
