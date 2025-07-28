@@ -752,9 +752,7 @@ private  NivelEducativoService nivelEducativoService;
      * Retorna un solo NotaCompletaDTO por idNota.
      */
 
-
-
-    public NotaCompletaDTO obtenerNotaCompletaPorIdParaPDF(Long idNota) {
+    public NotaCompletaDTO obtenerNotaCompletaPorIdParaPDF(Long idNota, String nombreTrimestre) {
         System.out.println("DEBUG obtenerNotaCompletaPorIdParaPDF(): Buscando nota con ID = " + idNota);
 
         Notas nota = buscarNotaPorId(idNota);
@@ -790,6 +788,60 @@ private  NivelEducativoService nivelEducativoService;
         System.out.println("DEBUG: notas encontradas = " + dtos.size());
 
         NotaCompletaDTO dto = dtos.isEmpty() ? new NotaCompletaDTO() : dtos.get(0);
+
+        // Aquí se limpia según el trimestre recibido
+        if (nombreTrimestre != null && !nombreTrimestre.isBlank()) {
+            switch (nombreTrimestre) {
+                case "Primer Trimestre":
+                    dto.setNotaNumericaSegundoTrim(null);
+                    dto.setNotaNumericaTercerTrim(null);
+                    dto.setNotaCualitativaSegundoTrim("--");
+                    dto.setNotaCualitativaTercerTrim("--");
+                    dto.setAsistenciaSegundoTrim(null);
+                    dto.setAsistenciaTercerTrim(null);
+                    dto.setComportamientoSegundoTrim("--");
+                    dto.setComportamientoTercerTrim("--");
+                    dto.setComportamientoFinalVariable2("--");
+                    dto.setComportamientoFinalVariable3("--");
+                    dto.setNotaCualitativaFinalSegundoTrim("--");
+                    dto.setNotaCualitativaFinalTercerTrim("--");
+                    break;
+
+                case "Segundo Trimestre":
+                    dto.setNotaNumericaPrimerTrim(null);
+                    dto.setNotaNumericaTercerTrim(null);
+                    dto.setNotaCualitativaPrimerTrim("--");
+                    dto.setNotaCualitativaTercerTrim("--");
+                    dto.setAsistenciaPrimerTrim(null);
+                    dto.setAsistenciaTercerTrim(null);
+                    dto.setComportamientoPrimerTrim("--");
+                    dto.setComportamientoTercerTrim("--");
+                    dto.setComportamientoFinalVariable1("--");
+                    dto.setComportamientoFinalVariable3("--");
+                    dto.setNotaCualitativaFinalPrimerTrim("--");
+                    dto.setNotaCualitativaFinalTercerTrim("--");
+                    break;
+
+                case "Tercer Trimestre":
+                    dto.setNotaNumericaPrimerTrim(null);
+                    dto.setNotaNumericaSegundoTrim(null);
+                    dto.setNotaCualitativaPrimerTrim("--");
+                    dto.setNotaCualitativaSegundoTrim("--");
+                    dto.setAsistenciaPrimerTrim(null);
+                    dto.setAsistenciaSegundoTrim(null);
+                    dto.setComportamientoPrimerTrim("--");
+                    dto.setComportamientoSegundoTrim("--");
+                    dto.setComportamientoFinalVariable1("--");
+                    dto.setComportamientoFinalVariable2("--");
+                    dto.setNotaCualitativaFinalPrimerTrim("--");
+                    dto.setNotaCualitativaFinalSegundoTrim("--");
+                    break;
+
+                default:
+                    // No hacer nada o limpiar todo según necesidad
+                    break;
+            }
+        }
 
         dto.setIdNota(nota.getId());
         dto.setCursoId(cursoRelacionado != null ? cursoRelacionado.getId() : null);
@@ -833,12 +885,13 @@ private  NivelEducativoService nivelEducativoService;
     /**
      * Obtiene el reporte final de todas las materias de un estudiante en un periodo.
      */
-    public List<NotaCompletaDTO> obtenerReporteFinal(String nombrePeriodo, String nombreCurso, String cedulaEstudiante) {
+    public List<NotaCompletaDTO> obtenerReporteFinal(String nombrePeriodo, String nombreCurso, String cedulaEstudiante, String nombreTrimestre) {
 
         System.out.println("DEBUG obtenerReporteFinal():");
         System.out.println(" - nombrePeriodo = " + nombrePeriodo);
         System.out.println(" - nombreCurso = " + nombreCurso);
         System.out.println(" - cedulaEstudiante = " + cedulaEstudiante);
+        System.out.println(" - nombreTrimestre = " + nombreTrimestre);
 
         PeriodoAcademico periodo = (nombrePeriodo != null && !nombrePeriodo.isBlank())
                 ? periodoAcademicoService.buscarPorNombre(nombrePeriodo)
@@ -875,36 +928,128 @@ private  NivelEducativoService nivelEducativoService;
 
         System.out.println("DEBUG: nivelFiltro = " + nivelFiltro);
 
+        // Aquí le pasamos null al nombreTrimestre para obtener todas las notas
         List<NotaCompletaDTO> dtos = obtenerNotasCompletas(
                 periodo.getNombre(),
                 nombreCurso,
                 null, // nombreMateria
                 est.getCedula(),
-                null, // nombreTrimestre
+                null, // nombreTrimestre en obtenerNotasCompletas para traer todo
                 nivelFiltro
         );
 
         System.out.println("DEBUG: Notas encontradas = " + dtos.size());
 
-        if (curso != null) {
-            comportamientoCursoFinalRepository.findByEstudianteAndCursoAndPeriodo(est, curso, periodo)
-                    .ifPresent(cf -> {
-                        System.out.println("DEBUG: Comportamiento final encontrado para estudiante:");
-                        System.out.println("  - 1T: " + cf.getComportamientoPrimerTrim());
-                        System.out.println("  - 2T: " + cf.getComportamientoSegundoTrim());
-                        System.out.println("  - 3T: " + cf.getComportamientoTercerTrim());
-                        for (NotaCompletaDTO dto : dtos) {
-                            dto.setComportamientoFinalVariable1(cf.getComportamientoPrimerTrim());
-                            dto.setComportamientoFinalVariable2(cf.getComportamientoSegundoTrim());
-                            dto.setComportamientoFinalVariable3(cf.getComportamientoTercerTrim());
-                        }
-                    });
-        } else {
-            System.out.println("DEBUG: No se encontró curso para comportamiento final.");
+        // Ahora filtramos en el DTO según el trimestre seleccionado
+        if (nombreTrimestre != null && !nombreTrimestre.equalsIgnoreCase("todos")) {
+            for (NotaCompletaDTO dto : dtos) {
+                switch (nombreTrimestre) {
+                    case "Primer Trimestre":
+                        // Segundo trimestre
+                        dto.setNotaNumericaSegundoTrim(null);
+                        dto.setNotaCualitativaSegundoTrim(null);
+                        dto.setAsistenciaSegundoTrim(null);
+                        dto.setFaltasJustificadasSegundoTrim(null);
+                        dto.setFaltasInjustificadasSegundoTrim(null);
+                        dto.setAtrasosSegundoTrim(null);
+                        dto.setComportamientoSegundoTrim(null);
+                        dto.setTotalAsistenciaSegundoTrim(null);
+
+                        // Tercer trimestre
+                        dto.setNotaNumericaTercerTrim(null);
+                        dto.setNotaCualitativaTercerTrim(null);
+                        dto.setAsistenciaTercerTrim(null);
+                        dto.setFaltasJustificadasTercerTrim(null);
+                        dto.setFaltasInjustificadasTercerTrim(null);
+                        dto.setAtrasosTercerTrim(null);
+                        dto.setComportamientoTercerTrim(null);
+                        dto.setTotalAsistenciaTercerTrim(null);
+
+                        // Comportamiento final y nota cualitativa final de 2do y 3er trimestre
+                        dto.setComportamientoFinalVariable2(null);
+                        dto.setComportamientoFinalVariable3(null);
+                        dto.setNotaCualitativaFinalSegundoTrim(null);
+                        dto.setNotaCualitativaFinalTercerTrim(null);
+
+                        dto.setAsistenciaFinalVariable2(null);
+                        dto.setAsistenciaFinalVariable3(null);
+
+                        break;
+
+                    case "Segundo Trimestre":
+                        // Primer trimestre
+                        dto.setNotaNumericaPrimerTrim(null);
+                        dto.setNotaCualitativaPrimerTrim(null);
+                        dto.setAsistenciaPrimerTrim(null);
+                        dto.setFaltasJustificadasPrimerTrim(null);
+                        dto.setFaltasInjustificadasPrimerTrim(null);
+                        dto.setAtrasosPrimerTrim(null);
+                        dto.setComportamientoPrimerTrim(null);
+                        dto.setTotalAsistenciaPrimerTrim(null);
+
+                        // Tercer trimestre
+                        dto.setNotaNumericaTercerTrim(null);
+                        dto.setNotaCualitativaTercerTrim(null);
+                        dto.setAsistenciaTercerTrim(null);
+                        dto.setFaltasJustificadasTercerTrim(null);
+                        dto.setFaltasInjustificadasTercerTrim(null);
+                        dto.setAtrasosTercerTrim(null);
+                        dto.setComportamientoTercerTrim(null);
+                        dto.setTotalAsistenciaTercerTrim(null);
+
+                        // Comportamiento final y nota cualitativa final de 1er y 3er trimestre
+                        dto.setComportamientoFinalVariable1(null);
+                        dto.setComportamientoFinalVariable3(null);
+                        dto.setNotaCualitativaFinalPrimerTrim(null);
+                        dto.setNotaCualitativaFinalTercerTrim(null);
+
+                        dto.setAsistenciaFinalVariable1(null);
+                        dto.setAsistenciaFinalVariable3(null);
+
+                        break;
+
+                    case "Tercer Trimestre":
+                        // Primer trimestre
+                        dto.setNotaNumericaPrimerTrim(null);
+                        dto.setNotaCualitativaPrimerTrim(null);
+                        dto.setAsistenciaPrimerTrim(null);
+                        dto.setFaltasJustificadasPrimerTrim(null);
+                        dto.setFaltasInjustificadasPrimerTrim(null);
+                        dto.setAtrasosPrimerTrim(null);
+                        dto.setComportamientoPrimerTrim(null);
+                        dto.setTotalAsistenciaPrimerTrim(null);
+
+                        // Segundo trimestre
+                        dto.setNotaNumericaSegundoTrim(null);
+                        dto.setNotaCualitativaSegundoTrim(null);
+                        dto.setAsistenciaSegundoTrim(null);
+                        dto.setFaltasJustificadasSegundoTrim(null);
+                        dto.setFaltasInjustificadasSegundoTrim(null);
+                        dto.setAtrasosSegundoTrim(null);
+                        dto.setComportamientoSegundoTrim(null);
+                        dto.setTotalAsistenciaSegundoTrim(null);
+
+                        // Comportamiento final y nota cualitativa final de 1er y 2do trimestre
+                        dto.setComportamientoFinalVariable1(null);
+                        dto.setComportamientoFinalVariable2(null);
+                        dto.setNotaCualitativaFinalPrimerTrim(null);
+                        dto.setNotaCualitativaFinalSegundoTrim(null);
+
+                        dto.setAsistenciaFinalVariable1(null);
+                        dto.setAsistenciaFinalVariable2(null);
+
+                        break;
+
+                    default:
+                        // No hacer nada si es "todos" o no coincide
+                        break;
+                }
+            }
         }
 
         return dtos;
     }
+
 
 
     public List<Notas> obtenerNotasPorCurso(Long cursoId) {

@@ -21,4 +21,13 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
             PeriodoAcademico periodo,
             Trimestre trimestre
     );
+
+
+    Optional<Asistencia> findByEstudianteIdAndMateriaIdAndTrimestreIdAndPeriodoId(
+            Long estudianteId,
+            Long materiaId,
+            Long trimestreId,
+            Long periodoId
+    );
+
 }
