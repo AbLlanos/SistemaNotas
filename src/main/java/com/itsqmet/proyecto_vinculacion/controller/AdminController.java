@@ -186,7 +186,7 @@ public class AdminController {
         }
         return "redirect:/pages/Admin/adminPerfilVista";
     }
-
+/*
     @GetMapping("/admin/generar-pdf")
     public void generarPdf(
             @RequestParam("idNota") Long idNota,
@@ -210,5 +210,5 @@ public class AdminController {
 
         pdfGeneratorService.generarPdfNotas(datos, trimestre, response.getOutputStream());
     }
-
+*/
 }

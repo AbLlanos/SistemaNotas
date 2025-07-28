@@ -70,5 +70,9 @@ public class NotaCompletaDTO {
     private String notaCualitativaFinalSegundoTrim;
     private String notaCualitativaFinalTercerTrim;
 
+    private String asistenciaFinalVariable1;
+    private String asistenciaFinalVariable2;
+    private String asistenciaFinalVariable3;
+
 
 }

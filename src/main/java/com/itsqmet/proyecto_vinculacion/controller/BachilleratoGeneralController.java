@@ -229,7 +229,6 @@ public class BachilleratoGeneralController {
 
 
 
-
     @GetMapping("/admin/reporte-notas")
     public void generarReporteNotas(
             @RequestParam(value = "cedula", required = false) String cedula,
@@ -238,11 +237,12 @@ public class BachilleratoGeneralController {
             @RequestParam(value = "trimestre", required = false, defaultValue = "todos") String trimestre,
             HttpServletResponse response
     ) throws IOException {
-        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
+        // Paso el trimestre al servicio para que limpie/filtre según el trimestre seleccionado
+        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula, trimestre);
 
         if (notas.isEmpty()) {
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("No se encontraron notas para los filtros indicados,debe cerrar esta ventana e intentar con un registroe existente");
+            response.getWriter().write("No se encontraron notas para los filtros indicados. Por favor, cierre esta ventana e intente con un registro existente.");
             return;
         }
 
@@ -265,7 +265,6 @@ public class BachilleratoGeneralController {
             response.getWriter().write("Error al generar el PDF: " + e.getMessage());
         }
     }
-
 
 
     //Rutas generales
@@ -344,7 +343,7 @@ public class BachilleratoGeneralController {
 
 
 
-
+/*
     @GetMapping("/admin/validar-reporte-notas")
     @ResponseBody
     public ResponseEntity<?> validarReporteNotas(
@@ -352,14 +351,14 @@ public class BachilleratoGeneralController {
             @RequestParam(value = "periodo", required = false) String periodo,
             @RequestParam(value = "curso", required = false) String curso
     ) {
-        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula);
+        List<NotaCompletaDTO> notas = notasService.obtenerReporteFinal(periodo, curso, cedula,trimestre);
         if (notas.isEmpty()) {
             return ResponseEntity.ok(Collections.singletonMap("mensaje", "No se encontraron notas para los filtros seleccionados."));
         } else {
             return ResponseEntity.ok(Collections.singletonMap("exito", true));
         }
     }
-
+*/
 
 
 }

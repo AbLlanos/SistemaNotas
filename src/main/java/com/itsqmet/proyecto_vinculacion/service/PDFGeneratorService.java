@@ -153,6 +153,30 @@ public class PDFGeneratorService {
         }
         return nota;
     }
+    private String getAsistenciaPorTrimestre(List<NotaCompletaDTO> notas, String trimestre) {
+        String asistencia = "--";
+        for (NotaCompletaDTO dto : notas) {
+            switch (trimestre) {
+                case "Primer Trimestre":
+                    if (dto.getAsistenciaPrimerTrim() != null) {
+                        asistencia = dto.getAsistenciaPrimerTrim().toString();
+                    }
+                    break;
+                case "Segundo Trimestre":
+                    if (dto.getAsistenciaSegundoTrim() != null) {
+                        asistencia = dto.getAsistenciaSegundoTrim().toString();
+                    }
+                    break;
+                case "Tercer Trimestre":
+                    if (dto.getAsistenciaTercerTrim() != null) {
+                        asistencia = dto.getAsistenciaTercerTrim().toString();
+                    }
+                    break;
+            }
+        }
+        return asistencia;
+    }
+
 
 
 
@@ -516,7 +540,7 @@ public class PDFGeneratorService {
     }
 
     private String stringSeguro(Integer val) {
-        return val != null ? val.toString() : "";
+        return val != null ? val.toString() : "--";
     }
 
 
