@@ -135,7 +135,11 @@
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Docente</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Nivel Educativo</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Tipo</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible</th>
+
+                <!-- Aquí dos columnas visibles separadas -->
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible Materia</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-700">Visible Periodo Académico</th>
+
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Periodo Académico</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
             </tr>
@@ -144,7 +148,7 @@
             <tbody class="divide-y divide-gray-100">
 
             <tr th:if="${#lists.isEmpty(materias)}">
-                <td colspan="8" class="px-4 py-4 text-center text-gray-500 italic">
+                <td colspan="9" class="px-4 py-4 text-center text-gray-500 italic">
                     No se encontraron datos.
                 </td>
             </tr>
@@ -155,15 +159,34 @@
                 <td class="px-4 py-2" th:text="${mat.docente != null ? mat.docente.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.nivelEducativo != null ? mat.nivelEducativo.nombre : '---'}"></td>
                 <td class="px-4 py-2" th:text="${mat.tipoMateria != null ? mat.tipoMateria : 'NORMAL'}"></td>
+
+                <!-- Visible Materia -->
                 <td class="px-4 py-2 text-center">
-                <span th:if="${mat.visible}" class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">
-                    Sí
-                </span>
-                    <span th:unless="${mat.visible}" class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">
-                    No
-                </span>
+            <span th:if="${mat.visible}"
+                  class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">
+                Sí
+            </span>
+                    <span th:unless="${mat.visible}"
+                          class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">
+                No
+            </span>
                 </td>
+
+                <!-- Visible Periodo Académico -->
+                <td class="px-4 py-2 text-center" th:if="${mat.periodoAcademico != null}">
+            <span th:if="${mat.periodoAcademico.visible}"
+                  class="bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-lg">
+                Sí
+            </span>
+                    <span th:unless="${mat.periodoAcademico.visible}"
+                          class="bg-red-100 text-red-600 font-semibold px-3 py-1 rounded-lg">
+                No
+            </span>
+                </td>
+                <td class="px-4 py-2 text-center" th:unless="${mat.periodoAcademico != null}">---</td>
+
                 <td class="px-4 py-2" th:text="${mat.periodoAcademico != null ? mat.periodoAcademico.nombre : '---'}"></td>
+
                 <td class="px-4 py-2 flex space-x-2">
                     <a th:href="@{/pages/Admin/materiaForm/{id}(id=${mat.id})}"
                        class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Editar</a>

@@ -242,7 +242,7 @@ public class BachilleratoGeneralController {
 
         if (notas.isEmpty()) {
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write("No se encontraron notas para los filtros indicados. Debe cerrar esta ventana e intentar con un registroe existente");
+            response.getWriter().write("No se encontraron notas para los filtros indicados,debe cerrar esta ventana e intentar con un registroe existente");
             return;
         }
 

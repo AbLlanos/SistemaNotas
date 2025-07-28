@@ -399,6 +399,8 @@ private  NivelEducativoService nivelEducativoService;
         // Guardar para cada trimestre nota, comportamiento y asistencia
 
         // Primer trimestre
+
+// Primer trimestre
         upsertNotaYRelacionados(estudiante, materia, periodo, t1,
                 form.getNotaNumericaPrimerTrim(), form.getNotaCualitativaPrimerTrim(),
                 form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
@@ -410,7 +412,13 @@ private  NivelEducativoService nivelEducativoService;
                 form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
                 form.getTotalAsistenciaPrimerTrim());
 
-        // Segundo trimestre
+// Guardar y propagar asistencia primer trimestre
+        guardarAsistenciaYPropagar(estudiante, curso, periodo, t1, materia,
+                form.getAsistenciaPrimerTrim(), form.getFaltasJustificadasPrimerTrim(),
+                form.getFaltasInjustificadasPrimerTrim(), form.getAtrasosPrimerTrim(),
+                form.getTotalAsistenciaPrimerTrim());
+
+// Segundo trimestre
         upsertNotaYRelacionados(estudiante, materia, periodo, t2,
                 form.getNotaNumericaSegundoTrim(), form.getNotaCualitativaSegundoTrim(),
                 form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
@@ -422,7 +430,13 @@ private  NivelEducativoService nivelEducativoService;
                 form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
                 form.getTotalAsistenciaSegundoTrim());
 
-        // Tercer trimestre
+// Guardar y propagar asistencia segundo trimestre
+        guardarAsistenciaYPropagar(estudiante, curso, periodo, t2, materia,
+                form.getAsistenciaSegundoTrim(), form.getFaltasJustificadasSegundoTrim(),
+                form.getFaltasInjustificadasSegundoTrim(), form.getAtrasosSegundoTrim(),
+                form.getTotalAsistenciaSegundoTrim());
+
+// Tercer trimestre
         upsertNotaYRelacionados(estudiante, materia, periodo, t3,
                 form.getNotaNumericaTercerTrim(), form.getNotaCualitativaTercerTrim(),
                 form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
@@ -433,6 +447,13 @@ private  NivelEducativoService nivelEducativoService;
                 form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
                 form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
                 form.getTotalAsistenciaTercerTrim());
+
+// Guardar y propagar asistencia tercer trimestre
+        guardarAsistenciaYPropagar(estudiante, curso, periodo, t3, materia,
+                form.getAsistenciaTercerTrim(), form.getFaltasJustificadasTercerTrim(),
+                form.getFaltasInjustificadasTercerTrim(), form.getAtrasosTercerTrim(),
+                form.getTotalAsistenciaTercerTrim());
+
 
         // Guardar comportamiento final por curso
         if (curso != null &&
@@ -567,6 +588,36 @@ private  NivelEducativoService nivelEducativoService;
         return s != null && !s.trim().isEmpty();
     }
 
+
+    @Transactional
+    public void guardarAsistenciaYPropagar(Estudiante estudiante, Curso curso, PeriodoAcademico periodo,
+                                           Trimestre trimestre, Materia materia,
+                                           Integer asistencias,
+                                           Integer faltasJustificadas,
+                                           Integer faltasInjustificadas,
+                                           Integer atrasos,
+                                           Integer totalAsistencias) {
+
+        // Guardar asistencia para la materia original
+        upsertAsistencia(estudiante, materia, periodo, trimestre,
+                asistencias, faltasJustificadas, faltasInjustificadas, atrasos, totalAsistencias);
+
+        System.out.println("Materia original: " + materia.getNombre());
+        System.out.println("Propagando asistencia a materias visibles y con periodo visible del curso: " + curso.getNombre());
+
+        // Obtener materias visibles del curso y cuyo periodo esté visible
+        List<Materia> materiasDelCurso = materiaService.listarMateriasVisiblesPorCurso(curso.getId());
+
+        for (Materia mat : materiasDelCurso) {
+            System.out.println("Materia a actualizar: " + mat.getNombre());
+            if (!mat.getId().equals(materia.getId())) {
+                upsertAsistencia(estudiante, mat, periodo, trimestre,
+                        asistencias, faltasJustificadas, faltasInjustificadas, atrasos, totalAsistencias);
+            }
+        }
+
+
+}
 
 
 

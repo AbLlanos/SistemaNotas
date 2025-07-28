@@ -131,6 +131,10 @@ public class MateriaService {
 
         return materias;
     }
+    public List<Materia> listarMateriasVisiblesPorCurso(Long cursoId) {
+        return materiaRepository.findByCursos_IdAndVisibleTrueAndPeriodoAcademico_VisibleTrue(cursoId);
+    }
+
 
 
 }

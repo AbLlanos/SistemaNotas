@@ -76,8 +76,7 @@ public class CursoController {
     }
 
 // ------------------------------------------------------------
-// 2. Formulario nuevo curso (con filtrado opcional por nivel)
-// ------------------------------------------------------------
+// Para mostrar formulario nuevo curso
 @GetMapping("/pages/Admin/cursoForm")
 public String mostrarCursoForm(
         @RequestParam(value = "nivelId", required = false) Long nivelId,
@@ -86,7 +85,6 @@ public String mostrarCursoForm(
 
     List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
 
-    // Solo periodos académicos visibles
     List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
             .stream()
             .filter(p -> Boolean.TRUE.equals(p.getVisible()))
@@ -96,22 +94,22 @@ public String mostrarCursoForm(
     List<Estudiante> estudiantes;
 
     if (nivelId != null) {
-        // Listar materias por nivel que sean visibles
         materias = materiaService.listarPorNivelId(nivelId)
                 .stream()
-                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                .filter(m -> Boolean.TRUE.equals(m.getVisible()) &&
+                        m.getPeriodoAcademico() != null &&
+                        Boolean.TRUE.equals(m.getPeriodoAcademico().getVisible()))
                 .toList();
 
-        // Listar solo estudiantes visibles por nivel
         estudiantes = estudianteService.listarVisiblesPorNivelId(nivelId);
     } else {
-        // Listar todas las materias visibles (crea este método si no existe)
         materias = materiaService.listarTodasMaterias()
                 .stream()
-                .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                .filter(m -> Boolean.TRUE.equals(m.getVisible()) &&
+                        m.getPeriodoAcademico() != null &&
+                        Boolean.TRUE.equals(m.getPeriodoAcademico().getVisible()))
                 .toList();
 
-        // Listar solo estudiantes visibles sin filtro de nivel
         estudiantes = estudianteService.listarVisibles();
     }
 
@@ -122,15 +120,12 @@ public String mostrarCursoForm(
     model.addAttribute("nivelSeleccionado", nivelId);
     model.addAttribute("periodoSeleccionado", periodoId);
     model.addAttribute("curso", new Curso());
-
-    // Nuevo atributo para indicar si el filtro se aplicó o no
     model.addAttribute("filtroAplicado", nivelId != null);
 
     return "pages/Admin/cursoForm";
 }
-    // ----------------------------------------
-// Mostrar formulario para editar curso
-// ----------------------------------------
+
+    // Para mostrar formulario editar curso
     @GetMapping("/pages/Admin/cursoForm/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id,
                                           @RequestParam(value = "nivelId", required = false) Long overrideNivelId,
@@ -147,7 +142,6 @@ public String mostrarCursoForm(
 
         List<NivelEducativo> niveles = nivelEducativoService.listarTodos();
 
-        // Solo periodos visibles
         List<PeriodoAcademico> periodos = periodoAcademicoService.listarTodosPeriodosAcademicos()
                 .stream()
                 .filter(p -> Boolean.TRUE.equals(p.getVisible()))
@@ -162,7 +156,9 @@ public String mostrarCursoForm(
         List<Materia> materias = (nivelId != null) ?
                 materiaService.listarPorNivelId(nivelId)
                         .stream()
-                        .filter(m -> Boolean.TRUE.equals(m.getVisible()))
+                        .filter(m -> Boolean.TRUE.equals(m.getVisible()) &&
+                                m.getPeriodoAcademico() != null &&
+                                Boolean.TRUE.equals(m.getPeriodoAcademico().getVisible()))
                         .toList()
                 : Collections.emptyList();
 
@@ -175,13 +171,10 @@ public String mostrarCursoForm(
         model.addAttribute("materias", materias);
         model.addAttribute("estudiantes", estudiantes);
         model.addAttribute("curso", curso);
-
-        // Variable para evitar errores en Thymeleaf con valores booleanos null
         model.addAttribute("filtroAplicado", nivelId != null);
 
         return "pages/Admin/cursoForm";
     }
-
     // ------------------------------------------------------------
 // 4. Guardar curso (nuevo o editado)
 // ------------------------------------------------------------

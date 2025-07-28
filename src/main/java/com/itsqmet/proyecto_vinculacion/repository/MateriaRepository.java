@@ -25,4 +25,5 @@ public interface MateriaRepository extends JpaRepository<Materia, Long> {
     List<Materia> findByVisibleTrueAndPeriodoAcademico_VisibleTrue();
     List<Materia> findByPeriodoAcademicoId(Long periodoId);
 
+    List<Materia> findByCursos_IdAndVisibleTrueAndPeriodoAcademico_VisibleTrue(Long cursoId);
 }

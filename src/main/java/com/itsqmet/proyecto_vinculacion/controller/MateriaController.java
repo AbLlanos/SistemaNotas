@@ -42,7 +42,7 @@ public class MateriaController {
     public String vistaMaterias(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) Long docenteId,
-            @RequestParam(required = false) Long periodoId,                  // <-- Nuevo parámetro
+            @RequestParam(required = false) Long periodoId,
             @RequestParam(required = false, defaultValue = "false") boolean mostrarOcultos,
             Model model) {
 
@@ -51,19 +51,21 @@ public class MateriaController {
         if (!mostrarOcultos) {
             materias = materias.stream()
                     .filter(Materia::getVisible)
+                    .filter(m -> m.getPeriodoAcademico() != null && m.getPeriodoAcademico().getVisible()) // filtro para periodo visible
                     .toList();
         }
 
         model.addAttribute("materias", materias);
         model.addAttribute("docentes", docenteService.listarTodosDocentes());
-        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos()); // lista de periodos
+        model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
         model.addAttribute("paramNombre", nombre);
         model.addAttribute("paramDocenteId", docenteId);
-        model.addAttribute("paramPeriodoId", periodoId);   // <-- Parámetro para vista
+        model.addAttribute("paramPeriodoId", periodoId);
         model.addAttribute("paramMostrarOcultos", mostrarOcultos);
 
         return "pages/Admin/materiaVista";
     }
+
 
 
     /* ========================
