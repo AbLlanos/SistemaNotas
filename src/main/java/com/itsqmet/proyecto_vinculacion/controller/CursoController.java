@@ -19,10 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class CursoController {
@@ -178,7 +176,6 @@ public String mostrarCursoForm(
     // ------------------------------------------------------------
 // 4. Guardar curso (nuevo o editado)
 // ------------------------------------------------------------
-
     @PostMapping("/pages/Admin/cursoGuardar")
     @Transactional
     public String guardarCurso(
@@ -192,10 +189,13 @@ public String mostrarCursoForm(
         if (result.hasErrors()) {
             model.addAttribute("periodos", periodoAcademicoService.listarTodosPeriodosAcademicos());
             model.addAttribute("niveles", nivelEducativoService.listarTodos());
-            model.addAttribute("materias", materiaService.listarPorNivelId(curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
-            model.addAttribute("estudiantes", estudianteService.buscarEstudiantePorId(curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
+            model.addAttribute("materias", materiaService.listarPorNivelId(
+                    curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
+            model.addAttribute("estudiantes", estudianteService.buscarEstudiantePorId(
+                    curso.getNivelEducativo() != null ? curso.getNivelEducativo().getId() : null));
             return "pages/Admin/cursoForm";
         }
+
         try {
             Curso cursoPersistido = (curso.getId() != null)
                     ? cursoService.buscarCursoPorId(curso.getId()).orElse(new Curso())
@@ -208,7 +208,7 @@ public String mostrarCursoForm(
 
             cursoPersistido.setNombre(curso.getNombre());
 
-            // Cargar PeriodoAcademico completo por id solo si no es null
+            // Periodo académico
             if (curso.getPeriodoAcademico() != null && curso.getPeriodoAcademico().getId() != null) {
                 PeriodoAcademico pa = periodoAcademicoService.buscarPorId(curso.getPeriodoAcademico().getId());
                 cursoPersistido.setPeriodoAcademico(pa);
@@ -216,14 +216,10 @@ public String mostrarCursoForm(
                 cursoPersistido.setPeriodoAcademico(null);
             }
 
-            // Cargar NivelEducativo completo por id solo si no es null
+            // Nivel educativo
             if (curso.getNivelEducativo() != null && curso.getNivelEducativo().getId() != null) {
                 Optional<NivelEducativo> optionalNe = nivelEducativoService.buscarPorId(curso.getNivelEducativo().getId());
-                if (optionalNe.isPresent()) {
-                    cursoPersistido.setNivelEducativo(optionalNe.get());
-                } else {
-                    cursoPersistido.setNivelEducativo(null);
-                }
+                cursoPersistido.setNivelEducativo(optionalNe.orElse(null));
             } else {
                 cursoPersistido.setNivelEducativo(null);
             }
@@ -236,21 +232,42 @@ public String mostrarCursoForm(
                 cursoPersistido.setMaterias(new ArrayList<>());
             }
 
-            // Guardar primero para obtener ID si es nuevo
+            // Guardar curso (necesario para obtener ID si es nuevo)
             cursoService.guardarCurso(cursoPersistido);
 
             if (estudiantesIds != null && !estudiantesIds.isEmpty()) {
                 List<Estudiante> estudiantesSeleccionados = estudianteService.obtenerPorIds(estudiantesIds);
 
-                // Detectar estudiantes removidos
-                List<Estudiante> estudiantesARemover = new ArrayList<>();
-                for (Estudiante actual : estudiantesActuales) {
-                    if (!estudiantesIds.contains(actual.getId())) {
-                        estudiantesARemover.add(actual);
+                // Validar duplicados por período académico
+                PeriodoAcademico periodoActual = cursoPersistido.getPeriodoAcademico();
+                List<Estudiante> estudiantesDuplicados = new ArrayList<>();
+
+                for (Estudiante estudiante : estudiantesSeleccionados) {
+                    for (Curso c : estudiante.getCursos()) {
+                        if (!Objects.equals(c.getId(), cursoPersistido.getId()) &&
+                                c.getPeriodoAcademico().getId().equals(periodoActual.getId())) {
+                            estudiantesDuplicados.add(estudiante);
+                            break;
+                        }
                     }
                 }
 
-                // Remover estudiantes y actualizar relación inversa
+                if (!estudiantesDuplicados.isEmpty()) {
+                    String nombres = estudiantesDuplicados.stream()
+                            .map(e -> e.getNombre() + " " + e.getApellido())
+                            .collect(Collectors.joining(", "));
+
+                    redirectAttributes.addFlashAttribute("error",
+                            "Los siguientes estudiantes ya están inscritos en otro curso del mismo período: " + nombres);
+
+                    return "redirect:/pages/Admin/cursoForm";
+                }
+
+                // Detectar estudiantes removidos
+                List<Estudiante> estudiantesARemover = estudiantesActuales.stream()
+                        .filter(actual -> !estudiantesIds.contains(actual.getId()))
+                        .toList();
+
                 for (Estudiante remover : estudiantesARemover) {
                     if (remover.getCursos() != null) {
                         remover.getCursos().remove(cursoPersistido);
@@ -258,7 +275,7 @@ public String mostrarCursoForm(
                 }
                 estudianteService.guardarTodos(estudiantesARemover);
 
-                // Agregar nuevos estudiantes y actualizar relación inversa
+                // Agregar nuevos estudiantes
                 for (Estudiante nuevo : estudiantesSeleccionados) {
                     if (!estudiantesActuales.contains(nuevo)) {
                         estudiantesActuales.add(nuevo);
@@ -275,7 +292,6 @@ public String mostrarCursoForm(
                 cursoPersistido.setEstudiantes(estudiantesActuales);
 
             } else {
-                // Si no seleccionó estudiantes, remover todos
                 for (Estudiante e : estudiantesActuales) {
                     if (e.getCursos() != null) {
                         e.getCursos().remove(cursoPersistido);
@@ -285,7 +301,6 @@ public String mostrarCursoForm(
                 cursoPersistido.setEstudiantes(new ArrayList<>());
             }
 
-            // Guardar actualización final de curso con estudiantes
             cursoService.guardarCurso(cursoPersistido);
 
             redirectAttributes.addFlashAttribute("success", "Curso guardado correctamente.");
@@ -296,7 +311,6 @@ public String mostrarCursoForm(
 
         return "redirect:/pages/Admin/cursoVista";
     }
-
 
 
 
