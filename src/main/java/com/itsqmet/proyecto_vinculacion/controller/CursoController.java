@@ -122,7 +122,7 @@ public String mostrarCursoForm(
     model.addAttribute("curso", new Curso());
     model.addAttribute("filtroAplicado", nivelId != null);
 
-    return "pages/Admin/cursoForm";
+    return "pages/Admin/cursoForm";  // Asegúrate que el nombre aquí sea el de tu plantilla con el formulario
 }
 
     // Para mostrar formulario editar curso

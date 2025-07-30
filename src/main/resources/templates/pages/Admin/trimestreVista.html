@@ -89,7 +89,7 @@
                 <tr>
                     <th class="px-4 py-2 text-left font-medium text-gray-700">ID</th>
                     <th class="px-4 py-2 text-left font-medium text-gray-700">Nombre</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>
+                   <!-- <th class="px-4 py-2 text-left font-medium text-gray-700">Controles</th>-->
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -99,6 +99,7 @@
                 <tr th:each="trimestre : ${trimestres}" class="hover:bg-blue-50" th:unless="${#lists.isEmpty(trimestres)}">
                     <td class="px-4 py-2" th:text="${trimestre.id}"></td>
                     <td class="px-4 py-2 font-medium" th:text="${trimestre.nombre}"></td>
+                    <!--
                     <td class="px-4 py-2">
                         <div class="flex space-x-2">
                             <a th:href="@{/pages/Admin/editarTrimestre/{id}(id=${trimestre.id})}"
@@ -107,6 +108,7 @@
                             </a>
                         </div>
                     </td>
+                    -->
                 </tr>
                 </tbody>
             </table>

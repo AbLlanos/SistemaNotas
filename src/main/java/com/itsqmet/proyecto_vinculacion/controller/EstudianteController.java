@@ -112,7 +112,7 @@ public class EstudianteController {
         if (estudiantePorEmail.isPresent()) {
             Estudiante existente = estudiantePorEmail.get();
             if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
-                result.rejectValue("email", "error.estudiante", "Ya existe un estudiante con este correo.");
+                result.rejectValue("email", "error.estudiante", "Ya existe un USUARIO con este correo.");
             }
         }
 
@@ -121,7 +121,7 @@ public class EstudianteController {
         if (estudiantePorCedula.isPresent()) {
             Estudiante existente = estudiantePorCedula.get();
             if (!esEdicion || !existente.getId().equals(estudiante.getId())) {
-                result.rejectValue("cedula", "error.estudiante", "Ya existe un estudiante con esta cédula.");
+                result.rejectValue("cedula", "error.estudiante", "Ya existe un USUARIO con esta cédula.");
             }
         }
 

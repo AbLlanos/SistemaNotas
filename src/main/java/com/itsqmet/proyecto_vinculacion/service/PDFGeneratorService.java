@@ -330,15 +330,41 @@ public class PDFGeneratorService {
             for (NotaCompletaDTO dto : notasRegular) {
                 tablaNotas.addCell(new Cell().add(new Paragraph(safeVal(dto.getAreaMateria()))).setFontSize(10));
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
+                // Primer Trimestre - nota numérica formateada (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaPrimerTrimFormateada(), "Primer Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
+                // Primer Trimestre - nota cualitativa (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaPrimerTrim(), "Primer Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
 
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
-                tablaNotas.addCell(new Cell().add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado))).setTextAlignment(TextAlignment.CENTER).setFontSize(10));
+                // Segundo Trimestre - nota numérica formateada (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaSegundoTrimFormateada(), "Segundo Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
 
+                // Segundo Trimestre - nota cualitativa (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaSegundoTrim(), "Segundo Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
+
+                // Tercer Trimestre - nota numérica formateada (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaNumericaTercerTrimFormateada(), "Tercer Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
+
+                // Tercer Trimestre - nota cualitativa (String)
+                tablaNotas.addCell(new Cell()
+                        .add(new Paragraph(mostrarTrimestre(dto.getNotaCualitativaTercerTrim(), "Tercer Trimestre", trimestreSeleccionado)))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setFontSize(10));
                 if (mostrarColumna("Primer Trimestre", trimestreSeleccionado) && dto.getNotaNumericaPrimerTrim() != null) {
                     sumaNota1T += dto.getNotaNumericaPrimerTrim();
                     countNota1T++;

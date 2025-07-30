@@ -220,5 +220,56 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const formCrear = document.getElementById('formCrearCurso');
+
+      // Campos que validar
+      const inputNombre = formCrear.querySelector('input#nombre');
+      const selectPeriodo = formCrear.querySelector('select#periodoSelectForm');
+      const selectNivel = formCrear.querySelector('select#nivelSelectForm');
+      const selectMaterias = formCrear.querySelector('select#materiasSeleccionadas');
+      const selectEstudiantes = formCrear.querySelector('select#estudiantesSeleccionados');
+      const btnSubmit = formCrear.querySelector('button[type="submit"]');
+
+      // Función para validar si hay al menos una opción seleccionada en select multiple
+      function tieneSeleccionMultiple(selectElement) {
+        return Array.from(selectElement.options).some(option => option.selected);
+      }
+
+      function validarFormulario() {
+        const nombreValido = inputNombre.value.trim() !== '';
+        const periodoValido = selectPeriodo.value.trim() !== '';
+        const nivelValido = selectNivel.value.trim() !== '';
+        const materiasValidas = tieneSeleccionMultiple(selectMaterias);
+        const estudiantesValidos = tieneSeleccionMultiple(selectEstudiantes);
+
+        const todoValido = nombreValido && periodoValido && nivelValido && materiasValidas && estudiantesValidos;
+
+        btnSubmit.disabled = !todoValido;
+
+        // Cambiar colores del botón según estado habilitado o deshabilitado
+        if (todoValido) {
+          btnSubmit.classList.remove('bg-gray-400', 'cursor-not-allowed');
+          btnSubmit.classList.add('bg-green-600', 'hover:bg-green-700', 'cursor-pointer');
+        } else {
+          btnSubmit.classList.remove('bg-green-600', 'hover:bg-green-700', 'cursor-pointer');
+          btnSubmit.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
+      }
+
+      // Validar inicialmente al cargar la página
+      validarFormulario();
+
+      // Añadir listeners para validar en cada cambio o entrada
+      inputNombre.addEventListener('input', validarFormulario);
+      selectPeriodo.addEventListener('change', validarFormulario);
+      selectNivel.addEventListener('change', validarFormulario);
+      selectMaterias.addEventListener('change', validarFormulario);
+      selectEstudiantes.addEventListener('change', validarFormulario);
+    });
+</script>
+
+
 </body>
 </html>

@@ -108,7 +108,7 @@ public class DocenteController {
         try {
             docenteService.guardarDocente(docente);
         } catch (DataIntegrityViolationException ex) {
-            result.reject("error.general", "Ya existe un docente con este correo o cédula.");
+            result.reject("error.general", "Ya existe un USUARIO con este correo o cédula.");
             model.addAttribute("docente", docente);
             return "pages/Admin/docenteForm";
         }

@@ -48,6 +48,7 @@ public class Curso {
             joinColumns = @JoinColumn(name = "curso_id"),
             inverseJoinColumns = @JoinColumn(name = "materia_id")
     )
+    @Size(min = 1, message = "Debe seleccionar al menos una materia.")
     private List<Materia> materias;
 
     @ManyToMany(mappedBy = "cursos", fetch = FetchType.LAZY)

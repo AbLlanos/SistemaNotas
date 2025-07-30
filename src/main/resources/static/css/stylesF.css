@@ -86,3 +86,12 @@ textarea:focus {
   border-color: rgba(0, 0, 0, 0.7); /* borde negro un poco más oscuro al enfocar */
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.2); /* sombra suave */
 }
+
+
+
+    .error-message {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -661,7 +663,11 @@ private  NivelEducativoService nivelEducativoService;
 
 
 
-    public NotaCompletaDTO obtenerNotaCompletaPorId(Long idNota) {
+
+
+
+
+        public NotaCompletaDTO obtenerNotaCompletaPorId(Long idNota) {
         Notas nota = buscarNotaPorId(idNota);
         if (nota == null) {
             throw new RuntimeException("Nota no encontrada con id: " + idNota);
@@ -724,6 +730,9 @@ private  NivelEducativoService nivelEducativoService;
                         });
             }
         }
+
+
+
 
         return dto;
     }
@@ -1047,8 +1056,33 @@ private  NivelEducativoService nivelEducativoService;
             }
         }
 
+        for (NotaCompletaDTO dto : dtos) {
+            formatearDecimalesConComa(dto);
+        }
+
         return dtos;
     }
+
+
+    public void formatearDecimalesConComa(NotaCompletaDTO dto) {
+        char separadorDecimal = ',';
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setDecimalSeparator(separadorDecimal);
+        DecimalFormat formatoDecimal = new DecimalFormat("#0.00", symbols);
+        DecimalFormat formatoEntero = new DecimalFormat("#0", symbols);
+
+        // Notas numéricas
+        if (dto.getNotaNumericaPrimerTrim() != null)
+            dto.setNotaNumericaPrimerTrimFormateada(formatoDecimal.format(dto.getNotaNumericaPrimerTrim()));
+
+        if (dto.getNotaNumericaSegundoTrim() != null)
+            dto.setNotaNumericaSegundoTrimFormateada(formatoDecimal.format(dto.getNotaNumericaSegundoTrim()));
+
+        if (dto.getNotaNumericaTercerTrim() != null)
+            dto.setNotaNumericaTercerTrimFormateada(formatoDecimal.format(dto.getNotaNumericaTercerTrim()));
+
+    }
+
 
 
 
