@@ -44,13 +44,53 @@
     <div class="contact-info-section">
         <div class="contact-item">
             <i class="fas fa-phone-alt"></i>
-            <span>Soporte: 0931231312</span>
+            <span>Soporte: +593 95 899 3845</span>
         </div>
         <div class="contact-item">
             <i class="fas fa-envelope"></i>
-            <span>Email: juan@gmail.com</span>
+            <span>Email: aguapulema@itsqmet.edu.ec</span>
         </div>
     </div>
 </div>
 </body>
 </html>
+
+
+<!--
+
+create database Lincon;
+
+
+use Lincon;
+
+INSERT INTO usuario (nombre, apellido, email, password, rol, cedula, direccion, telefono, visible) VALUES
+('U.E Lincoln L. Benalcazar', ' ', '1234@gmail.com', '$2a$12$E2JTjF1u58CGJHx39Lh4P.hwTLXDGhbJLaQT4bX6Z9VljZwTpd1ny', 'ADMIN', '1102789034', "0987654321", 'Cdla. Las Flores',1);
+
+-- 3. Insertar nivel educativo
+INSERT INTO nivel_educativo (id, nombre) VALUES
+(1, 'Bachillerato General'),
+(2, 'Educacion Basica'),
+(3, 'Bachillerato Tecnico en Computacion'),
+(4, 'Educacion Inicial');
+
+INSERT INTO trimestre (id, nombre) VALUES
+(1, 'Primer Trimestre'),
+(2, 'Segundo Trimestre'),
+(3, 'Tercer Trimestre');
+
+SELECT * FROM nivel_educativo;
+SELECT * FROM usuario;
+SELECT * FROM admin;
+SELECT * FROM docente;
+SELECT * FROM estudiante;
+SELECT * FROM curso;
+SELECT * FROM estudiante_curso;
+SELECT * FROM materia;
+SELECT * FROM curso_materia;
+SELECT * FROM trimestre;
+SELECT * FROM periodo_academico;
+SELECT * FROM notas;
+SELECT * FROM asistencia;
+select * from comportamiento_curso_final;
+
+-->
