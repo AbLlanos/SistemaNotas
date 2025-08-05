@@ -134,7 +134,7 @@ public class EducacionInicialController {
         model.addAttribute("param", param);
         model.addAttribute("mostrarOcultos", mostrarOcultos);
 
-        return "pages/Admin/Inicial/educacionInicialVista";
+        return "pages/Admin/Inicial/educacionInicialVIsta";
     }
 
 
